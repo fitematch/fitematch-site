@@ -5,8 +5,8 @@ import { useEffect, useState } from "react";
 import menuData from "./menuData";
 
 const Header = () => {
-  const languageMenuItem = menuData.find((item) => item.title === "Linguas");
-  const navigationMenuItems = menuData.filter((item) => item.title !== "Linguas");
+  const languageMenuItem = menuData.find((item) => item.title === "Línguas");
+  const navigationMenuItems = menuData.filter((item) => item.title !== "Línguas");
   const availableLanguages = languageMenuItem?.submenu || [];
 
   // Navbar toggle

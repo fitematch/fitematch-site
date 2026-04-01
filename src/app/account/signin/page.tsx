@@ -135,7 +135,7 @@ export default function SignInPage() {
                   </div>
                 </form>
                 <p className="text-body-color text-center text-base font-medium">
-                  Ainda nao tem uma conta?{" "}
+                  Ainda não tem uma conta?{" "}
                   <Link
                     href="/account/signup"
                     className="text-primary hover:underline"

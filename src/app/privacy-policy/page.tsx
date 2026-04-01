@@ -17,7 +17,7 @@ export default function PrivacyPolicyPage() {
               Política de Privacidade
             </h1>
             <p className="text-body-color text-base leading-relaxed md:text-lg">
-              Esta sera a pagina com as diretrizes de coleta, tratamento,
+              Esta será a página com as diretrizes de coleta, tratamento,
               armazenamento e uso de dados pessoais de candidatos, recrutadores
               e empresas dentro da plataforma.
             </p>

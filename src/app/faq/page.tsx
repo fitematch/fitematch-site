@@ -17,7 +17,7 @@ export default function FaqPage() {
               Perguntas frequentes
             </h1>
             <p className="text-body-color text-base leading-relaxed md:text-lg">
-              Esta sera a pagina com respostas para as principais duvidas de
+              Esta será a página com respostas para as principais dúvidas de
               candidatos e recrutadores sobre cadastro, candidaturas, alertas,
               planos e funcionamento da plataforma.
             </p>

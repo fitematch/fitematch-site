@@ -41,7 +41,7 @@ export default async function JobDetailsPage({ params }: Readonly<JobDetailsPage
       <div className="container">
         <div className="mx-auto max-w-5xl">
           <Link
-            href="/#jobs"
+            href="/jobs"
             className="text-primary mb-6 inline-flex text-sm font-semibold hover:opacity-80"
           >
             Voltar para vagas

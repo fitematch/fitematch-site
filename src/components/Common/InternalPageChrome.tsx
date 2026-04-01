@@ -34,7 +34,7 @@ const getBreadcrumbContent = (pathname: string) => {
     return {
       pageName: "Login",
       description:
-        "Acesse sua conta para acompanhar vagas, candidaturas, alertas e comunicacoes da plataforma.",
+        "Acesse sua conta para acompanhar vagas, candidaturas, alertas e comunicações da plataforma.",
     };
   }
 
@@ -88,9 +88,9 @@ const getBreadcrumbContent = (pathname: string) => {
 
   if (pathname === "/pricing") {
     return {
-      pageName: "Precos",
+      pageName: "Preços",
       description:
-        "Conheca os planos para candidatos e recrutadores e escolha a melhor opcao.",
+        "Conheça os planos para candidatos e recrutadores e escolha a melhor opção.",
     };
   }
 
@@ -98,13 +98,13 @@ const getBreadcrumbContent = (pathname: string) => {
     return {
       pageName: "FAQ",
       description:
-        "Encontre respostas para as principais duvidas de candidatos e recrutadores sobre a plataforma.",
+        "Encontre respostas para as principais dúvidas de candidatos e recrutadores sobre a plataforma.",
     };
   }
 
   if (pathname === "/privacy-policy") {
     return {
-      pageName: "Politica de Privacidade",
+      pageName: "Política de Privacidade",
       description:
         "Consulte como a fitematch coleta, trata, armazena e protege os dados da plataforma.",
     };
@@ -114,7 +114,7 @@ const getBreadcrumbContent = (pathname: string) => {
     return {
       pageName: "Termos de Uso",
       description:
-        "Veja as regras, responsabilidades e condicoes para uso da plataforma fitematch.",
+        "Veja as regras, responsabilidades e condições para uso da plataforma fitematch.",
     };
   }
 

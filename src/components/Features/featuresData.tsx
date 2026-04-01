@@ -15,7 +15,7 @@ const featuresData: Feature[] = [
     ),
     title: "Cadastro simples",
     paragraph:
-      "Crie seu perfil em poucas etapas, com um fluxo objetivo para candidato e recrutador. Menos burocracia no cadastro significa mais velocidade para publicar vagas, completar informações e começar a gerar conexoes reais.",
+      "Crie seu perfil em poucas etapas, com um fluxo objetivo para candidatos e recrutadores. Menos burocracia no cadastro significa mais velocidade para publicar vagas, completar informações e começar a gerar conexões reais.",
   },
   {
     id: 2,
@@ -30,7 +30,7 @@ const featuresData: Feature[] = [
     ),
     title: "Buscas avançadas",
     paragraph:
-      "Encontre vagas especificas com filtros inteligentes por regiao, cidade, funcao, modalidade e perfil desejado. O sistema ajuda candidatos a localizar oportunidades mais aderentes e recrutadores a serem encontrados com mais precisao.",
+      "Encontre vagas específicas com filtros inteligentes por região, cidade, função, modalidade e perfil desejado. O sistema ajuda candidatos a localizar oportunidades mais aderentes e recrutadores a serem encontrados com mais precisão.",
   },
   {
     id: 3,
@@ -45,7 +45,7 @@ const featuresData: Feature[] = [
     ),
     title: "Sistema de match",
     paragraph:
-      "Nossa logica de match cruza experiencia, competencias, localizacao e objetivo profissional para aproximar as melhores oportunidades. A IA ainda valida informacoes-chave e pode pre-aprovar candidatos com maior aderencia antes da analise final.",
+      "Nossa lógica de match cruza experiência, competências, localização e objetivo profissional para aproximar as melhores oportunidades. A IA ainda valida informações-chave e pode pré-aprovar candidatos com maior aderência antes da análise final.",
   },
   {
     id: 4,
@@ -60,7 +60,7 @@ const featuresData: Feature[] = [
     ),
     title: "Sistema de alerta de vaga",
     paragraph:
-      "O candidato recebe alertas quando surgem novas vagas com o perfil desejado e tambem acompanha o status de cada candidatura. Assim, fica mais facil agir rapido, nao perder oportunidades e saber exatamente em que etapa esta.",
+      "O candidato recebe alertas quando surgem novas vagas com o perfil desejado e também acompanha o status de cada candidatura. Assim, fica mais fácil agir rápido, não perder oportunidades e saber exatamente em que etapa está.",
   },
   {
     id: 5,
@@ -75,7 +75,7 @@ const featuresData: Feature[] = [
     ),
     title: "Sistema de alerta de candidatos",
     paragraph:
-      "Recrutadores sao avisados quando novos candidatos se aplicam, quando perfis compatveis entram na plataforma ou quando uma vaga atinge um volume definido de interessados. Isso acelera triagem, priorizacao e tomada de decisao.",
+      "Recrutadores são avisados quando novos candidatos se aplicam, quando perfis compatíveis entram na plataforma ou quando uma vaga atinge um volume definido de interessados. Isso acelera a triagem, a priorização e a tomada de decisão.",
   },
   {
     id: 6,
@@ -91,8 +91,8 @@ const featuresData: Feature[] = [
     title: "Aplicativo Mobile",
     paragraph:
       <>
-        Tenha toda a experiencia da plataforma no celular, com navegacao simples
-        e acesso rapido a vagas, candidaturas, alertas e acompanhamento de
+        Tenha toda a experiência da plataforma no celular, com navegação simples
+        e acesso rápido a vagas, candidaturas, alertas e acompanhamento de
         processos. O app foi pensado para facilitar o uso no dia a dia tanto no{" "}
         <Link href="/download-app" className="text-primary hover:opacity-80">
           Android

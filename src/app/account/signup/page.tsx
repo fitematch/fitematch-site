@@ -66,19 +66,19 @@ export default function SignUpPage() {
                   className="shadow-submit flex w-full items-center justify-center gap-2 rounded-xs bg-black px-9 py-4 text-base font-medium text-white duration-300 hover:bg-gray-700"
                 >
                   <CandidateIcon />
-                  Criar candidato
+                  Criar conta de candidato
                 </Link>
                 <Link
                   href="/account/recruiter/register"
                   className="shadow-submit flex w-full items-center justify-center gap-2 rounded-xs bg-black px-9 py-4 text-base font-medium text-white duration-300 hover:bg-gray-700"
                 >
                   <RecruiterIcon />
-                  Criar recrutador
+                  Criar conta de recrutador
                 </Link>
               </div>
 
               <p className="text-body-color mt-8 text-center text-base font-medium">
-                Ja tem uma conta?{" "}
+                Já tem uma conta?{" "}
                 <Link href="/account/signin" className="text-primary hover:underline">
                   Entrar
                 </Link>

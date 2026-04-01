@@ -11,7 +11,7 @@ const Jobs = () => {
       <div className="container">
         <SectionTitle
           title="Vagas em destaque"
-          paragraph="Confirma algumas das vagas em destaque e se cadastre"
+          paragraph="Confira algumas das vagas em destaque e cadastre-se"
           center
         />
 

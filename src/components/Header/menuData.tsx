@@ -27,7 +27,7 @@ import { Menu } from "@/types/menu";
   },
   {
     id: 5,
-    title: "Linguas",
+    title: "Línguas",
     newTab: false,
     submenu: [
       {
@@ -44,7 +44,7 @@ import { Menu } from "@/types/menu";
       },
       {
         id: 8,
-        title: "🇺🇸 INGLES",
+        title: "🇺🇸 INGLÊS",
         path: "#",
         newTab: false,
       },

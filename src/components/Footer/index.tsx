@@ -175,7 +175,7 @@ const Footer = () => {
                       href="/privacy-policy"
                       className="mb-4 inline-block text-base text-body-color duration-300 hover:text-primary"
                     >
-                      Politica de Privacidade
+                      Política de Privacidade
                     </Link>
                   </li>
                   <li>
@@ -205,7 +205,8 @@ const Footer = () => {
               © {currentYear} fitematch - Todos os direitos reservados
             </p>
             <p className="text-center text-base text-body-color">
-              developer by <a
+              Desenvolvido por{" "}
+              <a
                 href="http://drowper.com"
                 target="_blank"
                 rel="noopener noreferrer"

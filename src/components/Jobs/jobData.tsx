@@ -10,14 +10,14 @@ const jobData: Job[] = [
     company: {
       name: "Company Name",
       image: "/images/jobs/default_company_logo.png",
-      designation: "Unidade Vila Olimpia",
+      designation: "Unidade Vila Olímpia",
     },
     tags: ["musculação"],
     publishDate: "01/01/2026",
   },
   {
     id: 2,
-    title: "Estágiario(a)",
+    title: "Estagiário(a)",
     paragraph:
       "Apoie a equipe de musculação na rotina da sala, atendimento aos alunos e desenvolvimento prático da carreira.",
     image: "/images/jobs/default_company_cover.png",
@@ -38,7 +38,7 @@ const jobData: Job[] = [
     company: {
       name: "Company Name",
       image: "/images/jobs/default_company_logo.png",
-      designation: "Unidade Alphavile",
+      designation: "Unidade Alphaville",
     },
     tags: ["natação"],
     publishDate: "01/01/2026",

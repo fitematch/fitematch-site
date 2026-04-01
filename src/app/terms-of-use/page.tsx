@@ -17,9 +17,9 @@ export default function TermsOfUsePage() {
               Termos de Uso
             </h1>
             <p className="text-body-color text-base leading-relaxed md:text-lg">
-              Esta sera a pagina com as regras de uso da plataforma, direitos,
-              responsabilidades, limites operacionais e condicoes para
-              candidatos e recrutadores utilizarem os servicos da fitematch.
+              Esta será a página com as regras de uso da plataforma, direitos,
+              responsabilidades, limites operacionais e condições para
+              candidatos e recrutadores utilizarem os serviços da fitematch.
             </p>
           </div>
         </div>
