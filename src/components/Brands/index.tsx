@@ -5,9 +5,9 @@ import brandsData from "./brandsData";
 const Brands = () => {
   return (
     <section className="w-full pt-16">
-      <div className="brands-marquee bg-gray-light">
-        <div className="brands-marquee__fade-left" />
-        <div className="brands-marquee__fade-right" />
+      <div className="brands-marquee bg-gray-300 bg-gray-400">
+        <div className="brands-marquee__fade-left bg-gray-400" />
+        <div className="brands-marquee__fade-right bg-gray-400" />
         <div className="brands-marquee__track">
           <div className="brands-marquee__group">
             {brandsData.map((brand) => (
