@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { CiTrash } from "react-icons/ci";
 
 import { getSessionsByUser } from "@/api/auth";
 import AccountMenu from "@/components/Common/AccountMenu";
@@ -242,13 +241,6 @@ export default function SecurityPage() {
             <div className="rounded-xs border border-gray-200 bg-gray-50 p-8 md:p-12">
               {renderSessionsContent()}
             </div>
-            <button
-              type="button"
-              className="flex w-full items-center justify-center gap-3 rounded-xs border border-gray-200 bg-white px-8 py-4 text-base font-medium text-black transition-colors duration-300 hover:bg-red-900 hover:text-[#FCFCFC]"
-            >
-              <CiTrash className="h-5 w-5 shrink-0" />
-              <span>Apagar meu historico de navegacao</span>
-            </button>
           </div>
         </div>
       </div>

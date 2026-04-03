@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { CiTrash } from "react-icons/ci";
 import { MdKeyboardDoubleArrowDown } from "react-icons/md";
 import AccountMenu from "@/components/Common/AccountMenu";
 
@@ -37,13 +36,6 @@ export default function MembershipPage() {
                 <MdKeyboardDoubleArrowDown className="h-5 w-5 shrink-0" />
               </Link>
             </div>
-            <button
-              type="button"
-              className="flex w-full items-center justify-center gap-3 rounded-xs border border-gray-200 bg-white px-8 py-4 text-base font-medium text-black transition-colors duration-300 hover:bg-red-900 hover:text-[#FCFCFC]"
-            >
-              <CiTrash className="h-5 w-5 shrink-0" />
-              <span>Cancelar minha assinatura</span>
-            </button>
           </div>
         </div>
       </div>
