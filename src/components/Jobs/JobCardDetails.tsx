@@ -1,9 +1,17 @@
 import { Job } from "@/interfaces/job.interface";
+import { AiOutlineLike } from "react-icons/ai";
 import { CiCirclePlus } from "react-icons/ci";
+import { FaMedal } from "react-icons/fa";
 import Image from "next/image";
 import Link from "next/link";
 
-const JobCardDetails = ({ job }: { job: Job }) => {
+const JobCardDetails = ({
+  job,
+  hasApplied = false,
+}: {
+  job: Job;
+  hasApplied?: boolean;
+}) => {
   const {
     id,
     title,
@@ -24,9 +32,10 @@ const JobCardDetails = ({ job }: { job: Job }) => {
     company.cover?.trim() || "/images/jobs/default_company_cover.png";
   const companyLogo =
     company.logo?.trim() || "/images/jobs/default_company_logo.png";
-  const detailsHref = `/job/${id || ""}/details`;
-  const formattedRole =
-    role.charAt(0).toUpperCase() + role.slice(1).toLowerCase();
+  const detailsHref = hasApplied
+    ? "/jobs/applications"
+    : `/job/${id || ""}/details`;
+  const jobDetailsHref = `/job/${id || ""}/details`;
   const locationCity = company.address?.city?.trim();
   const locationState = company.address?.state?.trim();
   const locationLabel = [locationCity, locationState].filter(Boolean).join(" - ");
@@ -39,16 +48,21 @@ const JobCardDetails = ({ job }: { job: Job }) => {
           className="relative block aspect-37/22 w-full"
         >
           <div className="absolute inset-0 z-10 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-          <div className="absolute top-6 right-6 z-20 flex flex-wrap justify-end gap-2">
+          <div className="absolute top-6 left-6 z-20 flex flex-wrap items-center gap-2">
             {showFeaturedBadge ? (
               <span className="bg-orange-900 inline-flex items-center justify-center rounded-full px-4 py-2 text-sm font-semibold text-white">
-                Destaque
+                <FaMedal className="text-base" />
               </span>
             ) : null}
-            <span className="bg-primary inline-flex items-center justify-center rounded-full px-4 py-2 text-sm font-semibold text-white">
-              {formattedRole}
-            </span>
           </div>
+          {hasApplied ? (
+            <div className="absolute top-6 right-6 z-20">
+              <p className="inline-flex items-center justify-center gap-2 rounded-full bg-blue-400 px-4 py-2 text-sm font-semibold text-blue-900 transition-colors hover:bg-gray-700 hover:text-gray-300">
+                <AiOutlineLike className="shrink-0 text-lg" />
+                <span>Voce ja se aplicou a esta vaga</span>
+              </p>
+            </div>
+          ) : null}
           <div className="absolute right-6 bottom-6 left-6 z-20">
             <h3 className="text-xl font-bold text-white sm:text-2xl">
               {title}
@@ -62,9 +76,13 @@ const JobCardDetails = ({ job }: { job: Job }) => {
           <Image src={coverImage} alt={title} fill className="object-cover" />
         </Link>
         <div className="p-6 sm:p-8 md:px-6 md:py-8 lg:p-8 xl:px-5 xl:py-8 2xl:p-8">
-          <p className="border-body-color/10 text-body-color mb-6 border-b pb-6 text-base font-medium">
-            {slotsLabel} disponiveis para esta vaga.
-          </p>
+          <div className="border-body-color/10 mb-6 border-b pb-6">
+            {!hasApplied ? (
+              <p className="text-body-color text-base font-medium">
+                {slotsLabel} disponiveis para esta vaga.
+              </p>
+            ) : null}
+          </div>
           <div className="flex items-center justify-between gap-4">
             <div className="border-body-color/10 flex flex-1 items-center border-r pr-5">
               <div className="mr-4">
@@ -85,7 +103,7 @@ const JobCardDetails = ({ job }: { job: Job }) => {
               </div>
             </div>
             <Link
-              href={detailsHref}
+              href={jobDetailsHref}
               className="inline-flex items-center gap-2 rounded-md bg-green-900 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-green-700"
             >
               <CiCirclePlus className="text-lg" />

@@ -112,6 +112,16 @@ function getOptionalValue(value: unknown) {
   return typeof value === "string" && value.trim() ? value : null;
 }
 
+function hasInformedValue(value: string | number | null | undefined) {
+  const displayValue = getDisplayValue(value);
+
+  return (
+    displayValue !== NOT_INFORMED_LABEL &&
+    displayValue !== "Nao informado" &&
+    displayValue !== "(XX) XXXXX-XXXX"
+  );
+}
+
 function buildSocialLink(baseUrl: string, value: string | null) {
   if (!value) {
     return null;
@@ -191,7 +201,7 @@ function SectionHeader({
   isCreate = false,
   onClick,
   title,
-}: SectionHeaderProps) {
+}: Readonly<SectionHeaderProps>) {
   const Icon = isCreate ? IoIosAddCircleOutline : CiEdit;
 
   return (
@@ -1448,12 +1458,14 @@ export default function ProfilePage() {
   const hasDocuments =
     identityDocument !== NOT_INFORMED_LABEL || socialDocument !== NOT_INFORMED_LABEL;
   const hasContacts =
-    phone !== NOT_INFORMED_LABEL ||
-    neighborhood !== NOT_INFORMED_LABEL ||
-    city !== NOT_INFORMED_LABEL ||
-    state !== NOT_INFORMED_LABEL ||
-    zipCode !== NOT_INFORMED_LABEL ||
-    addressLine !== `${NOT_INFORMED_LABEL}, ${NOT_INFORMED_LABEL} - ${NOT_INFORMED_LABEL}`;
+    hasInformedValue(user?.phone ?? tokenProfileData.phone) ||
+    hasInformedValue(user?.street ?? tokenProfileData.street) ||
+    hasInformedValue(user?.number ?? tokenProfileData.number) ||
+    hasInformedValue(user?.complement ?? tokenProfileData.complement) ||
+    hasInformedValue(user?.neighborhood ?? tokenProfileData.neighborhood) ||
+    hasInformedValue(user?.city ?? tokenProfileData.city) ||
+    hasInformedValue(user?.state ?? tokenProfileData.state) ||
+    hasInformedValue(user?.zipCode ?? tokenProfileData.zipCode);
   const hasSocialLinks = socialLinks.length > 0;
 
   return (

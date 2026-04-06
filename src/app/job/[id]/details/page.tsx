@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
+import { getAllApplies } from "@/api/apply.api";
 import { getJob } from "@/api/job.api";
 import Breadcrumb from "@/components/Common/Breadcrumb";
 import JobDetailsPageClient from "@/components/Jobs/JobDetailsPageClient";
@@ -51,11 +52,15 @@ export default async function JobDetailsPage({
   params,
 }: Readonly<JobDetailsPageProps>) {
   const { id } = await params;
-  const job = await readJobOrNull(id);
+  const [job, applies] = await Promise.all([
+    readJobOrNull(id),
+    getAllApplies(),
+  ]);
 
   if (!job) {
     notFound();
   }
+  const hasApplied = applies.some((apply) => apply.jobId === job.id);
   const locationLabel = [
     job.company.address?.city?.trim(),
     job.company.address?.state?.trim(),
@@ -69,7 +74,7 @@ export default async function JobDetailsPage({
         pageName={job.title}
         description={locationLabel || "Localização não informada"}
       />
-      <JobDetailsPageClient job={job} />
+      <JobDetailsPageClient job={job} hasApplied={hasApplied} />
     </>
   );
 }

@@ -103,7 +103,7 @@ export function RecruiterRegisterForm() {
         email: data.email,
         password: data.password,
         birthday: data.birthday,
-        status: "active",
+        status: "pending",
       });
 
       reset();

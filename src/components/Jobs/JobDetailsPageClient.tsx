@@ -1,14 +1,16 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useState } from "react";
+import { AiFillLike, AiOutlineLike } from "react-icons/ai";
 import {
+  CiCircleCheck,
   CiFacebook,
   CiInstagram,
   CiLinkedin,
-  CiTwitter,
 } from "react-icons/ci";
-import { FaCheck } from "react-icons/fa";
+import { FaXTwitter } from "react-icons/fa6";
 import { IoIosArrowDropleft } from "react-icons/io";
 
 import { Job } from "@/interfaces/job.interface";
@@ -16,7 +18,16 @@ import { Job } from "@/interfaces/job.interface";
 import JobApplicationFormModal from "./JobApplicationFormModal";
 
 function formatRole(role: string) {
-  return role.charAt(0).toUpperCase() + role.slice(1).toLowerCase();
+  switch (role.toLowerCase()) {
+    case "intern":
+      return "Estágio";
+    case "freelance":
+      return "Frrelancer";
+    case "contract":
+      return "Contrato";
+    default:
+      return role.charAt(0).toUpperCase() + role.slice(1).toLowerCase();
+  }
 }
 
 function formatPublishDate(createdAt?: Date) {
@@ -24,13 +35,19 @@ function formatPublishDate(createdAt?: Date) {
     return "";
   }
 
-  return new Date(createdAt).toLocaleString("pt-BR", {
+  const parsedDate = new Date(createdAt);
+  const formattedDate = parsedDate.toLocaleDateString("pt-BR", {
     day: "2-digit",
     month: "2-digit",
     year: "numeric",
+  });
+  const formattedTime = parsedDate.toLocaleTimeString("pt-BR", {
     hour: "2-digit",
     minute: "2-digit",
+    hour12: false,
   });
+
+  return `${formattedDate} as ${formattedTime}`;
 }
 
 function buildSocialLink(baseUrl: string, value?: string) {
@@ -45,8 +62,10 @@ function buildSocialLink(baseUrl: string, value?: string) {
 
 export default function JobDetailsPageClient({
   job,
+  hasApplied = false,
 }: Readonly<{
   job: Job;
+  hasApplied?: boolean;
 }>) {
   const [isApplicationModalOpen, setIsApplicationModalOpen] = useState(false);
   const coverImage =
@@ -82,36 +101,36 @@ export default function JobDetailsPageClient({
   const socialLinks = [
     {
       key: "instagram",
-      label: "Instagram",
       href: buildSocialLink(
         "https://www.instagram.com/",
         job.company.social?.instagram,
       ),
       icon: CiInstagram,
+      className: "hover:text-purple-700",
     },
     {
       key: "facebook",
-      label: "Facebook",
       href: buildSocialLink(
         "https://www.facebook.com/",
         job.company.social?.facebook,
       ),
       icon: CiFacebook,
+      className: "hover:text-blue-700",
     },
     {
       key: "twitter",
-      label: "Twitter",
       href: buildSocialLink("https://x.com/", job.company.social?.twitter),
-      icon: CiTwitter,
+      icon: FaXTwitter,
+      className: "hover:text-black",
     },
     {
       key: "linkedin",
-      label: "LinkedIn",
       href: buildSocialLink(
         "https://www.linkedin.com/in/",
         job.company.social?.linkedin,
       ),
       icon: CiLinkedin,
+      className: "hover:text-blue-700",
     },
   ].filter((item) => item.href);
 
@@ -130,6 +149,11 @@ export default function JobDetailsPageClient({
 
             <div className="overflow-hidden rounded-xs border border-gray-200 bg-white shadow-one">
               <div className="relative aspect-16/7 w-full bg-gray-100">
+                <div className="absolute top-6 left-6 z-10">
+                  <span className="bg-primary rounded-full px-4 py-2 text-sm font-semibold text-white capitalize">
+                    {formattedRole}
+                  </span>
+                </div>
                 <Image
                   src={coverImage}
                   alt={job.title}
@@ -141,31 +165,45 @@ export default function JobDetailsPageClient({
 
               <div className="p-8 md:p-10">
                 <div className="mb-6 flex flex-wrap items-center gap-3">
-                  <span className="bg-primary rounded-full px-4 py-2 text-sm font-semibold text-white capitalize">
-                    {formattedRole}
-                  </span>
                   <span className="text-body-color text-sm">
                     Publicada em {publishDate}
                   </span>
                 </div>
 
                 <h1 className="mb-4 text-3xl font-bold text-black md:text-4xl">
-                  {job.title}
+                  {job.company.name || "Empresa"} - {job.title}
                 </h1>
 
                 <div className="mb-8 space-y-2 text-base md:text-lg">
-                  <p className="text-body-color">
-                    {slotsLabel} disponíveis para esta vaga.
-                  </p>
+                  {hasApplied ? (
+                    <p className="flex w-full items-center gap-2 rounded-sm border border-green-600 bg-green-900 px-4 py-3 text-base font-medium text-green-100">
+                      <AiFillLike className="text-lg shrink-0" />
+                      <span>Voce ja se aplicou a esta vaga.</span>
+                    </p>
+                  ) : (
+                    <p className="text-body-color">
+                      {slotsLabel} disponíveis para esta vaga.
+                    </p>
+                  )}
                   {benefits.length > 0 ? (
                     <div className="text-body-color">
-                      <p>Benefícios:</p>
-                      <p>{benefits.join(", ")}</p>
+                      <p className="mb-3 font-semibold text-black">Benefícios:</p>
+                      <ol className="space-y-2">
+                        {benefits.map((benefit) => (
+                          <li
+                            key={benefit}
+                            className="flex items-center gap-2"
+                          >
+                            <CiCircleCheck className="text-lg shrink-0 text-green-900" />
+                            <span>{benefit}</span>
+                          </li>
+                        ))}
+                      </ol>
                     </div>
                   ) : null}
                 </div>
 
-                <div className="flex flex-col gap-6 rounded-xs bg-gray-50 p-6 md:flex-row md:items-center md:justify-between">
+                <div className="flex flex-col gap-6 rounded-xs bg-gray-100 p-6 md:flex-row md:items-end md:justify-between">
                   <div className="space-y-4">
                     <div className="flex items-center gap-4">
                       <div className="relative h-14 w-14 overflow-hidden rounded-full bg-white">
@@ -204,10 +242,10 @@ export default function JobDetailsPageClient({
                               href={socialLink.href!}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="inline-flex items-center gap-2 rounded-xs border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-black transition-colors hover:border-blue-900 hover:text-blue-900"
+                              aria-label={`${socialLink.key}-link`}
+                              className={`text-body-color inline-flex items-center justify-center rounded-xs border border-gray-200 bg-white p-2 transition-colors ${socialLink.className}`}
                             >
-                              <Icon className="text-lg" />
-                              {socialLink.label}
+                              <Icon className="text-[28px]" />
                             </a>
                           );
                         })}
@@ -215,14 +253,24 @@ export default function JobDetailsPageClient({
                     ) : null}
                   </div>
 
-                  <button
-                    type="button"
-                    onClick={() => setIsApplicationModalOpen(true)}
-                    className="inline-flex items-center justify-center gap-2 rounded-xs border border-green-900 bg-transparent px-6 py-3 text-sm font-semibold text-green-900 transition-colors hover:border-green-700 hover:bg-green-700 hover:text-white"
-                  >
-                    <FaCheck />
-                    Candidatar-se
-                  </button>
+                  {hasApplied ? (
+                    <Link
+                      href="/jobs/applications"
+                      className="inline-flex items-center justify-center gap-2 rounded-xs border border-green-900 bg-transparent px-6 py-3 text-sm font-semibold text-green-900 transition-colors hover:border-green-700 hover:bg-green-700 hover:text-white"
+                    >
+                      <AiOutlineLike className="text-lg" />
+                      Ver Aplicações
+                    </Link>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => setIsApplicationModalOpen(true)}
+                      className="inline-flex items-center justify-center gap-2 rounded-xs border border-green-900 bg-transparent px-6 py-3 text-sm font-semibold text-green-900 transition-colors hover:border-green-700 hover:bg-green-700 hover:text-white"
+                    >
+                      <AiOutlineLike className="text-lg" />
+                      Candidatar-se
+                    </button>
+                  )}
                 </div>
               </div>
             </div>

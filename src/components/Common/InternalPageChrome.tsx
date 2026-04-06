@@ -182,15 +182,6 @@ const getBreadcrumbContent = (pathname: string) => {
     };
   }
 
-  const jobApplyMatch = pathname.match(/^\/job\/([^/]+)\/apply$/);
-  if (jobApplyMatch) {
-    return {
-      pageName: "Candidatura",
-      description:
-        "Inicie seu cadastro para continuar a candidatura na vaga selecionada.",
-    };
-  }
-
   return null;
 };
 

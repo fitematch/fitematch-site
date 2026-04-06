@@ -21,7 +21,7 @@ type UserMutationPayload = {
     city?: string;
     complement?: string;
     isTelegram?: boolean;
-    isWhatsApp?: boolean;
+    isWhatsapp?: boolean;
     neighborhood?: string;
     number?: string | number;
     phone?: string;
@@ -48,6 +48,7 @@ type UserApiResponse = User & {
     complement?: string;
     isTelegram?: boolean;
     isWhatsApp?: boolean;
+    isWhatsapp?: boolean;
     neighborhood?: string;
     number?: string | number;
     phone?: string;
@@ -75,7 +76,7 @@ function buildUserMutationPayload(data: UpdateUserRequestInterface | CreateUserR
       city: data.city,
       complement: data.complement,
       isTelegram: data.isTelegram,
-      isWhatsApp: data.isWhatsApp,
+      isWhatsapp: data.isWhatsApp,
       neighborhood: data.neighborhood,
       number: data.number,
       phone: data.phone,
@@ -104,7 +105,7 @@ function normalizeUserResponse(data: UserApiResponse): User {
     complement: data.complement ?? data.details?.complement,
     identityDocument: data.identityDocument ?? data.documents?.identityDocument,
     isTelegram: data.isTelegram ?? data.details?.isTelegram,
-    isWhatsApp: data.isWhatsApp ?? data.details?.isWhatsApp,
+    isWhatsApp: data.isWhatsApp ?? data.details?.isWhatsApp ?? data.details?.isWhatsapp,
     neighborhood: data.neighborhood ?? data.details?.neighborhood,
     number: data.number ?? data.details?.number,
     phone: data.phone ?? data.details?.phone,

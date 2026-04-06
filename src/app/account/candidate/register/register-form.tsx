@@ -104,7 +104,7 @@ export function CandidateRegisterForm() {
         email: data.email,
         password: data.password,
         birthday: data.birthday,
-        status: "active",
+        status: "pending",
       });
 
       reset();

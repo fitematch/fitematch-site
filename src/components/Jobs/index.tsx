@@ -1,10 +1,17 @@
 import { getAllJobs } from "@/api/job.api";
+import { getAllApplies } from "@/api/apply.api";
 
 import SectionTitle from "../Common/SectionTitle";
 import JobCardDetails from "./JobCardDetails";
 
 const Jobs = async () => {
   const jobs = await getAllJobs();
+  const applies = await getAllApplies();
+  const appliedJobIds = new Set(
+    applies
+      .map((apply) => apply.jobId)
+      .filter((jobId): jobId is string => Boolean(jobId)),
+  );
   const activeJobs = jobs.filter((job) => job.status === "active");
   const isFeaturedJob = (value: boolean | undefined) => value === true;
   const featuredJobs = activeJobs.filter((job) =>
@@ -29,7 +36,10 @@ const Jobs = async () => {
         <div className="grid grid-cols-1 gap-x-8 gap-y-10 md:grid-cols-2 md:gap-x-6 lg:gap-x-8 xl:grid-cols-3">
           {featuredJobs.map((job) => (
             <div key={job.id} className="w-full">
-              <JobCardDetails job={job} />
+              <JobCardDetails
+                job={job}
+                hasApplied={job.id ? appliedJobIds.has(job.id) : false}
+              />
             </div>
           ))}
         </div>
@@ -40,7 +50,10 @@ const Jobs = async () => {
             <div className="grid grid-cols-1 gap-x-8 gap-y-10 md:grid-cols-2 md:gap-x-6 lg:gap-x-8 xl:grid-cols-3">
               {regularJobs.map((job) => (
                 <div key={job.id} className="w-full">
-                  <JobCardDetails job={job} />
+                  <JobCardDetails
+                    job={job}
+                    hasApplied={job.id ? appliedJobIds.has(job.id) : false}
+                  />
                 </div>
               ))}
             </div>
