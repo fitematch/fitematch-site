@@ -15,28 +15,41 @@ const accountMenuItems = [
     href: "/account/profile",
     label: "Perfil",
     icon: TbUserSquareRounded,
+    roles: ["candidate", "recruiter"],
   },
   {
     href: "/account/advertisement",
     label: "Anúncios",
     icon: GrNotes,
+    roles: ["recruiter"],
+  },
+  {
+    href: "/jobs/applications",
+    label: "Processos Seletivos",
+    icon: GrNotes,
+    roles: ["candidate"],
   },
   {
     href: "/account/membership",
     label: "Assinatura",
     icon: FaCreditCard,
+    roles: ["candidate", "recruiter"],
   },
   {
     href: "/account/security",
     label: "Segurança",
     icon: MdOutlineSecurity,
+    roles: ["candidate", "recruiter"],
   },
 ];
 
 export default function AccountMenu() {
-  const { accessToken, signOut } = useAuth();
+  const { accessToken, role, signOut } = useAuth();
   const pathname = usePathname();
   const router = useRouter();
+  const visibleMenuItems = accountMenuItems.filter((item) =>
+    role ? item.roles.includes(role) : false,
+  );
 
   const handleSignOut = async () => {
     if (!accessToken) {
@@ -74,7 +87,7 @@ export default function AccountMenu() {
       <aside className="rounded-xs border border-gray-200 bg-white p-6">
         <nav aria-label="Account navigation">
           <ul className="flex flex-col gap-4">
-            {accountMenuItems.map((item) => (
+            {visibleMenuItems.map((item) => (
               <li key={item.href}>
                 <Link
                   href={item.href}

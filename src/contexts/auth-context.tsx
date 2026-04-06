@@ -12,6 +12,7 @@ import {
 type AuthContextValue = {
   accessToken: string | null;
   isAuthenticated: boolean;
+  role: string | null;
   setAccessToken: (token: string | null) => void;
   signOut: () => void;
 };
@@ -71,6 +72,41 @@ function getServerSnapshot() {
   return DEFAULT_AUTH_STATE;
 }
 
+function decodeTokenPayload(token: string | null) {
+  if (!token || typeof window === "undefined") {
+    return null;
+  }
+
+  try {
+    const [, payload] = token.split(".");
+
+    if (!payload) {
+      return null;
+    }
+
+    const normalizedPayload = payload.replace(/-/g, "+").replace(/_/g, "/");
+    const paddedPayload = normalizedPayload.padEnd(
+      normalizedPayload.length + ((4 - (normalizedPayload.length % 4)) % 4),
+      "=",
+    );
+    const decodedPayload = window.atob(paddedPayload);
+
+    return JSON.parse(decodedPayload) as Record<string, unknown>;
+  } catch {
+    return null;
+  }
+}
+
+function getRoleFromToken(token: string | null) {
+  const payload = decodeTokenPayload(token);
+
+  if (!payload || typeof payload.role !== "string") {
+    return null;
+  }
+
+  return payload.role;
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const accessToken = useSyncExternalStore(
     subscribe,
@@ -110,6 +146,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     () => ({
       accessToken,
       isAuthenticated: normalizeAccessToken(accessToken) !== DEFAULT_AUTH_STATE,
+      role: getRoleFromToken(accessToken),
       setAccessToken,
       signOut,
     }),

@@ -17,7 +17,7 @@ export default function AuthRouteGuard({
 }: {
   children: ReactNode;
 }) {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, role } = useAuth();
   const pathname = usePathname();
   const router = useRouter();
 
@@ -25,6 +25,7 @@ export default function AuthRouteGuard({
     const isGuestOnlyPath = GUEST_ONLY_PATHS.has(pathname);
     const isAccountPath = pathname === "/account" || pathname.startsWith("/account/");
     const isProtectedAccountPath = isAccountPath && !isGuestOnlyPath;
+    const isCandidateApplicationsPath = pathname === "/jobs/applications";
 
     if (isAuthenticated && GUEST_ONLY_PATHS.has(pathname)) {
       router.replace("/");
@@ -35,8 +36,26 @@ export default function AuthRouteGuard({
     if (!isAuthenticated && isProtectedAccountPath) {
       router.replace("/");
       router.refresh();
+      return;
     }
-  }, [isAuthenticated, pathname, router]);
+
+    if (!isAuthenticated && isCandidateApplicationsPath) {
+      router.replace("/");
+      router.refresh();
+      return;
+    }
+
+    if (pathname === "/account/advertisement" && role && role !== "recruiter") {
+      router.replace("/jobs/applications");
+      router.refresh();
+      return;
+    }
+
+    if (pathname === "/jobs/applications" && role && role !== "candidate") {
+      router.replace("/account/advertisement");
+      router.refresh();
+    }
+  }, [isAuthenticated, pathname, role, router]);
 
   return children;
 }

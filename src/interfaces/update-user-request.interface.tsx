@@ -1,10 +1,3 @@
-export interface UpdateUserRequestInterface {
-  role: string;
-  username: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  password: string;
-  birthday: string;
-  status: string;
-}
+import { User } from "@/interfaces/user.interface";
+
+export type UpdateUserRequestInterface = Omit<User, "id" | "createdAt" | "updatedAt">;

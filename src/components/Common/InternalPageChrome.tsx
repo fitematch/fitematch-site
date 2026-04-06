@@ -109,6 +109,14 @@ const getBreadcrumbContent = (pathname: string) => {
     };
   }
 
+  if (pathname === "/jobs/applications") {
+    return {
+      pageName: "Processos Seletivos",
+      description:
+        "Acompanhe seus processos seletivos e gerencie suas candidaturas.",
+    };
+  }
+
   if (pathname === "/account/membership") {
     return {
       pageName: "Assinatura",
@@ -171,6 +179,15 @@ const getBreadcrumbContent = (pathname: string) => {
       pageName: "Detalhes da Vaga",
       description:
         "Confira os detalhes da vaga e avance para a candidatura.",
+    };
+  }
+
+  const jobApplyMatch = pathname.match(/^\/job\/([^/]+)\/apply$/);
+  if (jobApplyMatch) {
+    return {
+      pageName: "Candidatura",
+      description:
+        "Inicie seu cadastro para continuar a candidatura na vaga selecionada.",
     };
   }
 
