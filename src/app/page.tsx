@@ -15,7 +15,7 @@ export default function Home() {
       <ScrollUp />
       <HeroSwitch />
       <Features />
-      <Jobs />
+      <Jobs showRegularJobs={false} />
     </>
   );
 }

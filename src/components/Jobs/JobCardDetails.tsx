@@ -1,5 +1,4 @@
 import { Job } from "@/interfaces/job.interface";
-import { AiOutlineLike } from "react-icons/ai";
 import { CiCirclePlus } from "react-icons/ci";
 import { FaMedal } from "react-icons/fa";
 import Image from "next/image";
@@ -27,7 +26,7 @@ const JobCardDetails = ({
     month: "2-digit",
     year: "2-digit",
   });
-  const slotsLabel = `${slots} ${slots === 1 ? "vaga" : "vagas"}`;
+  const slotsLabel = `${slots} ${slots === 1 ? "vaga disponível" : "vagas disponíveis"}`;
   const coverImage =
     company.cover?.trim() || "/images/jobs/default_company_cover.png";
   const companyLogo =
@@ -55,14 +54,6 @@ const JobCardDetails = ({
               </span>
             ) : null}
           </div>
-          {hasApplied ? (
-            <div className="absolute top-6 right-6 z-20">
-              <p className="inline-flex items-center justify-center gap-2 rounded-full bg-blue-400 px-4 py-2 text-sm font-semibold text-blue-900 transition-colors hover:bg-gray-700 hover:text-gray-300">
-                <AiOutlineLike className="shrink-0 text-lg" />
-                <span>Voce ja se aplicou a esta vaga</span>
-              </p>
-            </div>
-          ) : null}
           <div className="absolute right-6 bottom-6 left-6 z-20">
             <h3 className="text-xl font-bold text-white sm:text-2xl">
               {title}
@@ -77,11 +68,15 @@ const JobCardDetails = ({
         </Link>
         <div className="p-6 sm:p-8 md:px-6 md:py-8 lg:p-8 xl:px-5 xl:py-8 2xl:p-8">
           <div className="border-body-color/10 mb-6 border-b pb-6">
-            {!hasApplied ? (
-              <p className="text-body-color text-base font-medium">
-                {slotsLabel} disponiveis para esta vaga.
+            {hasApplied ? (
+              <p className="text-body-color text-base font-bold uppercase">
+                Você já se aplicou a esta vaga
               </p>
-            ) : null}
+            ) : (
+              <p className="text-body-color text-base font-bold uppercase">
+                {slotsLabel}
+              </p>
+            )}
           </div>
           <div className="flex items-center justify-between gap-4">
             <div className="border-body-color/10 flex flex-1 items-center border-r pr-5">
