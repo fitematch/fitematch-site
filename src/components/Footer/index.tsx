@@ -7,10 +7,14 @@ import {
   CiYoutube,
 } from "react-icons/ci";
 import { FaXTwitter } from "react-icons/fa6";
+import { useDictionary, useLocale } from "@/contexts/locale-context";
+import { localizePath } from "@/i18n/config";
 
 const currentYear = new Date(Date.now()).getFullYear();
 
 const Footer = () => {
+  const dictionary = useDictionary();
+  const locale = useLocale();
   return (
     <footer className="relative z-10 bg-white pt-16 md:pt-20 lg:pt-24">
         <div className="container">
@@ -18,13 +22,17 @@ const Footer = () => {
             <div className="w-full px-4 md:w-1/2 lg:w-4/12 xl:w-5/12">
               <div className="mb-12 max-w-[360px] lg:mb-16">
                 <Link
-                  href="/"
+                  href={localizePath("/", locale)}
                   className="mb-8 inline-block text-2xl font-bold tracking-tight text-gray-800 transition-colors hover:text-gray-600"
                 >
                   fitematch
                 </Link>
                 <p className="mb-9 text-base leading-relaxed text-gray-600">
-                  Você pode nos encontrar em alguns canais:
+                  {locale === "pt"
+                    ? "Você pode nos encontrar em alguns canais:"
+                    : locale === "es"
+                      ? "Puedes encontrarnos en algunos canales:"
+                      : "You can find us on some channels:"}
                 </p>
                 <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
                   <a
@@ -85,31 +93,31 @@ const Footer = () => {
             <div className="w-full px-4 md:w-1/2 lg:w-4/12 xl:w-3/12">
               <div className="mb-12 lg:mb-16">
                 <h2 className="mb-10 text-xl font-bold text-gray-800">
-                  Suporte & Ajuda
+                  {dictionary.common.supportHelp}
                 </h2>
                 <ul>
                   <li>
                     <Link
-                      href="/privacy-policy"
+                      href={localizePath("/privacy-policy", locale)}
                       className="mb-4 inline-block text-base text-gray-600 duration-300 hover:text-gray-600"
                     >
-                      Política de Privacidade
+                      {dictionary.common.privacyPolicy}
                     </Link>
                   </li>
                   <li>
                     <Link
-                      href="/terms-of-use"
+                      href={localizePath("/terms-of-use", locale)}
                       className="mb-4 inline-block text-base text-gray-600 duration-300 hover:text-gray-600"
                     >
-                      Termos de Uso
+                      {dictionary.common.termsOfUse}
                     </Link>
                   </li>
                   <li>
                     <Link
-                      href="/faq"
+                      href={localizePath("/faq", locale)}
                       className="mb-4 inline-block text-base text-gray-600 duration-300 hover:text-gray-600"
                     >
-                      FAQ
+                      {dictionary.common.faq}
                     </Link>
                   </li>
                 </ul>
@@ -120,10 +128,10 @@ const Footer = () => {
           <div className="h-px w-full bg-linear-to-r from-transparent via-[#D2D8E183] to-transparent"></div>
           <div className="py-8">
             <p className="text-center text-base text-gray-600">
-              © {currentYear} fitematch - Todos os direitos reservados
+              © {currentYear} fitematch - {dictionary.common.allRightsReserved}
             </p>
             <p className="text-center text-base text-gray-600">
-              Desenvolvido por{" "}
+              {dictionary.common.developedBy}{" "}
               <a
                 href="http://drowper.com"
                 target="_blank"

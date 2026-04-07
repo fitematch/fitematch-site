@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import { AiFillLike, AiOutlineLike } from "react-icons/ai";
@@ -13,28 +12,12 @@ import {
 import { FaXTwitter } from "react-icons/fa6";
 import { IoIosArrowDropleft } from "react-icons/io";
 
+import { useDictionary, useLocale } from "@/contexts/locale-context";
+import { localizePath } from "@/i18n/config";
 import { Job } from "@/interfaces/job.interface";
 
 import JobApplicationFormModal from "./JobApplicationFormModal";
-
-function getCompanyInitials(name?: string) {
-  const normalizedName = name?.trim();
-
-  if (!normalizedName) {
-    return "EM";
-  }
-
-  const words = normalizedName.split(/\s+/).filter(Boolean);
-
-  if (words.length === 1) {
-    return words[0].slice(0, 2).toUpperCase();
-  }
-
-  return words
-    .slice(0, 2)
-    .map((word) => word.charAt(0).toUpperCase())
-    .join("");
-}
+import CompanyAvatar, { resolveCompanyAssetUrl } from "./CompanyAvatar";
 
 function formatRole(role: string) {
   switch (role.toLowerCase()) {
@@ -88,11 +71,16 @@ export default function JobDetailsPageClient({
   job: Job;
   hasApplied?: boolean;
 }>) {
+  const dictionary = useDictionary();
+  const locale = useLocale();
   const [isApplicationModalOpen, setIsApplicationModalOpen] = useState(false);
   const coverImage =
-    job.company.cover?.trim() || "/images/jobs/default_company_cover.png";
-  const companyInitials = getCompanyInitials(job.company.name);
-  const formattedRole = formatRole(job.role);
+    resolveCompanyAssetUrl(job.cover) ||
+    "/images/jobs/default_company_cover.png";
+  const formattedRole =
+    dictionary.jobs.roleLabels[
+      job.role as keyof typeof dictionary.jobs.roleLabels
+    ] ?? formatRole(job.role);
   const publishDate = formatPublishDate(job.createdAt);
   const locationLabel = [
     job.company.address?.city?.trim(),
@@ -109,9 +97,13 @@ export default function JobDetailsPageClient({
   ]
     .filter(Boolean)
     .join(" - ");
-  const slotsLabel = `${job.slots} ${job.slots === 1 ? "vaga" : "vagas"}`;
+  const slotsLabel = `${job.slots} ${
+    job.slots === 1 ? dictionary.jobs.slotsAvailable : dictionary.jobs.slotsAvailablePlural
+  }`;
   const benefits = [
-    job.benefits.salary ? `Salário: R$ ${job.benefits.salary}` : null,
+    job.benefits.salary
+      ? `${locale === "en" ? "Salary" : locale === "es" ? "Salario" : "Salário"}: R$ ${job.benefits.salary}`
+      : null,
     job.benefits.transportation ? "Vale Transporte" : null,
     job.benefits.alimentation ? "Vale Alimentação/Refeição" : null,
     job.benefits.health ? "Plano de Saúde" : null,
@@ -160,11 +152,11 @@ export default function JobDetailsPageClient({
         <div className="container">
           <div className="mx-auto max-w-5xl">
             <a
-              href="/jobs"
+              href={localizePath("/jobs", locale)}
               className="mb-8 inline-flex items-center gap-2 rounded-md border border-blue-900 bg-gray-light px-4 py-2 text-sm font-semibold text-blue-900 transition-colors hover:border-blue-900 hover:bg-blue-900 hover:text-white"
             >
               <IoIosArrowDropleft className="text-lg" />
-              Voltar para vagas
+              {dictionary.jobs.backToJobs}
             </a>
 
             <div className="overflow-hidden rounded-xs border border-gray-200 bg-white shadow-one">
@@ -174,19 +166,17 @@ export default function JobDetailsPageClient({
                     {formattedRole}
                   </span>
                 </div>
-                <Image
+                <img
                   src={coverImage}
                   alt={job.title}
-                  fill
-                  className="object-cover"
-                  priority
+                  className="h-full w-full object-cover"
                 />
               </div>
 
               <div className="p-8 md:p-10">
                 <div className="mb-6 flex flex-wrap items-center gap-3">
                   <span className="text-body-color text-sm">
-                    Publicada em {publishDate}
+                    {dictionary.jobs.publishedOn} {publishDate}
                   </span>
                 </div>
 
@@ -198,16 +188,16 @@ export default function JobDetailsPageClient({
                   {hasApplied ? (
                     <p className="flex w-full items-center gap-2 rounded-sm border border-green-600 bg-green-900 px-4 py-3 text-base font-medium text-green-100">
                       <AiFillLike className="text-lg shrink-0" />
-                      <span>Voce ja se aplicou a esta vaga.</span>
+                      <span>{dictionary.jobs.appliedMessage}</span>
                     </p>
                   ) : (
                     <p className="text-body-color">
-                      {slotsLabel} disponíveis para esta vaga.
+                      {slotsLabel} {dictionary.jobs.availableForJob}
                     </p>
                   )}
                   {benefits.length > 0 ? (
                     <div className="text-body-color">
-                      <p className="mb-3 font-semibold text-black">Benefícios:</p>
+                      <p className="mb-3 font-semibold text-black">{dictionary.jobs.benefits}</p>
                       <ol className="space-y-2">
                         {benefits.map((benefit) => (
                           <li
@@ -226,9 +216,12 @@ export default function JobDetailsPageClient({
                 <div className="flex flex-col gap-6 rounded-xs bg-gray-100 p-6 md:flex-row md:items-end md:justify-between">
                   <div className="space-y-4">
                     <div className="flex items-center gap-4">
-                      <div className="flex h-14 w-14 items-center justify-center rounded-full bg-black text-lg font-bold uppercase text-white">
-                        {companyInitials}
-                      </div>
+                      <CompanyAvatar
+                        logo={job.company.logo}
+                        name={job.company.name}
+                        sizeClassName="h-14 w-14"
+                        textClassName="text-lg"
+                      />
                       <div>
                         <p className="text-black text-base font-semibold">
                           {job.company.name || "Empresa"}

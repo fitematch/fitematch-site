@@ -1,4 +1,8 @@
+"use client";
+
 import Link from "next/link";
+import { useDictionary, useLocale } from "@/contexts/locale-context";
+import { localizePath } from "@/i18n/config";
 
 const CandidateIcon = () => (
   <svg
@@ -41,6 +45,9 @@ const RecruiterIcon = () => (
 );
 
 const HeroLogged = () => {
+  const dictionary = useDictionary();
+  const locale = useLocale();
+
   return (
     <section
       id="home"
@@ -51,26 +58,25 @@ const HeroLogged = () => {
           <div className="w-full px-4">
             <div className="mx-auto max-w-[800px] text-center">
               <h1 className="mb-5 text-3xl font-bold leading-tight text-black sm:text-4xl sm:leading-tight md:text-5xl md:leading-tight">
-                Sua vaga ou candidato estão aqui!
+                {dictionary.hero.title}
               </h1>
               <p className="mb-12 text-base leading-relaxed! text-body-color sm:text-lg md:text-xl">
-                Continue navegando pela plataforma para encontrar vagas ou criar
-                novos anuncios.
+                {dictionary.hero.loggedSubtitle}
               </p>
               <div className="flex flex-col items-center justify-center space-y-4 sm:flex-row sm:space-x-4 sm:space-y-0">
                 <Link
-                  href="/jobs"
+                  href={localizePath("/jobs", locale)}
                   className="inline-flex items-center gap-2 rounded-xs bg-black px-8 py-4 text-base font-semibold text-white duration-300 ease-in-out hover:bg-gray-700"
                 >
                   <CandidateIcon />
-                  Buscar Vagas
+                  {dictionary.common.searchJobs}
                 </Link>
                 <Link
-                  href="/account/advertisement"
+                  href={localizePath("/account/advertisement", locale)}
                   className="inline-flex items-center gap-2 rounded-xs bg-black px-8 py-4 text-base font-semibold text-white duration-300 ease-in-out hover:bg-gray-700"
                 >
                   <RecruiterIcon />
-                  Criar Anuncio
+                  {dictionary.common.createAdvertisement}
                 </Link>
               </div>
             </div>

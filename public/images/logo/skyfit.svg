@@ -1,0 +1,16 @@
+<svg width="40" height="40" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+  <rect width="40" height="40" fill="none"></rect>
+
+  <!-- Texto "sky" -->
+  <text x="20" y="16" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="10" fill="#5EC1F3">
+    sky
+  </text>
+
+  <!-- Texto "fit" -->
+  <text x="20" y="28" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="bold" fill="#1E3A8A">
+    fit
+  </text>
+
+  <!-- Arco superior -->
+  <path d="M6 12 Q20 2 34 12" stroke="#5EC1F3" stroke-width="2" fill="none" stroke-linecap="round"></path>
+</svg>

@@ -1,0 +1,16 @@
+<svg width="40" height="40" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+  <rect width="40" height="40" fill="none"></rect>
+
+  <!-- Texto "tec" -->
+  <text x="20" y="16" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="9" fill="#111111" letter-spacing="1">
+    tec
+  </text>
+
+  <!-- Texto "fit" -->
+  <text x="20" y="28" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="bold" fill="#00AEEF">
+    fit
+  </text>
+
+  <!-- Linha tecnológica -->
+  <path d="M6 30 L14 30 L16 26 L20 34 L24 26 L26 30 L34 30" stroke="#00AEEF" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>

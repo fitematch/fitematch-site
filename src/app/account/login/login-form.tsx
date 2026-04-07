@@ -6,6 +6,8 @@ import { useForm } from "react-hook-form";
 import { MdLogin } from "react-icons/md";
 
 import { login } from "@/api/auth.api";
+import { useLocale } from "@/contexts/locale-context";
+import { localizePath } from "@/i18n/config";
 import { useAuth } from "@/contexts/auth-context";
 import {
   buildAuthClientContext,
@@ -30,6 +32,7 @@ const inputErrorClassName = "border-red-500 focus:border-red-500";
 
 export function LoginForm() {
   const { setAccessToken } = useAuth();
+  const locale = useLocale();
   const {
     register,
     handleSubmit,
@@ -231,7 +234,7 @@ export function LoginForm() {
               <p className="text-body-color text-center text-base font-medium">
                 Ainda não tem uma conta?{" "}
                 <Link
-                  href="/account/signup"
+                  href={localizePath("/account/signup", locale)}
                   className="text-primary hover:underline"
                 >
                   Criar conta

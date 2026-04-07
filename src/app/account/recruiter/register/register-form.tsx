@@ -7,6 +7,8 @@ import { useForm, useWatch } from "react-hook-form";
 import { FaUserPlus } from "react-icons/fa";
 
 import { createUser } from "@/api/user.api";
+import { useLocale } from "@/contexts/locale-context";
+import { localizePath } from "@/i18n/config";
 
 type RecruiterRegisterFormData = {
   firstName: string;
@@ -54,6 +56,7 @@ function validateBirthday(value: string) {
 
 export function RecruiterRegisterForm() {
   const router = useRouter();
+  const locale = useLocale();
   const {
     control,
     register,
@@ -86,12 +89,12 @@ export function RecruiterRegisterForm() {
       setFeedback(null);
 
       if (feedback.type === "success") {
-        router.push("/account/login");
+        router.push(localizePath("/account/login", locale));
       }
     }, 5000);
 
     return () => window.clearTimeout(timeoutId);
-  }, [feedback, router]);
+  }, [feedback, locale, router]);
 
   const onSubmit = async (data: RecruiterRegisterFormData) => {
     try {
@@ -303,7 +306,7 @@ export function RecruiterRegisterForm() {
                     <span>
                       Li e aceito{" "}
                       <Link
-                        href="/terms-of-use"
+                        href={localizePath("/terms-of-use", locale)}
                         className="text-primary hover:underline"
                       >
                         Termos de Uso
@@ -323,7 +326,7 @@ export function RecruiterRegisterForm() {
                     <span>
                       Li e aceito a{" "}
                       <Link
-                        href="/privacy-policy"
+                        href={localizePath("/privacy-policy", locale)}
                         className="text-primary hover:underline"
                       >
                         Política de Privacidade
@@ -344,7 +347,7 @@ export function RecruiterRegisterForm() {
               </form>
               <p className="text-body-color text-center text-base font-medium">
                 Já tem uma conta?{" "}
-                <Link href="/account/login" className="text-primary hover:underline">
+                <Link href={localizePath("/account/login", locale)} className="text-primary hover:underline">
                   Entrar
                 </Link>
               </p>

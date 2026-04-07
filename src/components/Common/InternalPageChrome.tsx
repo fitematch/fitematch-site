@@ -3,6 +3,7 @@
 import { usePathname } from "next/navigation";
 
 import Breadcrumb from "@/components/Common/Breadcrumb";
+import { useDictionary, useLocale } from "@/contexts/locale-context";
 
 const Star = ({
   className,
@@ -28,7 +29,11 @@ const Star = ({
   </span>
 );
 
-const getBreadcrumbContent = (pathname: string) => {
+const getBreadcrumbContent = (
+  pathname: string,
+  dictionary: ReturnType<typeof useDictionary>,
+  locale: ReturnType<typeof useLocale>,
+) => {
   if (pathname === "/account/login") {
     return {
       pageName: "Login",
@@ -135,33 +140,49 @@ const getBreadcrumbContent = (pathname: string) => {
 
   if (pathname === "/jobs") {
     return {
-      pageName: "Vagas",
+      pageName: dictionary.common.jobs,
       description:
-        "Explore oportunidades para diferentes perfis, modalidades e unidades.",
+        locale === "es"
+          ? "Explora oportunidades para diferentes perfiles, modalidades y unidades."
+          : locale === "en"
+            ? "Explore opportunities for different profiles, formats and units."
+            : "Explore oportunidades para diferentes perfis, modalidades e unidades.",
     };
   }
 
   if (pathname === "/faq") {
     return {
-      pageName: "FAQ",
+      pageName: dictionary.common.faq,
       description:
-        "Encontre respostas para as principais dúvidas de candidatos e recrutadores sobre a plataforma.",
+        locale === "es"
+          ? "Encuentra respuestas a las principales dudas de candidatos y reclutadores sobre la plataforma."
+          : locale === "en"
+            ? "Find answers to the main questions from candidates and recruiters about the platform."
+            : "Encontre respostas para as principais dúvidas de candidatos e recrutadores sobre a plataforma.",
     };
   }
 
   if (pathname === "/privacy-policy") {
     return {
-      pageName: "Política de Privacidade",
+      pageName: dictionary.common.privacyPolicy,
       description:
-        "Consulte como a fitematch coleta, trata, armazena e protege os dados da plataforma.",
+        locale === "es"
+          ? "Consulta cómo fitematch recopila, trata, almacena y protege los datos de la plataforma."
+          : locale === "en"
+            ? "See how fitematch collects, processes, stores and protects platform data."
+            : "Consulte como a fitematch coleta, trata, armazena e protege os dados da plataforma.",
     };
   }
 
   if (pathname === "/terms-of-use") {
     return {
-      pageName: "Termos de Uso",
+      pageName: dictionary.common.termsOfUse,
       description:
-        "Veja as regras, responsabilidades e condições para uso da plataforma fitematch.",
+        locale === "es"
+          ? "Consulta las reglas, responsabilidades y condiciones para usar la plataforma fitematch."
+          : locale === "en"
+            ? "See the rules, responsibilities and conditions for using the fitematch platform."
+            : "Veja as regras, responsabilidades e condições para uso da plataforma fitematch.",
     };
   }
 
@@ -178,13 +199,15 @@ const getBreadcrumbContent = (pathname: string) => {
 };
 
 export default function InternalPageChrome() {
-  const pathname = usePathname();
+  const dictionary = useDictionary();
+  const locale = useLocale();
+  const pathname = usePathname().replace(/^\/(pt|es|en)(?=\/|$)/, "") || "/";
 
   if (pathname === "/" || /^\/job\/[^/]+\/details$/.test(pathname)) {
     return null;
   }
 
-  const breadcrumb = getBreadcrumbContent(pathname);
+  const breadcrumb = getBreadcrumbContent(pathname, dictionary, locale);
 
   return (
     <>

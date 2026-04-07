@@ -1,9 +1,7 @@
-import InternalPageChrome from "@/components/Common/InternalPageChrome";
-import AuthRouteGuard from "@/components/Common/AuthRouteGuard";
-import Footer from "@/components/Footer";
-import Header from "@/components/Header";
-import ScrollToTop from "@/components/ScrollToTop";
+import { LocaleProvider } from "@/contexts/locale-context";
 import { AuthProvider } from "@/contexts/auth-context";
+import { defaultLocale } from "@/i18n/config";
+import { getDictionary } from "@/i18n/dictionaries";
 import "../styles/index.css";
 
 export default function RootLayout({
@@ -12,19 +10,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="pt-BR">
+    <html lang="pt">
       <body className="bg-[#FCFCFC]">
-        <AuthProvider>
-          <AuthRouteGuard>
-            <div className="isolate">
-              <Header />
-              <InternalPageChrome />
-              {children}
-              <Footer />
-            </div>
-            <ScrollToTop />
-          </AuthRouteGuard>
-        </AuthProvider>
+        <LocaleProvider
+          locale={defaultLocale}
+          dictionary={getDictionary(defaultLocale)}
+        >
+          <AuthProvider>{children}</AuthProvider>
+        </LocaleProvider>
       </body>
     </html>
   );

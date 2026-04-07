@@ -1,13 +1,17 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { FaUserGraduate, FaUserTie } from "react-icons/fa6";
+import { getCurrentLocale } from "@/i18n/server";
+import { localizePath } from "@/i18n/config";
 
 export const metadata: Metadata = {
   title: "fitematch | Criar Conta",
   description: "Crie sua conta na fitematch.",
 };
 
-export default function SignUpPage() {
+export default async function SignUpPage() {
+  const locale = await getCurrentLocale();
+
   return (
     <section className="relative z-10 overflow-hidden pt-8 pb-16 md:pb-20 lg:pb-28">
       <div className="container">
@@ -23,14 +27,14 @@ export default function SignUpPage() {
 
               <div className="flex flex-col gap-4">
                 <Link
-                  href="/account/candidate/register"
+                  href={localizePath("/account/candidate/register", locale)}
                   className="shadow-submit flex w-full items-center justify-center gap-2 rounded-xs bg-green-900 px-9 py-4 text-base font-medium text-white duration-300 hover:bg-green-600"
                 >
                   <FaUserGraduate className="h-[1.1em] w-[1.1em] shrink-0" />
                   Criar conta de candidato
                 </Link>
                 <Link
-                  href="/account/recruiter/register"
+                  href={localizePath("/account/recruiter/register", locale)}
                   className="shadow-submit flex w-full items-center justify-center gap-2 rounded-xs bg-green-900 px-9 py-4 text-base font-medium text-white duration-300 hover:bg-green-600"
                 >
                   <FaUserTie className="h-[1.1em] w-[1.1em] shrink-0" />
@@ -40,7 +44,7 @@ export default function SignUpPage() {
 
               <p className="text-body-color mt-8 text-center text-base font-medium">
                 Já tem uma conta?{" "}
-                <Link href="/account/login" className="text-primary hover:underline">
+                <Link href={localizePath("/account/login", locale)} className="text-primary hover:underline">
                   Entrar
                 </Link>
               </p>

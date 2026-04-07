@@ -1,4 +1,8 @@
+"use client";
+
 import Link from "next/link";
+import { useDictionary, useLocale } from "@/contexts/locale-context";
+import { localizePath } from "@/i18n/config";
 
 type BreadcrumbProps = {
   pageName: string;
@@ -6,6 +10,9 @@ type BreadcrumbProps = {
 };
 
 const Breadcrumb = ({ pageName, description }: BreadcrumbProps) => {
+  const dictionary = useDictionary();
+  const locale = useLocale();
+
   return (
     <section className="relative z-10 overflow-hidden pt-28 lg:pt-[150px]">
       <div className="container">
@@ -25,10 +32,10 @@ const Breadcrumb = ({ pageName, description }: BreadcrumbProps) => {
               <ul className="flex items-center md:justify-end">
                 <li className="flex items-center">
                   <Link
-                    href="/"
+                    href={localizePath("/", locale)}
                     className="pr-1 text-base font-medium text-body-color hover:text-primary"
                   >
-                    Home
+                    {dictionary.common.home}
                   </Link>
                   <span className="mr-3 block h-2 w-2 rotate-45 border-r-2 border-t-2 border-body-color"></span>
                 </li>

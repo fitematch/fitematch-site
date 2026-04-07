@@ -9,6 +9,7 @@ import { FaCreditCard } from "react-icons/fa";
 import { MdOutlineSecurity } from "react-icons/md";
 import { logout } from "@/api/auth.api";
 import { useAuth } from "@/contexts/auth-context";
+import { getLocaleFromPathname, localizePath } from "@/i18n/config";
 
 const accountMenuItems = [
   {
@@ -46,6 +47,8 @@ const accountMenuItems = [
 export default function AccountMenu() {
   const { accessToken, role, signOut } = useAuth();
   const pathname = usePathname();
+  const locale = getLocaleFromPathname(pathname) ?? "pt";
+  const normalizedPathname = pathname.replace(/^\/(pt|es|en)(?=\/|$)/, "") || "/";
   const router = useRouter();
   const visibleMenuItems = accountMenuItems.filter((item) =>
     role ? item.roles.includes(role) : false,
@@ -54,7 +57,7 @@ export default function AccountMenu() {
   const handleSignOut = async () => {
     if (!accessToken) {
       signOut();
-      router.replace("/");
+      router.replace(localizePath("/", locale));
       router.refresh();
       return;
     }
@@ -66,7 +69,7 @@ export default function AccountMenu() {
 
       if (success) {
         signOut();
-        router.replace("/");
+        router.replace(localizePath("/", locale));
         router.refresh();
       }
     } catch {
@@ -90,9 +93,9 @@ export default function AccountMenu() {
             {visibleMenuItems.map((item) => (
               <li key={item.href}>
                 <Link
-                  href={item.href}
+                  href={localizePath(item.href, locale)}
                   className={`flex items-center gap-3 text-base transition-colors duration-300 ${
-                    pathname === item.href
+                    normalizedPathname === item.href
                       ? "font-semibold text-gray-900"
                       : "text-gray-900 hover:text-gray-700"
                   }`}

@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { CiSearch } from "react-icons/ci";
 
+import { useDictionary } from "@/contexts/locale-context";
 import { Job } from "@/interfaces/job.interface";
 
 import JobCardDetails from "./JobCardDetails";
@@ -26,19 +27,10 @@ function formatRole(role: string) {
   }
 }
 
-function matchesJob(job: Job, query: string) {
+function matchesFields(fields: Array<string | undefined>, query: string) {
   if (!query.length) {
     return true;
   }
-
-  const fields = [
-    job.company.name,
-    job.title,
-    job.company.address?.city,
-    job.company.address?.state,
-    job.role,
-    formatRole(job.role),
-  ];
 
   return fields.some((field) => normalizeSearchValue(field ?? "").includes(query));
 }
@@ -50,13 +42,32 @@ export default function JobsSearchForm({
   appliedJobIds: string[];
   jobs: Job[];
 }>) {
+  const dictionary = useDictionary();
   const [query, setQuery] = useState("");
 
   const filteredJobs = useMemo(() => {
     const normalizedQuery = normalizeSearchValue(query);
 
-    return jobs.filter((job) => matchesJob(job, normalizedQuery));
-  }, [jobs, query]);
+    return jobs.filter((job) => {
+      const localizedRole =
+        dictionary.jobs.roleLabels[
+          job.role as keyof typeof dictionary.jobs.roleLabels
+        ] ?? "";
+
+      return matchesFields(
+        [
+          job.company.name,
+          job.title,
+          job.company.address?.city,
+          job.company.address?.state,
+          job.role,
+          formatRole(job.role),
+          localizedRole,
+        ],
+        normalizedQuery,
+      );
+    });
+  }, [dictionary.jobs.roleLabels, jobs, query]);
 
   return (
     <>
@@ -72,7 +83,7 @@ export default function JobsSearchForm({
               value={query}
               onChange={(event) => setQuery(event.target.value)}
               className="w-full px-4 py-3 text-sm text-black outline-none transition-colors placeholder:text-gray-400 placeholder:uppercase"
-              placeholder="Busque sua vaga"
+              placeholder={dictionary.common.searchPlaceholder}
             />
           </div>
 

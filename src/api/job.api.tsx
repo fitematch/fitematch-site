@@ -11,15 +11,85 @@ const JOB_API_URL = 'http://localhost:3002/job';
 
 export type UpdateJobRequestInterface = Partial<CreateJobRequestInterface>;
 
+export interface JobListPagination {
+  currentPage: number;
+  totalPages: number;
+  perPage: number;
+  totalItems: number;
+}
+
+export interface JobListResult {
+  jobs: Job[];
+  pagination: JobListPagination;
+}
+
+function normalizePagination(
+  pagination: ListJobResponseInterface["metadata"] extends { pagination?: infer T }
+    ? T
+    : unknown,
+  jobsLength: number,
+  fallbackPage: number,
+  fallbackLimit: number,
+): JobListPagination {
+  const paginationData =
+    pagination && typeof pagination === "object"
+      ? (pagination as Record<string, unknown>)
+      : {};
+
+  const readNumber = (...keys: string[]) => {
+    for (const key of keys) {
+      const value = paginationData[key];
+
+      if (typeof value === "number" && Number.isFinite(value)) {
+        return value;
+      }
+    }
+
+    return undefined;
+  };
+
+  const currentPage = readNumber("currentPage", "page", "current_page") ?? fallbackPage;
+  const perPage = readNumber("perPage", "limit", "pageSize", "page_size") ?? fallbackLimit;
+  const totalItems = readNumber("totalItems", "total", "count", "total_count") ?? jobsLength;
+  const totalPages =
+    readNumber("totalPages", "pages", "pageCount", "page_count") ??
+    Math.max(1, Math.ceil(totalItems / Math.max(perPage, 1)));
+
+  return {
+    currentPage,
+    totalPages,
+    perPage,
+    totalItems,
+  };
+}
+
 /**
  * List all jobs with API.
  */
-export async function getAllJobs(): Promise<ListJobResponseInterface> {
+export async function getAllJobs(
+  options?: {
+    page?: number;
+    limit?: number;
+  },
+): Promise<JobListResult> {
+  const page = options?.page ?? 1;
+  const limit = options?.limit ?? 6;
   const { data } = await axios.get<ListJobResponseInterface>(
     JOB_API_URL,
+    {
+      params: {
+        page,
+        limit,
+      },
+    },
   );
 
-  return data;
+  const jobs = Array.isArray(data.data) ? data.data : [];
+
+  return {
+    jobs,
+    pagination: normalizePagination(data.metadata?.pagination, jobs.length, page, limit),
+  };
 }
 
 /**

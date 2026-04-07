@@ -1,12 +1,16 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { getCurrentLocale } from "@/i18n/server";
+import { localizePath } from "@/i18n/config";
 
 export const metadata: Metadata = {
   title: "fitematch | Recrutador",
   description: "Acesse o fluxo de cadastro para recrutadores na fitematch.",
 };
 
-export default function RecruiterPage() {
+export default async function RecruiterPage() {
+  const locale = await getCurrentLocale();
+
   return (
     <main className="bg-white pt-8 pb-20">
       <div className="container">
@@ -22,7 +26,7 @@ export default function RecruiterPage() {
             organizar o processo seletivo.
           </p>
           <Link
-            href="/account/recruiter/register"
+            href={localizePath("/account/recruiter/register", locale)}
             className="shadow-submit bg-primary hover:bg-primary/90 inline-flex items-center justify-center rounded-xs px-8 py-4 text-base font-medium text-white duration-300"
           >
             Continuar cadastro

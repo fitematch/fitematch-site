@@ -3,6 +3,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { getJob } from "@/api/job.api";
+import { getCurrentLocale } from "@/i18n/server";
+import { localizePath } from "@/i18n/config";
 
 type JobApplyPageProps = {
   params: Promise<{
@@ -41,6 +43,7 @@ export async function generateMetadata({
 export default async function JobApplyPage({
   params,
 }: Readonly<JobApplyPageProps>) {
+  const locale = await getCurrentLocale();
   const { id } = await params;
   const jobTitle = await readJobTitle(id);
 
@@ -63,7 +66,7 @@ export default async function JobApplyPage({
             concluir sua inscrição nesta vaga.
           </p>
           <Link
-            href="/account/candidate/register"
+            href={localizePath("/account/candidate/register", locale)}
             className="shadow-submit bg-primary hover:bg-primary/90 inline-flex items-center justify-center rounded-xs px-8 py-4 text-base font-medium text-white duration-300"
           >
             Continuar cadastro

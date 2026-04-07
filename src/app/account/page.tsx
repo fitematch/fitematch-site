@@ -1,12 +1,16 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { getCurrentLocale } from "@/i18n/server";
+import { localizePath } from "@/i18n/config";
 
 export const metadata: Metadata = {
   title: "fitematch | Minha Conta",
   description: "Acesse a area principal da sua conta na fitematch.",
 };
 
-export default function AccountPage() {
+export default async function AccountPage() {
+  const locale = await getCurrentLocale();
+
   return (
     <main className="bg-white pt-8 pb-20">
       <div className="container">
@@ -24,19 +28,19 @@ export default function AccountPage() {
           </p>
           <div className="flex flex-col gap-4">
             <Link
-              href="/account/profile"
+              href={localizePath("/account/profile", locale)}
               className="shadow-submit bg-primary hover:bg-primary/90 inline-flex items-center justify-center rounded-xs px-8 py-4 text-base font-medium text-white duration-300"
             >
               Perfil
             </Link>
             <Link
-              href="/account/membership"
+              href={localizePath("/account/membership", locale)}
               className="shadow-submit bg-primary hover:bg-primary/90 inline-flex items-center justify-center rounded-xs px-8 py-4 text-base font-medium text-white duration-300"
             >
               Membership
             </Link>
             <Link
-              href="/account/security"
+              href={localizePath("/account/security", locale)}
               className="shadow-submit bg-primary hover:bg-primary/90 inline-flex items-center justify-center rounded-xs px-8 py-4 text-base font-medium text-white duration-300"
             >
               Security

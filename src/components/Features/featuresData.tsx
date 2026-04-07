@@ -6,69 +6,59 @@ import { FaExchangeAlt } from "react-icons/fa";
 import { AiOutlineAlert } from "react-icons/ai";
 import { IoLogoAndroid } from "react-icons/io";
 import { FaApple } from "react-icons/fa";
+import { Locale } from "@/i18n/config";
+import { dictionaries } from "@/i18n/dictionaries";
 
 
-const featuresData: Feature[] = [
+type Dictionary = (typeof dictionaries)[Locale];
+
+const featuresData = (dictionary: Dictionary): Feature[] => [
   {
     id: 1,
     icon: <CiSearch size={40} />,
-    title: "Busque Vagas",
-    paragraph:
-      <>
-        Como candiadto, busque vagas nas mais renomadas academias, studios e negócios fitness.
-      </>
+    title: dictionary.features.items[0].title,
+    paragraph: <>{dictionary.features.items[0].paragraph}</>,
   },
   {
     id: 2,
     icon: <MdFormatListBulletedAdd size={40} />,
-    title: "Cadastre Vagas",
-    paragraph:
-      <>
-        Como recrutador, cadastre vagas de sua empresa e acompanhe as candidaturas.
-      </>
+    title: dictionary.features.items[1].title,
+    paragraph: <>{dictionary.features.items[1].paragraph}</>,
   },
   {
     id: 3,
     icon: <FaExchangeAlt size={40} />,
-    title: "Sistema Match",
-    paragraph:
-      <>
-        Crie parametros de candidatos e quando candiados se aplicarem receba os matches de vagas.
-      </>
+    title: dictionary.features.items[2].title,
+    paragraph: <>{dictionary.features.items[2].paragraph}</>,
   },
   {
     id: 4,
     icon: <AiOutlineAlert size={40} />,
-    title: "Alerta de Novas Vagas",
-    paragraph:
-      <>
-        Adicione parametros para receber alertas de novas vagas com as características desejadas.
-      </>
+    title: dictionary.features.items[3].title,
+    paragraph: <>{dictionary.features.items[3].paragraph}</>,
   },
   {
     id: 5,
     icon: <IoLogoAndroid size={40} />,
-    title: "Aplicativo Android",
+    title: dictionary.features.items[4].title,
     paragraph:
       <>
-        Em desenvolvimento para Android, em breve na {" "}
+        {dictionary.features.items[4].paragraph.replace("Play Store para download.", "")}{" "}
         <Link href="/#" className="text-primary hover:opacity-80">
           Play Store
-        </Link>{" "}
-        para download.
+        </Link>.
       </>
   },
   {
     id: 6,
     icon: <FaApple size={40} />,
-    title: "Aplicativo iOS",
+    title: dictionary.features.items[5].title,
     paragraph:
       <>
-        Em desenvolvimento para iOS, em breve na{" "}
+        {dictionary.features.items[5].paragraph.replace("Apple Store para download.", "")}{" "}
         <Link href="/#" className="text-primary hover:opacity-80">
           Apple Store
-        </Link>{" "}
-        para download.
+        </Link>.
       </>
   },
 ];

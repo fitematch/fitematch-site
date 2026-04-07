@@ -4,6 +4,7 @@ import { useEffect, type ReactNode } from "react";
 import { usePathname, useRouter } from "next/navigation";
 
 import { useAuth } from "@/contexts/auth-context";
+import { getLocaleFromPathname, localizePath } from "@/i18n/config";
 
 const GUEST_ONLY_PATHS = new Set([
   "/account/login",
@@ -19,43 +20,46 @@ export default function AuthRouteGuard({
 }) {
   const { isAuthenticated, role } = useAuth();
   const pathname = usePathname();
+  const locale = getLocaleFromPathname(pathname) ?? "pt";
+  const normalizedPathname = pathname.replace(/^\/(pt|es|en)(?=\/|$)/, "") || "/";
   const router = useRouter();
 
   useEffect(() => {
-    const isGuestOnlyPath = GUEST_ONLY_PATHS.has(pathname);
-    const isAccountPath = pathname === "/account" || pathname.startsWith("/account/");
+    const isGuestOnlyPath = GUEST_ONLY_PATHS.has(normalizedPathname);
+    const isAccountPath =
+      normalizedPathname === "/account" || normalizedPathname.startsWith("/account/");
     const isProtectedAccountPath = isAccountPath && !isGuestOnlyPath;
-    const isCandidateApplicationsPath = pathname === "/jobs/applications";
+    const isCandidateApplicationsPath = normalizedPathname === "/jobs/applications";
 
-    if (isAuthenticated && GUEST_ONLY_PATHS.has(pathname)) {
-      router.replace("/");
+    if (isAuthenticated && GUEST_ONLY_PATHS.has(normalizedPathname)) {
+      router.replace(localizePath("/", locale));
       router.refresh();
       return;
     }
 
     if (!isAuthenticated && isProtectedAccountPath) {
-      router.replace("/");
+      router.replace(localizePath("/", locale));
       router.refresh();
       return;
     }
 
     if (!isAuthenticated && isCandidateApplicationsPath) {
-      router.replace("/");
+      router.replace(localizePath("/", locale));
       router.refresh();
       return;
     }
 
-    if (pathname === "/account/advertisement" && role && role !== "recruiter") {
-      router.replace("/jobs/applications");
+    if (normalizedPathname === "/account/advertisement" && role && role !== "recruiter") {
+      router.replace(localizePath("/jobs/applications", locale));
       router.refresh();
       return;
     }
 
-    if (pathname === "/jobs/applications" && role && role !== "candidate") {
-      router.replace("/account/advertisement");
+    if (normalizedPathname === "/jobs/applications" && role && role !== "candidate") {
+      router.replace(localizePath("/account/advertisement", locale));
       router.refresh();
     }
-  }, [isAuthenticated, pathname, role, router]);
+  }, [isAuthenticated, locale, normalizedPathname, role, router]);
 
   return children;
 }

@@ -1,12 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { Controller, useForm, useWatch } from "react-hook-form";
 import { IoMdClose } from "react-icons/io";
 import { MdOutlinePublish } from "react-icons/md";
 
 import { createNewJobApply } from "@/api/apply.api";
+import { getLocaleFromPathname, localizePath } from "@/i18n/config";
 import { Job } from "@/interfaces/job.interface";
 import { useAuth } from "@/contexts/auth-context";
 
@@ -65,6 +66,8 @@ export default function JobApplicationFormModal({
   onClose: () => void;
 }>) {
   const router = useRouter();
+  const pathname = usePathname();
+  const locale = getLocaleFromPathname(pathname) ?? "pt";
   const { accessToken } = useAuth();
   const [feedback, setFeedback] = useState<SubmitFeedback>(null);
   const {
@@ -96,11 +99,11 @@ export default function JobApplicationFormModal({
     const timeoutId = window.setTimeout(() => {
       setFeedback(null);
       onClose();
-      router.push("/jobs");
+      router.push(localizePath("/jobs", locale));
     }, 5000);
 
     return () => window.clearTimeout(timeoutId);
-  }, [feedback, onClose, router]);
+  }, [feedback, locale, onClose, router]);
 
   const onSubmit = async () => {
     if (!job.id || !userId) {

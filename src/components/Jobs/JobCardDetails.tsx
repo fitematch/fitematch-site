@@ -1,8 +1,12 @@
+"use client";
+
+import { useDictionary, useLocale } from "@/contexts/locale-context";
+import { localizePath } from "@/i18n/config";
 import { Job } from "@/interfaces/job.interface";
 import { CiCirclePlus } from "react-icons/ci";
 import { FaMedal } from "react-icons/fa";
-import Image from "next/image";
 import Link from "next/link";
+import CompanyAvatar, { resolveCompanyAssetUrl } from "./CompanyAvatar";
 
 function formatRole(role: string) {
   switch (role.toLowerCase()) {
@@ -19,25 +23,6 @@ function formatRole(role: string) {
   }
 }
 
-function getCompanyInitials(name?: string) {
-  const normalizedName = name?.trim();
-
-  if (!normalizedName) {
-    return "EM";
-  }
-
-  const words = normalizedName.split(/\s+/).filter(Boolean);
-
-  if (words.length === 1) {
-    return words[0].slice(0, 2).toUpperCase();
-  }
-
-  return words
-    .slice(0, 2)
-    .map((word) => word.charAt(0).toUpperCase())
-    .join("");
-}
-
 const JobCardDetails = ({
   job,
   hasApplied = false,
@@ -45,6 +30,8 @@ const JobCardDetails = ({
   job: Job;
   hasApplied?: boolean;
 }) => {
+  const dictionary = useDictionary();
+  const locale = useLocale();
   const {
     id,
     title,
@@ -61,20 +48,25 @@ const JobCardDetails = ({
         month: "2-digit",
         year: "2-digit",
       })
-    : "Nao informado";
-  const slotsLabel = `${slots} ${slots === 1 ? "vaga disponível" : "vagas disponíveis"}`;
+    : dictionary.jobs.notInformed;
+  const slotsLabel = `${slots} ${
+    slots === 1 ? dictionary.jobs.slotsAvailable : dictionary.jobs.slotsAvailablePlural
+  }`;
   const coverImage =
-    company.cover?.trim() || "/images/jobs/default_company_cover.png";
-  const companyInitials = getCompanyInitials(company.name);
+    resolveCompanyAssetUrl(job.cover) ||
+    "/images/jobs/default_company_cover.png";
   const detailsHref = hasApplied
-    ? "/jobs/applications"
-    : `/job/${id || ""}/details`;
-  const jobDetailsHref = `/job/${id || ""}/details`;
+    ? localizePath("/jobs/applications", locale)
+    : localizePath(`/job/${id || ""}/details`, locale);
+  const jobDetailsHref = localizePath(`/job/${id || ""}/details`, locale);
   const locationCity = company.address?.city?.trim();
   const locationState = company.address?.state?.trim();
   const locationLabel = [locationCity, locationState].filter(Boolean).join(" - ");
   const showFeaturedBadge = isPaidAdvertising === true;
-  const roleLabel = formatRole(role).toUpperCase();
+  const localizedRole =
+    dictionary.jobs.roleLabels[role as keyof typeof dictionary.jobs.roleLabels] ??
+    formatRole(role);
+  const roleLabel = localizedRole.toUpperCase();
 
   return (
     <div className="group shadow-one hover:shadow-two relative overflow-hidden rounded-xs bg-white duration-300">
@@ -105,13 +97,13 @@ const JobCardDetails = ({
               </p>
             ) : null}
           </div>
-          <Image src={coverImage} alt={title} fill className="object-cover" />
+          <img src={coverImage} alt={title} className="h-full w-full object-cover" />
         </Link>
         <div className="p-6 sm:p-8 md:px-6 md:py-8 lg:p-8 xl:px-5 xl:py-8 2xl:p-8">
           <div className="border-body-color/10 mb-6 border-b pb-6">
             {hasApplied ? (
               <p className="text-base font-bold uppercase text-gray-500">
-                Você já se aplicou a esta vaga
+                {dictionary.common.appliedToJob}
               </p>
             ) : (
               <p className="text-base font-bold uppercase text-gray-500">
@@ -122,15 +114,20 @@ const JobCardDetails = ({
           <div className="flex items-center justify-between gap-4">
             <div className="border-body-color/10 flex flex-1 items-center border-r pr-5">
               <div className="mr-4">
-                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-black text-sm font-bold uppercase text-white">
-                  {companyInitials}
-                </div>
+                <CompanyAvatar
+                  logo={company.logo}
+                  name={company.name}
+                  sizeClassName="h-10 w-10"
+                  textClassName="text-sm"
+                />
               </div>
               <div className="w-full">
                 <h4 className="text-dark mb-1 text-sm font-medium">
                   {company.name || "Empresa"}
                 </h4>
-                <p className="text-body-color text-xs">Publicado: {publishDate}</p>
+                <p className="text-body-color text-xs">
+                  {dictionary.common.published}: {publishDate}
+                </p>
               </div>
             </div>
             <Link
@@ -138,7 +135,7 @@ const JobCardDetails = ({
               className="inline-flex items-center gap-2 rounded-md bg-green-700 px-4 py-2 text-sm font-medium text-green-100 transition-colors hover:bg-green-900"
             >
               <CiCirclePlus className="text-lg" />
-              Detalhes
+              {dictionary.common.details}
             </Link>
           </div>
         </div>

@@ -6,6 +6,7 @@ export interface Job {
   companyId: string;
   slug: string;
   title: string;
+  cover?: string | null;
   slots: number;
   benefits: JobBenefits;
   isPaidAdvertising?: boolean;
