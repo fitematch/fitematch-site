@@ -70,6 +70,18 @@ export const THEME = {
     jobDetailText: 'text-gray-500',
     jobDetailBackground: 'bg-gray-100',
   },
+  faq: {
+    sectionTitle: 'text-gray-200',
+    sectionSubtitle: 'text-gray-100',
+    buttonCandidate:
+      'border border-green-500 text-green-500 hover:border-green-500 hover:bg-green-800 hover:text-green-100',
+    buttonRecruiter:
+      'border border-blue-500 text-blue-500 hover:border-blue-500 hover:bg-blue-800 hover:text-blue-100',
+    boxBorder: 'border-gray-100',
+    boxBackground: 'bg-gray-100',
+    boxTitle: 'text-gray-700 hover:text-gray-500',
+    boxText: 'text-gray-500 hover:text-gray-700',
+  },
   footer: {
     title: 'text-gray-100',
     text: 'text-gray-400',

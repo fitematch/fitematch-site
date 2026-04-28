@@ -1,4 +1,4 @@
-import { CARD_STYLES, TEXT_STYLES } from '@/constants/styles';
+import { FAQ_STYLES } from '@/constants/styles';
 
 interface FaqItemProps {
   question: string;
@@ -7,12 +7,12 @@ interface FaqItemProps {
 
 export function FaqItem({ question, answer }: FaqItemProps) {
   return (
-    <div className={`${CARD_STYLES.featureBox} p-5`}>
-      <h3 className={TEXT_STYLES.featureTitle}>
+    <div className={FAQ_STYLES.box}>
+      <h3 className={FAQ_STYLES.boxTitle}>
         {question}
       </h3>
 
-      <p className={`mt-3 leading-6 ${TEXT_STYLES.featureText}`}>
+      <p className={`mt-3 leading-6 ${FAQ_STYLES.boxText}`}>
         {answer}
       </p>
     </div>

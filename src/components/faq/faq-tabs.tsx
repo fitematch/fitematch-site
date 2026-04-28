@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import { FaBuilding, FaUser } from 'react-icons/fa';
 import { Button } from '@/components/ui/button';
-import { THEME } from '@/constants/theme';
 import { FaqItem } from './faq-item';
 
 const candidateFaq = [
@@ -61,10 +60,10 @@ export function FaqTabs() {
 
   return (
     <div>
-      <div className={`mb-8 flex gap-3 ${THEME.text.body}`}>
+      <div className="mb-8 flex gap-3">
         <Button
           type="button"
-          variant={activeTab === 'candidate' ? 'positive' : 'ghost'}
+          color={activeTab === 'candidate' ? 'faqCandidate' : 'ghost'}
           icon={<FaUser />}
           onClick={() => setActiveTab('candidate')}
         >
@@ -73,7 +72,7 @@ export function FaqTabs() {
 
         <Button
           type="button"
-          variant={activeTab === 'recruiter' ? 'positive' : 'ghost'}
+          color={activeTab === 'recruiter' ? 'faqRecruiter' : 'ghost'}
           icon={<FaBuilding />}
           onClick={() => setActiveTab('recruiter')}
         >

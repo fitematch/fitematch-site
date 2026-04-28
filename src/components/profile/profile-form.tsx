@@ -14,9 +14,10 @@ import { Input } from '@/components/ui/input';
 import { useAuth } from '@/hooks/use-auth';
 import { UpdateMeRequest } from '@/services/auth/auth.types';
 import { useFlashMessage } from '@/contexts/flash-message-context';
-import { CARD_STYLES, TEXT_STYLES } from '@/constants/styles';
+import { CARD_STYLES } from '@/constants/styles';
 import { ProductRoleEnum } from '@/types/entities/user.entity';
 import { RecruiterProfileForm } from './recruiter-profile-form';
+import { ProfileSectionTitle } from './profile-section-title';
 
 export function ProfileForm() {
   const { user } = useAuth();
@@ -56,9 +57,7 @@ export function CandidateProfileForm() {
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
       <div className={CARD_STYLES.featureBox}>
-        <h2 className={TEXT_STYLES.featureTitle}>
-          Dados básicos
-        </h2>
+        <ProfileSectionTitle title="Dados básicos" />
 
         <div className="mt-6 grid gap-4 md:grid-cols-2">
           <Input icon={<FaUser />} placeholder="Nome" {...register('name')} />
@@ -80,9 +79,7 @@ export function CandidateProfileForm() {
       </div>
 
       <div className={CARD_STYLES.featureBox}>
-        <h2 className={TEXT_STYLES.featureTitle}>
-          Contatos
-        </h2>
+        <ProfileSectionTitle title="Contatos" />
 
         <div className="mt-6 grid gap-4 md:grid-cols-2">
           <Input
@@ -109,9 +106,7 @@ export function CandidateProfileForm() {
       </div>
 
       <div className={CARD_STYLES.featureBox}>
-        <h2 className={TEXT_STYLES.featureTitle}>
-          Documentos
-        </h2>
+        <ProfileSectionTitle title="Documentos" />
 
         <div className="mt-6 grid gap-4 md:grid-cols-2">
           <Input
@@ -149,9 +144,7 @@ export function CandidateProfileForm() {
       </div>
 
       <div className={CARD_STYLES.featureBox}>
-        <h2 className={TEXT_STYLES.featureTitle}>
-          Mídia
-        </h2>
+        <ProfileSectionTitle title="Mídia" />
 
         <div className="mt-6">
           <Input

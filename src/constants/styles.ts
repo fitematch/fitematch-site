@@ -15,6 +15,12 @@ export const BUTTON_STYLES = {
 
   ghost:
     `inline-flex items-center gap-2 rounded-md px-4 py-2 text-sm font-medium ${THEME.button.ghost}`,
+
+  faqCandidate:
+    `inline-flex items-center gap-2 rounded-md px-4 py-2 text-sm font-medium ${THEME.faq.buttonCandidate}`,
+
+  faqRecruiter:
+    `inline-flex items-center gap-2 rounded-md px-4 py-2 text-sm font-medium ${THEME.faq.buttonRecruiter}`,
 };
 
 export const BUTTON_VARIANT_ALIASES = {
@@ -71,6 +77,19 @@ export const CARD_STYLES = {
     `${THEME.card.jobDetailBox} ${THEME.card.jobDetailBorder} ${THEME.card.jobDetailBackground}`,
   featureIcon:
     `h-8 w-8 ${THEME.card.featureIcon}`,
+};
+
+export const FAQ_STYLES = {
+  sectionTitle:
+    `text-3xl md:text-4xl font-bold tracking-tight ${THEME.faq.sectionTitle}`,
+  sectionSubtitle:
+    `mt-3 text-base ${THEME.faq.sectionSubtitle}`,
+  box:
+    `rounded-xl border p-5 ${THEME.faq.boxBorder} ${THEME.faq.boxBackground}`,
+  boxTitle:
+    `text-xl font-semibold ${THEME.faq.boxTitle}`,
+  boxText:
+    `text-sm ${THEME.faq.boxText}`,
 };
 
 export const PAGE_STYLES = {

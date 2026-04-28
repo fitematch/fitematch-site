@@ -7,7 +7,8 @@ import { Input } from '@/components/ui/input';
 import { useAuth } from '@/hooks/use-auth';
 import { UpdateMeRequest } from '@/services/auth/auth.types';
 import { useFlashMessage } from '@/contexts/flash-message-context';
-import { CARD_STYLES, TEXT_STYLES } from '@/constants/styles';
+import { CARD_STYLES } from '@/constants/styles';
+import { ProfileSectionTitle } from './profile-section-title';
 
 export function RecruiterProfileForm() {
   const { user, updateMe } = useAuth();
@@ -37,9 +38,7 @@ export function RecruiterProfileForm() {
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
       <div className={CARD_STYLES.featureBox}>
-        <h2 className={TEXT_STYLES.featureTitle}>
-          Dados básicos
-        </h2>
+        <ProfileSectionTitle title="Dados básicos" />
 
         <div className="mt-6 grid gap-4 md:grid-cols-2">
           <Input icon={<FaUser />} placeholder="Nome" {...register('name')} />
@@ -61,9 +60,7 @@ export function RecruiterProfileForm() {
       </div>
 
       <div className={CARD_STYLES.featureBox}>
-        <h2 className={TEXT_STYLES.featureTitle}>
-          Dados do recrutador
-        </h2>
+        <ProfileSectionTitle title="Dados do recrutador" />
 
         <div className="mt-6 grid gap-4 md:grid-cols-2">
           <Input
