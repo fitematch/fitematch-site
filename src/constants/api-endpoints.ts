@@ -9,11 +9,19 @@ export const API_ENDPOINTS = {
   AUTH_REFRESH: '/auth/refresh',
   AUTH_SIGN_OUT: '/auth/sign-out',
 
+  AUTH_SESSIONS: '/auth/sessions',
+  AUTH_REVOKE_SESSION: (sessionId: string) =>
+    `/auth/sessions/${sessionId}/revoke`,
+
   COMPANY: '/company',
+  COMPANY_PUBLIC: '/company/public',
 
   JOB: '/job',
+  JOB_ME: '/job/me',
   JOB_BY_ID: (jobId: string) => `/job/${jobId}`,
 
   APPLY: '/apply',
+  APPLY_ME: '/apply/me',
   APPLY_BY_ID: (applyId: string) => `/apply/${applyId}`,
+  APPLY_BY_JOB_ID: (jobId: string) => `/apply/job/${jobId}`,
 };

@@ -1,14 +1,24 @@
+import { PAGE_STYLES, TEXT_STYLES } from '@/constants/styles';
 import { FaqTabs } from '@/components/faq/faq-tabs';
+import { Breadcrumb } from '@/components/ui/breadcrumb';
+import { ROUTES } from '@/constants/routes';
 
 export default function FaqPage() {
   return (
-    <section className="min-h-screen px-4 py-20">
-      <div className="mx-auto max-w-4xl">
-        <h1 className="text-3xl font-bold text-gray-100">
+    <section className={`${PAGE_STYLES.body} py-20`}>
+      <div className={PAGE_STYLES.container}>
+        <Breadcrumb
+          items={[
+            { label: 'Home', href: ROUTES.HOME },
+            { label: 'FAQ' },
+          ]}
+        />
+
+        <h1 className={`${TEXT_STYLES.sectionTitle} mt-8`}>
           FAQ
         </h1>
 
-        <p className="mt-3 text-gray-700">
+        <p className={TEXT_STYLES.sectionSubtitle}>
           Tire suas dúvidas sobre cadastro, ativação, vagas e aplicações.
         </p>
 

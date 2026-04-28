@@ -1,0 +1,19 @@
+<svg width="40" height="40" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+  <rect width="40" height="40" fill="none"></rect>
+
+  <!-- Texto "pano" -->
+  <text x="20" y="16" text-anchor="middle" font-family="Arial Black, Arial, sans-serif" font-size="9" fill="#111111" letter-spacing="1">
+    pano
+  </text>
+
+  <!-- Texto "bianco" -->
+  <text x="20" y="28" text-anchor="middle" font-family="Arial Black, Arial, sans-serif" font-size="9" fill="#E11D2E" letter-spacing="1">
+    bianco
+  </text>
+
+  <!-- Barra inferior (estilo marca) -->
+  <rect x="6" y="32" width="28" height="2" fill="#E11D2E"></rect>
+
+  <!-- detalhe lateral moderno -->
+  <rect x="6" y="8" width="2" height="20" fill="#111111"></rect>
+</svg>

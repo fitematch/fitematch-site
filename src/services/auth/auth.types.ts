@@ -13,12 +13,17 @@ export interface SignUpRequest {
   password: string;
   birthday: string;
   productRole: ProductRoleEnum;
-  acceptedTermsOfUse: boolean;
-  acceptedPrivacyPolicy: boolean;
 }
 
 export interface SignUpResponse {
-  user: AuthUser;
+  id: string;
+  name: string;
+  email: string;
+  birthday: string;
+  productRole: ProductRoleEnum;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface SignInRequest {
@@ -69,6 +74,25 @@ export interface RefreshTokenResponse {
   refreshToken: string;
 }
 
+export interface SignOutRequest {
+  refreshToken: string | null;
+}
+
 export interface SignOutResponse {
   message?: string;
 }
+
+export interface AuthSessionResponse {
+  id: string;
+  userId: string;
+  userAgent?: string;
+  ipAddress?: string;
+  expiresAt: string | Date;
+  revokedAt?: string | Date;
+  createdAt?: string | Date;
+  updatedAt?: string | Date;
+}
+
+export type ListAuthSessionsResponse = AuthSessionResponse[];
+
+export type RevokeAuthSessionResponse = void;

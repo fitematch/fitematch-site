@@ -14,18 +14,22 @@ interface BreadcrumbProps {
 export function Breadcrumb({ items }: BreadcrumbProps) {
   return (
     <nav className={`flex items-center gap-2 text-sm ${THEME.text.body}`}>
-      <FaHome />
+      <FaHome className={THEME.navigation.breadcrumbIcon} />
 
       {items.map((item, index) => (
         <div key={item.label} className="flex items-center gap-2">
-          {index > 0 && <FaChevronRight className="h-3 w-3" />}
+          {index > 0 && (
+            <FaChevronRight
+              className={`h-3 w-3 ${THEME.navigation.breadcrumbIcon}`}
+            />
+          )}
 
           {item.href ? (
-            <Link href={item.href} className={THEME.text.link}>
+            <Link href={item.href} className={THEME.navigation.breadcrumb}>
               {item.label}
             </Link>
           ) : (
-            <span className={THEME.text.linkStrong}>
+            <span className={THEME.navigation.breadcrumbActive}>
               {item.label}
             </span>
           )}

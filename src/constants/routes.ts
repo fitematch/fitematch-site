@@ -2,6 +2,8 @@ export const ROUTES = {
   HOME: '/',
   JOBS: '/jobs',
   FAQ: '/faq',
+  TERMS_OF_USE: '/terms-of-use',
+  PRIVACY_POLICY: '/privacy-policy',
   HEALTH_CHECK: '/health-check',
 
   SIGN_IN: '/sign-in',

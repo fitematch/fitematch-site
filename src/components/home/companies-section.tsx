@@ -1,39 +1,63 @@
+'use client';
+
+import Image from 'next/image';
 import { FaBuilding } from 'react-icons/fa';
-
+import { usePublicCompanies } from '@/hooks/use-public-companies';
 import { SectionTitle } from '@/components/ui/section-title';
-import { THEME } from '@/constants/theme';
-
-const companies = [
-  'Bluefit',
-  'Panobianco',
-  'Smart Fit',
-  'Bio Ritmo',
-  'Competition',
-  'Bodytech',
-];
+import { Skeleton } from '@/components/ui/skeleton';
+import { Alert } from '@/components/ui/alert';
 
 export function CompaniesSection() {
-  return (
-    <section className={`${THEME.layout.background} py-20`}>
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="mb-10 flex items-center gap-3">
-          <FaBuilding className={`h-6 w-6 ${THEME.icon.default}`} />
-          <SectionTitle
-            title="Empresas que usam a plataforma"
-          />
-        </div>
+  const { companies, isLoading, error } = usePublicCompanies();
 
-        <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6">
-          {companies.map((company) => (
-            <div
-              key={company}
-              className={`flex h-24 items-center justify-center rounded-xl border ${THEME.layout.border} ${THEME.layout.background} px-4 text-center`}
-            >
-              <span className={`text-sm font-semibold ${THEME.text.body}`}>
-                {company}
-              </span>
+  if (!isLoading && !error && companies.length === 0) {
+    return null;
+  }
+
+  return (
+    <section className="bg-black py-20">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <SectionTitle
+          title="Empresas que usam a plataforma"
+          icon={<FaBuilding className="h-6 w-6" />}
+        />
+
+        <div className="mt-10">
+          {isLoading && (
+            <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6">
+              {Array.from({ length: 6 }).map((_, index) => (
+                <Skeleton key={index} className="h-24" />
+              ))}
             </div>
-          ))}
+          )}
+
+          {error && <Alert type="error" message={error} />}
+
+          {!isLoading && !error && companies.length > 0 && (
+            <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6">
+              {companies.map((company) => (
+                <div
+                  key={company._id}
+                  className="flex h-24 items-center justify-center rounded-xl border border-gray-900 bg-black px-4 text-center"
+                >
+                  {company.media?.logoUrl ? (
+                    <Image
+                      src={company.media.logoUrl}
+                      alt={company.tradeName}
+                      width={160}
+                      height={48}
+                      unoptimized
+                      className="max-h-12 max-w-full object-contain"
+                    />
+                  ) : (
+                    <span className="text-sm font-semibold text-gray-700">
+                      {company.tradeName}
+                    </span>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </section>

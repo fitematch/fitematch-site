@@ -1,16 +1,26 @@
 import { PrivateRoute } from '@/components/auth/private-route';
 import { ProfileForm } from '@/components/profile/profile-form';
+import { Breadcrumb } from '@/components/ui/breadcrumb';
+import { ROUTES } from '@/constants/routes';
+import { PAGE_STYLES, TEXT_STYLES } from '@/constants/styles';
 
 export default function ProfilePage() {
   return (
     <PrivateRoute>
-      <section className="min-h-screen px-4 py-20">
-        <div className="mx-auto max-w-4xl">
-          <h1 className="text-3xl font-bold text-gray-100">
+      <section className={`${PAGE_STYLES.body} py-20`}>
+        <div className={PAGE_STYLES.container}>
+          <Breadcrumb
+            items={[
+              { label: 'Home', href: ROUTES.HOME },
+              { label: 'Profile' },
+            ]}
+          />
+
+          <h1 className={`${TEXT_STYLES.sectionTitle} mt-8`}>
             Profile
           </h1>
 
-          <p className="mt-3 text-gray-700">
+          <p className={TEXT_STYLES.sectionSubtitle}>
             Atualize seus dados básicos e complementares.
           </p>
 

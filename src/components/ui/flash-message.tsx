@@ -1,13 +1,23 @@
 'use client';
 
+import { usePathname } from 'next/navigation';
 import { FaCheckCircle, FaTimesCircle } from 'react-icons/fa';
+import { ROUTES } from '@/constants/routes';
 import { FLASH_MESSAGE_STYLES } from '@/constants/styles';
 import { useFlashMessage } from '@/contexts/flash-message-context';
 
 export function FlashMessage() {
+  const pathname = usePathname();
   const { flashMessage, closeFlashMessage } = useFlashMessage();
 
-  if (!flashMessage) {
+  const hiddenRoutes = new Set([
+    ROUTES.SIGN_IN,
+    ROUTES.SIGN_UP,
+    ROUTES.ACTIVATION_CODE,
+    ROUTES.ACTIVATE_ACCOUNT,
+  ]);
+
+  if (!flashMessage || hiddenRoutes.has(pathname)) {
     return null;
   }
 

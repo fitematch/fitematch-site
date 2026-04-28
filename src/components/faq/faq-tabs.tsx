@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { FaBuilding, FaUser } from 'react-icons/fa';
 import { Button } from '@/components/ui/button';
+import { THEME } from '@/constants/theme';
 import { FaqItem } from './faq-item';
 
 const candidateFaq = [
@@ -60,7 +61,7 @@ export function FaqTabs() {
 
   return (
     <div>
-      <div className="mb-8 flex gap-3">
+      <div className={`mb-8 flex gap-3 ${THEME.text.body}`}>
         <Button
           type="button"
           variant={activeTab === 'candidate' ? 'positive' : 'ghost'}

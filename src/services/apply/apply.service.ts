@@ -4,6 +4,8 @@ import {
   CreateApplyRequest,
   CreateApplyResponse,
   DeleteApplyResponse,
+  ListAppliesByJobResponse,
+  ListMyAppliesResponse,
   ReadApplyResponse,
   UpdateApplyStatusRequest,
   UpdateApplyStatusResponse,
@@ -15,6 +17,16 @@ export const ApplyService = {
       method: 'POST',
       body: JSON.stringify(payload),
     });
+  },
+
+  listMine(): Promise<ListMyAppliesResponse> {
+    return apiClient<ListMyAppliesResponse>(API_ENDPOINTS.APPLY_ME);
+  },
+
+  listByJob(jobId: string): Promise<ListAppliesByJobResponse> {
+    return apiClient<ListAppliesByJobResponse>(
+      API_ENDPOINTS.APPLY_BY_JOB_ID(jobId),
+    );
   },
 
   read(applyId: string): Promise<ReadApplyResponse> {

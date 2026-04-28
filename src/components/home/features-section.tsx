@@ -7,13 +7,13 @@ import {
   FaUserCheck,
 } from 'react-icons/fa';
 import { SectionTitle } from '@/components/ui/section-title';
-import { TEXT_STYLES } from '@/constants/styles';
+import { CARD_STYLES, PAGE_STYLES, TEXT_STYLES } from '@/constants/styles';
 import { THEME } from '@/constants/theme';
 
 const features = [
   {
     icon: FaBriefcase,
-    title: 'Vagas para profissionais fitness',
+    title: 'Vagas para profissionais',
     description: 'Busque oportunidades em academias e empresas do setor fitness.',
   },
   {
@@ -45,8 +45,8 @@ const features = [
 
 export function FeaturesSection() {
   return (
-    <section className={`${THEME.layout.background} py-20`}>
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    <section className={`${THEME.layout.background} ${PAGE_STYLES.section}`}>
+      <div className={PAGE_STYLES.container}>
         <SectionTitle
           title="Funcionalidades da plataforma"
         />
@@ -57,15 +57,16 @@ export function FeaturesSection() {
             return (
               <div
                 key={feature.title}
-                className={`rounded-xl border ${THEME.layout.border} ${THEME.layout.background} p-6`}
+                className={CARD_STYLES.featureBox}
               >
-                <Icon className={`h-8 w-8 ${THEME.icon.default}`} />
+                <div className="flex items-center gap-3">
+                  <Icon className={CARD_STYLES.featureIcon} />
+                  <h3 className={TEXT_STYLES.featureTitle}>
+                    {feature.title}
+                  </h3>
+                </div>
 
-                <h3 className={`mt-4 text-xl font-semibold ${THEME.card.title}`}>
-                  {feature.title}
-                </h3>
-
-                <p className={`mt-3 text-sm ${THEME.card.text}`}>
+                <p className={`mt-3 ${TEXT_STYLES.featureText}`}>
                   {feature.description}
                 </p>
               </div>

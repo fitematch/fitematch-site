@@ -1,4 +1,6 @@
-import ApplyEntity, { ApplicationStatusEnum } from '@/types/entities/apply.entity';
+import ApplyEntity, {
+  ApplicationStatusEnum,
+} from '@/types/entities/apply.entity';
 
 export interface CreateApplyRequest {
   jobId: string;
@@ -7,6 +9,10 @@ export interface CreateApplyRequest {
 export type CreateApplyResponse = ApplyEntity;
 
 export type ReadApplyResponse = ApplyEntity;
+
+export type ListMyAppliesResponse = ApplyEntity[];
+
+export type ListAppliesByJobResponse = ApplyEntity[];
 
 export interface UpdateApplyStatusRequest {
   status: ApplicationStatusEnum;

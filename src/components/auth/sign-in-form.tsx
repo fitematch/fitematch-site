@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { FaEnvelope, FaLock, FaSignInAlt } from 'react-icons/fa';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { InlineFlashMessage } from '@/components/ui/inline-flash-message';
 import { SignInRequest } from '@/services/auth/auth.types';
 import { useFlashMessage } from '@/contexts/flash-message-context';
 import { useAuth } from '@/hooks/use-auth';
@@ -13,7 +14,7 @@ import { ROUTES } from '@/constants/routes';
 export function SignInForm() {
   const router = useRouter();
   const { signIn } = useAuth();
-  const { showSuccess, showError } = useFlashMessage();
+  const { flashMessage, showSuccess, showError } = useFlashMessage();
 
   const {
     register,
@@ -33,6 +34,13 @@ export function SignInForm() {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="mx-auto w-full max-w-md space-y-4">
+      {flashMessage && (
+        <InlineFlashMessage
+          type={flashMessage.type}
+          message={flashMessage.message}
+        />
+      )}
+
       <Input
         icon={<FaEnvelope />}
         type="email"

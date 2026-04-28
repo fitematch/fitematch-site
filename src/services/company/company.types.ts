@@ -6,3 +6,20 @@ export type CreateCompanyRequest = Omit<
 >;
 
 export type CreateCompanyResponse = CompanyEntity;
+
+export interface PublicCompanyResponse {
+  _id: string;
+  slug: string;
+  tradeName: string;
+  contacts?: {
+    address?: {
+      city?: string;
+      state?: string;
+    };
+  };
+  media?: {
+    logoUrl?: string;
+  };
+}
+
+export type ListPublicCompaniesResponse = PublicCompanyResponse[];

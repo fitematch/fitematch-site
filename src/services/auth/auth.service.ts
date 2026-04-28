@@ -1,5 +1,6 @@
 import { API_ENDPOINTS } from '@/constants/api-endpoints';
 import { apiClient } from '@/services/http/api-client';
+import { ApiError } from '@/services/http/api-error';
 import { TokenStorage } from '@/services/http/token-storage';
 import {
   ActivateAccountRequest,
@@ -10,11 +11,14 @@ import {
   RequestActivationCodeResponse,
   SignInRequest,
   SignInResponse,
+  SignOutRequest,
   SignOutResponse,
   SignUpRequest,
   SignUpResponse,
   UpdateMeRequest,
   UpdateMeResponse,
+  ListAuthSessionsResponse,
+  RevokeAuthSessionResponse,
 } from './auth.types';
 
 export const AuthService = {
@@ -93,12 +97,39 @@ export const AuthService = {
   },
 
   async signOut(): Promise<SignOutResponse> {
+    const payload: SignOutRequest = {
+      refreshToken: TokenStorage.getRefreshToken(),
+    };
+
     try {
       return await apiClient<SignOutResponse>(API_ENDPOINTS.AUTH_SIGN_OUT, {
         method: 'POST',
+        auth: false,
+        body: JSON.stringify(payload),
       });
+    } catch (error) {
+      if (error instanceof ApiError && error.statusCode === 401) {
+        return {
+          message: 'Sessão local encerrada.',
+        };
+      }
+
+      throw error;
     } finally {
       TokenStorage.clearTokens();
     }
+  },
+
+  listSessions(): Promise<ListAuthSessionsResponse> {
+    return apiClient<ListAuthSessionsResponse>(API_ENDPOINTS.AUTH_SESSIONS);
+  },
+
+  revokeSession(sessionId: string): Promise<RevokeAuthSessionResponse> {
+    return apiClient<RevokeAuthSessionResponse>(
+      API_ENDPOINTS.AUTH_REVOKE_SESSION(sessionId),
+      {
+        method: 'PATCH',
+      },
+    );
   },
 };

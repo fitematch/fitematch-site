@@ -14,6 +14,19 @@ import { Input } from '@/components/ui/input';
 import { useAuth } from '@/hooks/use-auth';
 import { UpdateMeRequest } from '@/services/auth/auth.types';
 import { useFlashMessage } from '@/contexts/flash-message-context';
+import { CARD_STYLES, TEXT_STYLES } from '@/constants/styles';
+import { ProductRoleEnum } from '@/types/entities/user.entity';
+import { RecruiterProfileForm } from './recruiter-profile-form';
+
+export function ProfileForm() {
+  const { user } = useAuth();
+
+  if (user?.productRole === ProductRoleEnum.RECRUITER) {
+    return <RecruiterProfileForm />;
+  }
+
+  return <CandidateProfileForm />;
+}
 
 export function CandidateProfileForm() {
   const { user, updateMe } = useAuth();
@@ -42,8 +55,8 @@ export function CandidateProfileForm() {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
-      <div className="rounded-xl border border-gray-900 p-6">
-        <h2 className="text-xl font-semibold text-gray-100">
+      <div className={CARD_STYLES.featureBox}>
+        <h2 className={TEXT_STYLES.featureTitle}>
           Dados básicos
         </h2>
 
@@ -66,8 +79,8 @@ export function CandidateProfileForm() {
         </div>
       </div>
 
-      <div className="rounded-xl border border-gray-900 p-6">
-        <h2 className="text-xl font-semibold text-gray-100">
+      <div className={CARD_STYLES.featureBox}>
+        <h2 className={TEXT_STYLES.featureTitle}>
           Contatos
         </h2>
 
@@ -95,8 +108,8 @@ export function CandidateProfileForm() {
         </div>
       </div>
 
-      <div className="rounded-xl border border-gray-900 p-6">
-        <h2 className="text-xl font-semibold text-gray-100">
+      <div className={CARD_STYLES.featureBox}>
+        <h2 className={TEXT_STYLES.featureTitle}>
           Documentos
         </h2>
 
@@ -135,8 +148,8 @@ export function CandidateProfileForm() {
         </div>
       </div>
 
-      <div className="rounded-xl border border-gray-900 p-6">
-        <h2 className="text-xl font-semibold text-gray-100">
+      <div className={CARD_STYLES.featureBox}>
+        <h2 className={TEXT_STYLES.featureTitle}>
           Mídia
         </h2>
 

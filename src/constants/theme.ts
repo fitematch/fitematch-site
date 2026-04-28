@@ -2,15 +2,24 @@ export const THEME = {
   layout: {
     background: 'bg-black',
     border: 'border-gray-900',
+    headerBackground: 'bg-black',
+  },
+  navigation: {
+    menuItem: 'text-gray-300 hover:text-gray-400',
+    menuItemActive: 'text-gray-500 hover:text-gray-400',
+    breadcrumb: 'text-gray-500 hover:text-gray-300',
+    breadcrumbActive: 'text-gray-100',
+    breadcrumbIcon: 'text-gray-700',
+    dropdownTrigger:
+      'border border-gray-500 text-gray-300 hover:border-gray-500 hover:bg-gray-800 hover:text-gray-100',
   },
   text: {
-    logo: 'text-gray-700 hover:text-gray-500',
-    menu: 'text-gray-700 hover:text-gray-500',
-    title: 'text-gray-100',
-    subtitle: 'text-gray-700',
-    body: 'text-gray-700',
+    logo: 'text-gray-300 hover:text-gray-500',
+    title: 'text-gray-200',
+    subtitle: 'text-gray-100',
+    body: 'text-gray-200',
     muted: 'text-gray-700',
-    placeholder: 'placeholder:text-gray-700',
+    placeholder: 'placeholder:text-gray-100',
     link: 'text-gray-700 hover:text-gray-500',
   },
   icon: {
@@ -32,20 +41,43 @@ export const THEME = {
       'border border-red-100 bg-red-900 text-red-100',
   },
   button: {
-    positive:
-      'bg-green-900 text-green-100 hover:bg-green-700',
-    danger:
-      'border border-red-100 bg-red-900 text-red-100 hover:bg-red-700',
-    login:
-      'border border-blue-900 text-blue-900 hover:border-blue-100 hover:bg-blue-900 hover:text-blue-100',
-    profile:
-      'border border-gray-900 text-gray-900 hover:border-gray-100 hover:bg-gray-900 hover:text-gray-100',
+    green:
+      'border border-green-500 text-green-500 hover:border-green-500 hover:bg-green-800 hover:text-green-100',
+    red:
+      'border border-red-500 text-red-500 hover:border-red-500 hover:bg-red-800 hover:text-red-100',
+    blue:
+      'border border-blue-500 text-blue-500 hover:border-blue-500 hover:bg-blue-800 hover:text-blue-100',
+    gray:
+      'border border-gray-500 text-gray-500 hover:border-gray-500 hover:bg-gray-800 hover:text-gray-100',
     ghost:
       'text-gray-700 hover:text-gray-500',
   },
   card: {
-    base: 'border-gray-900 bg-black',
+    featureBox: 'rounded-xl border p-6 bg-gray-100',
+    featureIcon: 'text-gray-700 hover:text-gray-500',
+    featureTitle: 'text-gray-700 hover:text-gray-500',
+    featureText: 'text-gray-500 hover:text-gray-700',
+    featureBorder: 'border-gray-100',
+    featureBackground: 'bg-gray-100',
+    jobBox: 'rounded-xl border p-6 bg-gray-100',
+    jobBorder: 'border-gray-100',
+    jobTitle: 'text-gray-700 hover:text-gray-500',
+    jobText: 'text-gray-500 hover:text-gray-700',
+    jobBackground: 'bg-gray-100', 
+    jobDetailBox: 'rounded-xl border p-6 bg-gray-100',
+    jobDetailBorder: 'border-gray-100',
+    jobDetailTitle: 'text-gray-700',
+    jobDetailText: 'text-gray-500',
+    jobDetailBackground: 'bg-gray-100',
+  },
+  footer: {
     title: 'text-gray-100',
-    text: 'text-gray-700',
+    text: 'text-gray-400',
+    link: 'cursor-pointer text-gray-400 hover:text-gray-100',
+    socialFacebook: 'cursor-pointer text-gray-400 hover:text-blue-500',
+    socialInstagram: 'cursor-pointer text-gray-400 hover:text-pink-500',
+    socialX: 'cursor-pointer text-gray-400 hover:text-gray-100',
+    socialYoutube: 'cursor-pointer text-gray-400 hover:text-red-500',
+    socialLinkedin: 'cursor-pointer text-gray-400 hover:text-sky-500',
   },
 };

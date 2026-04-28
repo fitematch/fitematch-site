@@ -34,9 +34,8 @@ interface AuthProviderProps {
 }
 
 export function AuthProvider({ children }: AuthProviderProps) {
-  const hasStoredToken = TokenStorage.getAccessToken() !== null;
   const [user, setUser] = useState<AuthUser | null>(null);
-  const [isLoading, setIsLoading] = useState(hasStoredToken);
+  const [isLoading, setIsLoading] = useState(false);
 
   const refreshMe = useCallback(async () => {
     try {
@@ -70,6 +69,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
   }, []);
 
   useEffect(() => {
+    const hasStoredToken = TokenStorage.getAccessToken() !== null;
+
     if (!hasStoredToken) {
       return;
     }
@@ -77,6 +78,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
     let isActive = true;
 
     const loadMe = async () => {
+      if (isActive) {
+        setIsLoading(true);
+      }
+
       try {
         const me = await AuthService.me();
 
@@ -101,7 +106,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     return () => {
       isActive = false;
     };
-  }, [hasStoredToken]);
+  }, []);
 
   const value = useMemo(
     () => ({

@@ -1,27 +1,71 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { FaArrowRight, FaBriefcase } from 'react-icons/fa';
 import { Button } from '@/components/ui/button';
 import { ROUTES } from '@/constants/routes';
 import { useJobs } from '@/hooks/use-jobs';
+import { usePublicCompanies } from '@/hooks/use-public-companies';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Card } from '@/components/ui/card';
-import { CardTitle } from '@/components/ui/card-title';
+import { SectionTitle } from '@/components/ui/section-title';
+import { EmptyState } from '@/components/ui/empty-state';
+import { Alert } from '@/components/ui/alert';
+import { JobCard } from '@/components/jobs/job-card';
 
 export function FeaturedJobsSection() {
-  const { jobs, isLoading } = useJobs();
+  const { jobs, isLoading, error } = useJobs();
+  const {
+    companies,
+    isLoading: isLoadingCompanies,
+    error: companiesError,
+  } = usePublicCompanies();
+  const [startIndex, setStartIndex] = useState(0);
+  const [isTransitioning, setIsTransitioning] = useState(false);
+
+  const companiesById = Object.fromEntries(
+    companies.map((company) => [company._id, company]),
+  );
+  const featuredJobs = jobs.length <= 3
+    ? jobs
+    : Array.from({ length: 3 }, (_, index) => {
+        const jobIndex = (startIndex + index) % jobs.length;
+
+        return jobs[jobIndex];
+      });
+
+  useEffect(() => {
+    if (jobs.length <= 3) {
+      return;
+    }
+
+    let transitionTimeoutId: number | undefined;
+
+    const intervalId = window.setInterval(() => {
+      setIsTransitioning(true);
+
+      transitionTimeoutId = window.setTimeout(() => {
+        setStartIndex((current) => (current + 1) % jobs.length);
+        setIsTransitioning(false);
+      }, 300);
+    }, 10000);
+
+    return () => {
+      window.clearInterval(intervalId);
+      if (transitionTimeoutId) {
+        window.clearTimeout(transitionTimeoutId);
+      }
+    };
+  }, [jobs.length]);
 
   return (
     <section className="bg-black py-20">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="mb-10 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <FaBriefcase className="text-gray-700" />
-            <h2 className="text-3xl font-bold text-gray-100">
-              Vagas em destaque
-            </h2>
-          </div>
+          <SectionTitle
+            title="Vagas em destaque"
+            icon={<FaBriefcase className="h-6 w-6" />}
+          />
 
           <Link href={ROUTES.JOBS}>
             <Button variant="login" icon={<FaArrowRight />}>
@@ -30,31 +74,37 @@ export function FeaturedJobsSection() {
           </Link>
         </div>
 
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {isLoading &&
-            Array.from({ length: 3 }).map((_, i) => (
-              <Skeleton key={i} className="h-48" />
+        {(isLoading || isLoadingCompanies) && (
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {Array.from({ length: 3 }).map((_, index) => (
+              <Skeleton key={index} className="h-80" />
             ))}
+          </div>
+        )}
 
-          {!isLoading &&
-            jobs.slice(0, 3).map((job) => (
-              <Card key={job._id}>
-                <CardTitle>{job.title}</CardTitle>
+        {error && <Alert type="error" message={error} />}
 
-                <p className="mt-3 text-sm text-gray-700">
-                  {job.description}
-                </p>
+        {companiesError && <Alert type="error" message={companiesError} />}
 
-                <div className="mt-6">
-                  <Link href={`${ROUTES.JOBS}/${job._id}`}>
-                    <Button variant="login" icon={<FaArrowRight />}>
-                      Ver detalhes
-                    </Button>
-                  </Link>
-                </div>
-              </Card>
+        {!isLoading && !isLoadingCompanies && !error && !companiesError && featuredJobs.length === 0 && (
+          <EmptyState message="Nenhuma vaga em destaque encontrada." />
+        )}
+
+        {!isLoading && !isLoadingCompanies && !error && !companiesError && featuredJobs.length > 0 && (
+          <div
+            className={`grid gap-6 transition-opacity duration-300 md:grid-cols-2 lg:grid-cols-3 ${
+              isTransitioning ? 'opacity-50' : 'opacity-100'
+            }`}
+          >
+            {featuredJobs.map((job) => (
+              <JobCard
+                key={job._id}
+                job={job}
+                company={companiesById[job.companyId]}
+              />
             ))}
-        </div>
+          </div>
+        )}
       </div>
     </section>
   );

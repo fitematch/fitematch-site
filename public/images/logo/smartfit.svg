@@ -1,0 +1,16 @@
+<svg width="40" height="40" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+  <rect width="40" height="40" fill="none"></rect>
+
+  <!-- Texto "smart" -->
+  <text x="20" y="14" text-anchor="middle" font-family="Arial, sans-serif" font-size="8" fill="#444444">
+    smart
+  </text>
+
+  <!-- Texto "fit" -->
+  <text x="20" y="26" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#f5b400">
+    fit
+  </text>
+
+  <!-- Curva (sorriso) -->
+  <path d="M8 30 Q20 36 32 30" stroke="#f5b400" stroke-width="2" fill="none"></path>
+</svg>

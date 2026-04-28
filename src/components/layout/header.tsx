@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import {
   FaSignInAlt,
   FaSignOutAlt,
@@ -16,6 +16,7 @@ import { useFlashMessage } from '@/contexts/flash-message-context';
 import { LanguageDropdown } from './language-dropdown';
 
 export function Header() {
+  const pathname = usePathname();
   const router = useRouter();
   const { isAuthenticated, isLoading, signOut } = useAuth();
   const { showSuccess, showError } = useFlashMessage();
@@ -31,7 +32,9 @@ export function Header() {
   }
 
   return (
-    <header className="sticky top-0 z-40 border-b border-gray-900 bg-black/90 backdrop-blur">
+    <header
+      className={`sticky top-0 z-40 border-b ${THEME.layout.border} ${THEME.layout.headerBackground} backdrop-blur`}
+    >
       <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         <div className="flex items-center gap-8">
           <Link
@@ -42,11 +45,25 @@ export function Header() {
           </Link>
 
           <nav className="hidden items-center gap-6 md:flex">
-            <Link href={ROUTES.JOBS} className={`text-sm ${THEME.text.menu}`}>
+            <Link
+              href={ROUTES.JOBS}
+              className={`text-sm ${
+                pathname.startsWith(ROUTES.JOBS)
+                  ? THEME.navigation.menuItemActive
+                  : THEME.navigation.menuItem
+              }`}
+            >
               Vagas
             </Link>
 
-            <Link href={ROUTES.FAQ} className={`text-sm ${THEME.text.menu}`}>
+            <Link
+              href={ROUTES.FAQ}
+              className={`text-sm ${
+                pathname.startsWith(ROUTES.FAQ)
+                  ? THEME.navigation.menuItemActive
+                  : THEME.navigation.menuItem
+              }`}
+            >
               FAQ
             </Link>
           </nav>
@@ -57,15 +74,15 @@ export function Header() {
 
           {!isLoading && !isAuthenticated && (
             <>
-              <Link href={ROUTES.SIGN_UP}>
-                <Button variant="positive" icon={<FaUserPlus />}>
-                  Cadastre-se
-                </Button>
-              </Link>
-
               <Link href={ROUTES.SIGN_IN}>
                 <Button variant="login" icon={<FaSignInAlt />}>
                   Entrar
+                </Button>
+              </Link>
+
+              <Link href={ROUTES.SIGN_UP}>
+                <Button color="green" icon={<FaUserPlus />}>
+                  Cadastre-se
                 </Button>
               </Link>
             </>

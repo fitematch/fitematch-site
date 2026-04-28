@@ -1,5 +1,10 @@
 import { TEXT_STYLES } from '@/constants/styles';
 
-export function CardTitle({ children }: { children: React.ReactNode }) {
-  return <h3 className={TEXT_STYLES.cardTitle}>{children}</h3>;
+interface CardTitleProps {
+  children: React.ReactNode;
+  className?: string;
+}
+
+export function CardTitle({ children, className = '' }: CardTitleProps) {
+  return <h3 className={`${TEXT_STYLES.featureTitle} ${className}`}>{children}</h3>;
 }

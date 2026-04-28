@@ -1,12 +1,13 @@
 'use client';
 
+import { Alert } from '@/components/ui/alert';
 import { EmptyState } from '@/components/ui/empty-state';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useApplications } from '@/hooks/use-applications';
 import { ApplicationCard } from './application-card';
 
 export function ApplicationList() {
-  const { applications, isLoading } = useApplications();
+  const { applications, isLoading, error } = useApplications();
 
   if (isLoading) {
     return (
@@ -16,6 +17,10 @@ export function ApplicationList() {
         ))}
       </div>
     );
+  }
+
+  if (error) {
+    return <Alert type="error" message={error} />;
   }
 
   if (applications.length === 0) {
