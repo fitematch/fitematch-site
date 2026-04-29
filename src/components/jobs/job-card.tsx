@@ -21,7 +21,7 @@ export function JobCard({ job, company }: JobCardProps) {
     .join(', ');
 
   return (
-    <article className={CARD_STYLES.jobBox}>
+    <article className={CARD_STYLES.jobCard}>
       <JobCompanyHeader job={job} company={company} />
 
       <div className="mt-4">

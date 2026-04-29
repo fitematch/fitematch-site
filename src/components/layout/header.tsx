@@ -33,45 +33,41 @@ export function Header() {
 
   return (
     <header
-      className={`sticky top-0 z-40 border-b ${THEME.layout.border} ${THEME.layout.headerBackground} backdrop-blur`}
+      className={`sticky top-0 z-40 border-b ${THEME.layout.header.border} ${THEME.layout.header.background} backdrop-blur`}
     >
       <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         <div className="flex items-center gap-8">
           <Link
             href={ROUTES.HOME}
-            className={`text-2xl font-bold lowercase ${THEME.text.logo}`}
+            className={`text-2xl font-bold lowercase ${THEME.layout.header.logo}`}
           >
             fitematch
           </Link>
-
           <nav className="hidden items-center gap-6 md:flex">
             <Link
               href={ROUTES.JOBS}
               className={`text-sm ${
                 pathname.startsWith(ROUTES.JOBS)
-                  ? THEME.navigation.menuItemActive
-                  : THEME.navigation.menuItem
+                  ? THEME.navigation.linkActive
+                  : THEME.navigation.link
               }`}
             >
               Vagas
             </Link>
-
             <Link
               href={ROUTES.FAQ}
               className={`text-sm ${
                 pathname.startsWith(ROUTES.FAQ)
-                  ? THEME.navigation.menuItemActive
-                  : THEME.navigation.menuItem
+                  ? THEME.navigation.linkActive
+                  : THEME.navigation.link
               }`}
             >
               FAQ
             </Link>
           </nav>
         </div>
-
         <div className="flex items-center gap-3">
           <LanguageDropdown />
-
           {!isLoading && !isAuthenticated && (
             <>
               <Link href={ROUTES.SIGN_IN}>
@@ -79,7 +75,6 @@ export function Header() {
                   Entrar
                 </Button>
               </Link>
-
               <Link href={ROUTES.SIGN_UP}>
                 <Button color="green" icon={<FaUserPlus />}>
                   Cadastre-se
@@ -87,7 +82,6 @@ export function Header() {
               </Link>
             </>
           )}
-
           {!isLoading && isAuthenticated && (
             <>
               <Link href={ROUTES.PROFILE}>
@@ -95,7 +89,6 @@ export function Header() {
                   Profile
                 </Button>
               </Link>
-
               <Button
                 type="button"
                 variant="danger"

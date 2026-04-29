@@ -1,7 +1,8 @@
-import { FAQ_STYLES, PAGE_STYLES } from '@/constants/styles';
+import { PAGE_STYLES, TEXT_STYLES } from '@/constants/styles';
 import { FaqTabs } from '@/components/faq/faq-tabs';
 import { Breadcrumb } from '@/components/ui/breadcrumb';
 import { ROUTES } from '@/constants/routes';
+
 
 export default function FaqPage() {
   return (
@@ -13,15 +14,12 @@ export default function FaqPage() {
             { label: 'FAQ' },
           ]}
         />
-
-        <h1 className={`${FAQ_STYLES.sectionTitle} mt-8`}>
+        <h1 className={`${TEXT_STYLES.pageTitle} mt-8`}>
           FAQ
         </h1>
-
-        <p className={FAQ_STYLES.sectionSubtitle}>
+        <p className={TEXT_STYLES.pageSubtitle}>
           Tire suas dúvidas sobre cadastro, ativação, vagas e aplicações.
         </p>
-
         <div className="mt-10">
           <FaqTabs />
         </div>

@@ -15,15 +15,12 @@ export default function ProfilePage() {
               { label: 'Profile' },
             ]}
           />
-
-          <h1 className={`${TEXT_STYLES.sectionTitle} mt-8`}>
+          <h1 className={`${TEXT_STYLES.pageTitle} mt-4`}>
             Profile
           </h1>
-
-          <p className={TEXT_STYLES.sectionSubtitle}>
+          <p className={TEXT_STYLES.pageSubtitle}>
             Atualize seus dados básicos e complementares.
           </p>
-
           <div className="mt-10">
             <ProfileForm />
           </div>
