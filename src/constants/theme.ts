@@ -24,7 +24,7 @@ export const THEME = {
 
   form: {
     input:
-      'border-gray-700 bg-black text-white placeholder:text-gray-300',
+      'border-gray-700 bg-black text-white placeholder:text-gray-300, page',
     error: 'text-red-100',
   },
 
@@ -94,7 +94,7 @@ export const THEME = {
       card: 'rounded-xl p-6',
       title: 'text-white hover:text-green-200',
       text: 'text-gray-100 hover:text-green-200',
-      border: 'border border-gray-300',
+      border: 'border border-green-500',
       background: 'bg-black',
     },
 

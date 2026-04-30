@@ -2,14 +2,16 @@
 
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { FaArrowLeft } from 'react-icons/fa';
+import { FaArrowLeft, FaWhatsapp, FaFacebook, FaLinkedinIn, FaPhone } from 'react-icons/fa';
+import { SlGlobe } from 'react-icons/sl';
+import { FaXTwitter } from 'react-icons/fa6';
 import { useJob } from '@/hooks/use-job';
 import { usePublicCompanies } from '@/hooks/use-public-companies';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert } from '@/components/ui/alert';
 import { ApplyJobButton } from '@/components/jobs/apply-job-button';
 import { THEME } from '@/constants/theme';
-import { JobCompanyHeader } from '@/components/jobs/job-company-header';
+import { JobCard } from '@/components/jobs/job-card';
 import { Button } from '@/components/ui/button';
 import { ROUTES } from '@/constants/routes';
 import { Breadcrumb } from '@/components/ui/breadcrumb';
@@ -26,9 +28,16 @@ export default function JobDetailsPage() {
     error: companiesError,
   } = usePublicCompanies();
 
-  const company = job
-    ? companies.find((item) => item._id === job.companyId)
-    : undefined;
+  // Prioriza company do job, depois busca na lista pública
+  const company = job?.company
+    ? {
+        ...job.company,
+        // compatibiliza id/_id
+        _id: job.company.id || job.company._id,
+      }
+    : (job && companies.find((item) => item._id === job.companyId))
+      ? companies.find((item) => item._id === job.companyId)
+      : undefined;
 
   if (isLoading || isLoadingCompanies) {
     return <Skeleton className="h-64" />;
@@ -47,8 +56,8 @@ export default function JobDetailsPage() {
   }
 
   return (
-    <section className={`min-h-screen ${THEME.layout.background} px-4 py-20`}>
-      <div className="mx-auto max-w-3xl">
+    <section className={`min-h-screen ${THEME.layout.background} py-20`}>
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <Breadcrumb
           items={[
             { label: 'Home', href: ROUTES.HOME },
@@ -56,38 +65,162 @@ export default function JobDetailsPage() {
             { label: job.title },
           ]}
         />
-
-        <div className={`mt-8 ${CARD_STYLES.jobDetailBox}`}>
-        <JobCompanyHeader
-          job={job}
-          company={company}
-          coverMode="detail"
-        />
-
-        <h1 className={TEXT_STYLES.jobDetailTitle}>
-          {job.title}
+        <h1 className={`${TEXT_STYLES.pageTitle} mt-8`}>
+          {company?.tradeName ? `${company.tradeName} - ${job.title}` : job.title}
         </h1>
-
-        <p className={`mt-3 text-sm uppercase ${TEXT_STYLES.jobDetailText}`}>
-          {job.status}
-        </p>
-
-        <p className={`mt-6 ${TEXT_STYLES.jobDetailText}`}>{job.description}</p>
-
-        <p className={`mt-4 text-sm ${TEXT_STYLES.jobDetailText}`}>
-          {job.slots === 1 ? '1 vaga disponível' : `${job.slots} vagas disponíveis`}
-        </p>
-
-        <div className="mt-10 flex items-center justify-end gap-4">
-          <Link href={ROUTES.JOBS}>
-            <Button color="gray" icon={<FaArrowLeft />}>
-              Voltar para vagas
-            </Button>
-          </Link>
-
-          <ApplyJobButton jobId={job._id} />
+        {/* Data de publicação */}
+        <div className={`${TEXT_STYLES.pageSubtitle} mt-2 mb-2 text-gray-400`}>{job.createdAt && `Publicado: ${new Date(job.createdAt).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: '2-digit' })} às ${new Date(job.createdAt).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}`}</div>
+        <div className="mt-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Conteúdo principal */}
+          <div className="lg:col-span-2">
+            <JobCard
+              job={job}
+              company={company}
+              showRequirements={true}
+              hideDetailsButton={true}
+              hideCompanyLogoAndTitle={true}
+              hideImageTitleAndLocation={true}
+              hidePublishedDate={true}
+              customActions={
+                <>
+                  <Link href={ROUTES.JOBS}>
+                    <Button color="gray" icon={<FaArrowLeft />}>
+                      Vagas
+                    </Button>
+                  </Link>
+                  <ApplyJobButton jobId={job._id} />
+                </>
+              }
+            />
+          </div>
+          {/* Sidebar */}
+          <aside className="space-y-8">
+            {/* Sobre a empresa (com mapa) */}
+            {company && (
+              <div className={CARD_STYLES.jobCard}>
+                <div className="flex items-center gap-4 mb-4">
+                  {company.media?.logoUrl ? (
+                    <img
+                      src={company.media.logoUrl}
+                      alt={company.tradeName}
+                      className="h-12 w-12 rounded-lg border border-gray-800 object-cover"
+                    />
+                  ) : (
+                    <div className="flex h-12 w-12 items-center justify-center rounded-lg border border-gray-800 bg-gray-950 text-lg font-semibold text-gray-300">
+                      {company.tradeName?.slice(0, 2).toUpperCase()}
+                    </div>
+                  )}
+                  <div>
+                    <div className="font-bold text-gray-100 text-lg">{company.tradeName}</div>
+                  </div>
+                </div>
+                {company.contacts?.website && (
+                  <a
+                    href={company.contacts.website}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 text-xs text-gray-400 hover:underline mb-2"
+                  >
+                    <SlGlobe className="text-base" />
+                    {company.contacts.website}
+                  </a>
+                )}
+                {/* Telefone */}
+                {company.contacts?.phone?.number && (
+                  <div className="flex items-center gap-2 text-xs text-gray-400 mb-2">
+                    <FaPhone className="text-base" />
+                    {company.contacts.phone.number}
+                  </div>
+                )}
+                {/* Endereço formatado */}
+                {company.contacts?.address && (
+                  <div className="text-xs text-gray-400 space-y-1 mb-2">
+                    {/* Rua, número, complemento */}
+                    {(company.contacts.address.street || company.contacts.address.number) && (
+                      <div>
+                        {company.contacts.address.street || ''}
+                        {company.contacts.address.number ? `, ${company.contacts.address.number}` : ''}
+                        {company.contacts.address.complement ? ` - ${company.contacts.address.complement}` : ''}
+                      </div>
+                    )}
+                    {/* Cidade - Estado */}
+                    {(company.contacts.address.city || company.contacts.address.state) && (
+                      <div>
+                        {company.contacts.address.city || ''}
+                        {company.contacts.address.state ? ` - ${company.contacts.address.state}` : ''}
+                      </div>
+                    )}
+                    {/* CEP */}
+                    {company.contacts.address.zipCode && (
+                      <div>{company.contacts.address.zipCode}</div>
+                    )}
+                  </div>
+                )}
+                {/* Mapa dentro do card */}
+                {company.contacts?.address?.city && company.contacts?.address?.state && (
+                  <div className="mt-4">
+                    <iframe
+                      title="Mapa da empresa"
+                      width="100%"
+                      height="180"
+                      style={{ border: 0 }}
+                      loading="lazy"
+                      allowFullScreen
+                      referrerPolicy="no-referrer-when-downgrade"
+                      src={`https://www.google.com/maps?q=${encodeURIComponent(company.contacts.address.city + ', ' + company.contacts.address.state)}&output=embed`}
+                    ></iframe>
+                  </div>
+                )}
+              </div>
+            )}
+            {/* Compartilhamento */}
+            <div className={CARD_STYLES.jobCard}>
+              <div className="font-bold text-gray-100 text-lg mb-2">Compartilhar</div>
+              <div className="flex gap-3 items-center">
+                <a
+                  href={`https://wa.me/?text=${encodeURIComponent(typeof window !== 'undefined' ? window.location.href : '')}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center justify-center p-2 rounded-md bg-green-600 text-white hover:bg-green-700"
+                  title="WhatsApp"
+                  style={{ lineHeight: 0 }}
+                >
+                  <FaWhatsapp size={22} style={{ verticalAlign: 'middle' }} />
+                </a>
+                <a
+                  href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(typeof window !== 'undefined' ? window.location.href : '')}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center justify-center p-2 rounded-md bg-black text-white hover:bg-gray-800 border border-gray-700"
+                  title="X (Twitter)"
+                  style={{ lineHeight: 0 }}
+                >
+                  <FaXTwitter size={22} style={{ verticalAlign: 'middle' }} />
+                </a>
+                <a
+                  href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(typeof window !== 'undefined' ? window.location.href : '')}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center justify-center p-2 rounded-md bg-blue-700 text-white hover:bg-blue-800"
+                  title="Facebook"
+                  style={{ lineHeight: 0 }}
+                >
+                  <FaFacebook size={22} style={{ verticalAlign: 'middle' }} />
+                </a>
+                <a
+                  href={`https://www.linkedin.com/shareArticle?mini=true&url=${encodeURIComponent(typeof window !== 'undefined' ? window.location.href : '')}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center justify-center p-2 rounded-md bg-blue-900 text-white hover:bg-blue-950"
+                  title="LinkedIn"
+                  style={{ lineHeight: 0 }}
+                >
+                  <FaLinkedinIn size={22} style={{ verticalAlign: 'middle' }} />
+                </a>
+              </div>
+            </div>
+          </aside>
         </div>
-      </div>
       </div>
     </section>
   );

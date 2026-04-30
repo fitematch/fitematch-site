@@ -11,6 +11,7 @@ export interface PublicCompanyResponse {
   _id: string;
   slug: string;
   tradeName: string;
+  logo?: string; // URL do logo vinda da API
   contacts?: {
     address?: {
       city?: string;

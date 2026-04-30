@@ -53,7 +53,7 @@ export const TEXT_STYLES = {
     `mt-3 text-base ${THEME.pages.subtitle}`,
   
   jobCardTitle:
-    `text-xl font-semibold ${THEME.card.job.title}`,
+    `text-md font-semibold ${THEME.card.job.title}`,
   jobCardText:
     `text-sm ${THEME.card.job.text}`,
   

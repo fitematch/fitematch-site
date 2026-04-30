@@ -128,6 +128,7 @@ export interface JobEntity {
   requirements?: RequirementsEntity;
   benefits?: BenefitsEntity;
   media?: JobMediaEntity;
+  contractType?: string;
   status: JobStatusEnum;
   createdAt?: Date;
   updatedAt?: Date;

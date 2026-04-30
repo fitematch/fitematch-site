@@ -24,7 +24,7 @@ export function ApplyJobButton({ jobId }: { jobId: string }) {
       disabled={isLoading}
       icon={<FaCheck />}
     >
-      Aplicar-se à vaga
+      Aplicar-se
     </Button>
   );
 }
