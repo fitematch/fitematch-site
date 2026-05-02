@@ -78,13 +78,8 @@ const typedFeatures: Feature[] = features;
 
 export function FeaturesSection() {
   return (
-    <section className={`relative overflow-hidden bg-[linear-gradient(180deg,#050505_0%,#0b0f14_42%,#10151b_100%)] ${PAGE_STYLES.section}`}>
-      <div className="pointer-events-none absolute inset-0">
-        <div className="absolute -top-20 left-[8%] h-72 w-72 rounded-full bg-gray-100/7 blur-3xl" />
-        <div className="absolute bottom-[-80px] right-[10%] h-80 w-80 rounded-full bg-slate-300/10 blur-3xl" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(243,244,246,0.08),transparent_35%),radial-gradient(circle_at_bottom_right,rgba(148,163,184,0.10),transparent_38%)]" />
-      </div>
-      <div className={`relative ${PAGE_STYLES.container}`}>
+    <section className={`bg-[#0f141a] ${PAGE_STYLES.section}`}>
+      <div className={PAGE_STYLES.container}>
         <SectionTitle
           title="FUNCIONALIDADES DA PLATAFORMA"
           icon={<IoMdSettings />}
