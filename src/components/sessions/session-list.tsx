@@ -1,19 +1,34 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { Alert } from '@/components/ui/alert';
 import { EmptyState } from '@/components/ui/empty-state';
+import { PaginationBox } from '@/components/ui/pagination-box';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useAuthSessions } from '@/hooks/use-auth-sessions';
 import { SessionCard } from './session-card';
 
 export function SessionList() {
   const { sessions, isLoading, error, revokeSession } = useAuthSessions();
+  const [page, setPage] = useState(1);
+  const itemsPerPage = 10;
+  const totalPages = Math.ceil(sessions.length / itemsPerPage);
+  const paginatedSessions = sessions.slice(
+    (page - 1) * itemsPerPage,
+    page * itemsPerPage
+  );
+
+  useEffect(() => {
+    if (page > totalPages && totalPages > 0) {
+      setPage(totalPages);
+    }
+  }, [page, totalPages]);
 
   if (isLoading) {
     return (
       <div className="space-y-4">
         {Array.from({ length: 3 }).map((_, index) => (
-          <Skeleton key={index} className="h-36" />
+          <Skeleton key={index} className="h-36 rounded-2xl border border-gray-500 bg-black" />
         ))}
       </div>
     );
@@ -31,13 +46,18 @@ export function SessionList() {
 
   return (
     <div className="space-y-4">
-      {sessions.map((session) => (
+      {paginatedSessions.map((session) => (
         <SessionCard
           key={session.id}
           session={session}
           onRevoke={revokeSession}
         />
       ))}
+      <PaginationBox
+        currentPage={page}
+        totalPages={totalPages}
+        onPageChange={setPage}
+      />
     </div>
   );
 }

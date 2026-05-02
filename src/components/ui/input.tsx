@@ -1,6 +1,6 @@
 'use client';
 
-import { InputHTMLAttributes, ReactNode, useState } from 'react';
+import { forwardRef, InputHTMLAttributes, ReactNode, useState } from 'react';
 import { FaEyeSlash, FaRegEye } from 'react-icons/fa';
 import { INPUT_STYLES } from '@/constants/styles';
 
@@ -11,14 +11,17 @@ interface Props extends InputHTMLAttributes<HTMLInputElement> {
   error?: string;
 }
 
-export function Input({
-  icon,
-  label,
-  labelClassName = 'text-gray-300',
-  error,
-  className = '',
-  ...props
-}: Props) {
+export const Input = forwardRef<HTMLInputElement, Props>(function Input(
+  {
+    icon,
+    label,
+    labelClassName = 'text-gray-300',
+    error,
+    className = '',
+    ...props
+  },
+  ref
+) {
   const isPasswordField = props.type === 'password';
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const inputType = isPasswordField && isPasswordVisible ? 'text' : props.type;
@@ -38,6 +41,7 @@ export function Input({
         )}
 
         <input
+          ref={ref}
           className={`${INPUT_STYLES} ${icon ? 'pl-11' : ''} ${isPasswordField ? 'pr-11' : ''} ${className}`}
           {...props}
           type={inputType}
@@ -60,4 +64,4 @@ export function Input({
       )}
     </div>
   );
-}
+});

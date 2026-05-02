@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { FaPaperPlane } from 'react-icons/fa';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/use-auth';
@@ -19,6 +20,7 @@ export function ApplyJobButton({
   hasAlreadyApplied = false,
   onApplied,
 }: ApplyJobButtonProps) {
+  const router = useRouter();
   const { user, isAuthenticated } = useAuth();
   const { showSuccess, showError } = useFlashMessage();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -58,6 +60,7 @@ export function ApplyJobButton({
 
       showSuccess('Candidatura realizada com sucesso.');
       onApplied?.();
+      router.refresh();
     } catch {
       showError('Não foi possível realizar sua candidatura.');
     } finally {

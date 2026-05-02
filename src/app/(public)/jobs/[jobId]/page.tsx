@@ -3,9 +3,10 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { FaArrowLeft, FaWhatsapp, FaFacebook, FaLinkedinIn } from 'react-icons/fa';
+import { FaArrowLeft, FaWhatsapp, FaFacebook, FaInstagram, FaLinkedinIn } from 'react-icons/fa';
 import { MdOutlinePlace } from 'react-icons/md';
 import { SlGlobe } from 'react-icons/sl';
+import { CiShare2 } from 'react-icons/ci';
 import { FaXTwitter } from 'react-icons/fa6';
 import { useJob } from '@/hooks/use-job';
 import { usePublicCompanies } from '@/hooks/use-public-companies';
@@ -19,6 +20,7 @@ import { Button } from '@/components/ui/button';
 import { ROUTES } from '@/constants/routes';
 import { Breadcrumb } from '@/components/ui/breadcrumb';
 import { CARD_STYLES, TEXT_STYLES } from '@/constants/styles';
+import { JobLocationMapTest } from '@/components/jobs/job-location-map-test';
 
 export default function JobDetailsPage() {
   const params = useParams();
@@ -86,6 +88,7 @@ export default function JobDetailsPage() {
               showRequirements={true}
               hideDetailsButton={true}
               hideImageTitleAndLocation={true}
+              className="border-slate-600/70 bg-zinc-950 shadow-[0_18px_50px_rgba(0,0,0,0.34),0_0_0_1px_rgba(148,163,184,0.06)]"
               customActions={
                 <>
                   <Link href={ROUTES.JOBS}>
@@ -101,8 +104,8 @@ export default function JobDetailsPage() {
           <aside className="space-y-8">
             {/* Sobre a empresa (com mapa) */}
             {company && (
-              <div className={CARD_STYLES.jobCard}>
-                <div className="flex items-center gap-4 mb-4">
+              <div className={`${CARD_STYLES.jobCard} border-slate-700/70 bg-zinc-950 shadow-[0_12px_32px_rgba(0,0,0,0.26)]`}>
+                <div className="mb-5 flex items-center gap-4">
                   {company.media?.logoUrl ? (
                     <Image
                       src={company.media.logoUrl}
@@ -110,10 +113,10 @@ export default function JobDetailsPage() {
                       width={48}
                       height={48}
                       unoptimized
-                      className="h-12 w-12 rounded-lg border border-gray-800 object-cover"
+                      className="h-12 w-12 rounded-xl border border-slate-700 object-cover"
                     />
                   ) : (
-                    <div className="flex h-12 w-12 items-center justify-center rounded-lg border border-gray-800 bg-gray-950 text-lg font-semibold text-gray-300">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-slate-700 bg-black text-lg font-semibold text-gray-300">
                       {company.tradeName?.slice(0, 2).toUpperCase()}
                     </div>
                   )}
@@ -126,105 +129,71 @@ export default function JobDetailsPage() {
                     href={company.contacts.website}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center gap-2 text-xs text-gray-400 hover:underline mb-2"
+                    className="flex items-center gap-2 rounded-xl border border-slate-700/80 bg-black/60 px-3 py-3 text-sm text-gray-300 transition-colors hover:border-slate-500 hover:text-gray-100"
                   >
                     <SlGlobe className="text-base" />
                     {company.contacts.website}
                   </a>
                 )}
-
-                {company.contacts?.address && (
-                  <div className="text-xs text-gray-400 space-y-1 mb-2">
-                    {(company.contacts.address.street || company.contacts.address.number) && (
-                      <div className="flex items-center gap-2">
-                        <MdOutlinePlace className="text-gray-400" />
-                        <span>
-                          {company.contacts.address.street || ''}
-                          {company.contacts.address.number ? `, ${company.contacts.address.number}` : ''}
-                          {company.contacts.address.complement ? ` - ${company.contacts.address.complement}` : ''}
-                          {company.contacts.address.neighborhood ? ` - ${company.contacts.address.neighborhood}` : ''}
-                          {company.contacts.address.city ? ` - ${company.contacts.address.city}` : ''}
-                          {company.contacts.address.state ? ` / ${company.contacts.address.state}` : ''}
-                        </span>
-                      </div>
-                    )}
-                  </div>
-                )}
-                {/* Mapa dentro do card */}
-                {company.contacts?.address && (
-                  (() => {
-                    const addr = company.contacts.address;
-                    const addressParts = [
-                      addr.street,
-                      addr.number,
-                      addr.neighborhood,
-                      addr.complement,
-                      addr.city,
-                      addr.state
-                    ].filter(Boolean);
-                    const fullAddress = addressParts.join(', ');
-                    const mapQuery = fullAddress || [addr.city, addr.state].filter(Boolean).join(', ');
-                    return (addr.city && addr.state) ? (
-                      <div className="mt-4">
-                        <iframe
-                          title="Mapa da empresa"
-                          width="100%"
-                          height="180"
-                          style={{ border: 0 }}
-                          loading="lazy"
-                          allowFullScreen
-                          referrerPolicy="no-referrer-when-downgrade"
-                          src={`https://www.google.com/maps?q=${encodeURIComponent(mapQuery)}&output=embed`}
-                        ></iframe>
-                      </div>
-                    ) : null;
-                  })()
-                )}
               </div>
             )}
+            {company && <JobLocationMapTest company={company} />}
             {/* Compartilhamento */}
-            <div className={CARD_STYLES.jobCard}>
-              <div className="font-bold text-gray-100 text-lg mb-2">Compartilhar</div>
-              <div className="flex gap-3 items-center">
+            <div className={`${CARD_STYLES.jobCard} border-slate-700/70 bg-zinc-950 shadow-[0_12px_32px_rgba(0,0,0,0.26)]`}>
+              <div className="mb-5 flex items-center gap-3 text-lg font-bold text-gray-100">
+                <CiShare2 className="h-6 w-6" />
+                <span>Compartilhar</span>
+              </div>
+              <div className="flex items-center justify-between gap-3">
                 <a
                   href={`https://wa.me/?text=${encodeURIComponent(typeof window !== 'undefined' ? window.location.href : '')}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center justify-center p-2 rounded-md bg-green-600 text-white hover:bg-green-700"
+                  className="inline-flex h-14 w-14 shrink-0 items-center justify-center rounded-xl border border-slate-700 bg-zinc-900 text-green-300 transition-all hover:-translate-y-0.5 hover:border-green-500 hover:bg-green-600 hover:text-white"
                   title="WhatsApp"
                   style={{ lineHeight: 0 }}
                 >
-                  <FaWhatsapp size={22} style={{ verticalAlign: 'middle' }} />
+                  <FaWhatsapp size={26} style={{ verticalAlign: 'middle' }} />
                 </a>
                 <a
                   href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(typeof window !== 'undefined' ? window.location.href : '')}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center justify-center p-2 rounded-md bg-black text-white hover:bg-gray-800 border border-gray-700"
+                  className="inline-flex h-14 w-14 shrink-0 items-center justify-center rounded-xl border border-slate-700 bg-zinc-900 text-gray-300 transition-all hover:-translate-y-0.5 hover:border-white/70 hover:bg-black hover:text-white"
                   title="X (Twitter)"
                   style={{ lineHeight: 0 }}
                 >
-                  <FaXTwitter size={22} style={{ verticalAlign: 'middle' }} />
+                  <FaXTwitter size={26} style={{ verticalAlign: 'middle' }} />
                 </a>
                 <a
                   href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(typeof window !== 'undefined' ? window.location.href : '')}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center justify-center p-2 rounded-md bg-blue-700 text-white hover:bg-blue-800"
+                  className="inline-flex h-14 w-14 shrink-0 items-center justify-center rounded-xl border border-slate-700 bg-zinc-900 text-blue-300 transition-all hover:-translate-y-0.5 hover:border-blue-500 hover:bg-blue-700 hover:text-white"
                   title="Facebook"
                   style={{ lineHeight: 0 }}
                 >
-                  <FaFacebook size={22} style={{ verticalAlign: 'middle' }} />
+                  <FaFacebook size={26} style={{ verticalAlign: 'middle' }} />
+                </a>
+                <a
+                  href="https://www.instagram.com/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex h-14 w-14 shrink-0 items-center justify-center rounded-xl border border-slate-700 bg-zinc-900 text-pink-300 transition-all hover:-translate-y-0.5 hover:border-pink-500 hover:bg-gradient-to-br hover:from-pink-500 hover:via-red-500 hover:to-yellow-500 hover:text-white"
+                  title="Instagram"
+                  style={{ lineHeight: 0 }}
+                >
+                  <FaInstagram size={26} style={{ verticalAlign: 'middle' }} />
                 </a>
                 <a
                   href={`https://www.linkedin.com/shareArticle?mini=true&url=${encodeURIComponent(typeof window !== 'undefined' ? window.location.href : '')}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center justify-center p-2 rounded-md bg-blue-900 text-white hover:bg-blue-950"
+                  className="inline-flex h-14 w-14 shrink-0 items-center justify-center rounded-xl border border-slate-700 bg-zinc-900 text-sky-300 transition-all hover:-translate-y-0.5 hover:border-sky-500 hover:bg-sky-800 hover:text-white"
                   title="LinkedIn"
                   style={{ lineHeight: 0 }}
                 >
-                  <FaLinkedinIn size={22} style={{ verticalAlign: 'middle' }} />
+                  <FaLinkedinIn size={26} style={{ verticalAlign: 'middle' }} />
                 </a>
               </div>
             </div>

@@ -1,10 +1,15 @@
+'use client';
+
 import Link from 'next/link';
-import { FaBriefcase, FaUserPlus } from 'react-icons/fa';
+import { FaBriefcase, FaCheckCircle, FaUserPlus } from 'react-icons/fa';
 import { Button } from '@/components/ui/button';
 import { ROUTES } from '@/constants/routes';
 import { THEME } from '@/constants/theme';
+import { useAuth } from '@/hooks/use-auth';
 
 export function HeroSection() {
+  const { isAuthenticated } = useAuth();
+
   return (
     <section className={`flex min-h-screen items-center ${THEME.layout.background}`}>
       <div className="mx-auto grid max-w-7xl gap-10 px-4 sm:px-6 lg:grid-cols-2 lg:px-8">
@@ -19,9 +24,12 @@ export function HeroSection() {
           </p>
 
           <div className="mt-8 flex flex-wrap gap-4">
-            <Link href={ROUTES.SIGN_UP}>
-              <Button color="green" icon={<FaUserPlus />}>
-                Quero me cadastrar
+            <Link href={isAuthenticated ? ROUTES.APPLICATIONS : ROUTES.SIGN_UP}>
+              <Button
+                color="green"
+                icon={isAuthenticated ? <FaCheckCircle /> : <FaUserPlus />}
+              >
+                {isAuthenticated ? 'Ver candidaturas' : 'Quero me cadastrar'}
               </Button>
             </Link>
 

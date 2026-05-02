@@ -60,8 +60,13 @@ export function FeaturedJobsSection() {
   }, [jobs.length]);
 
   return (
-    <section className="bg-black py-20">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    <section className="relative overflow-hidden bg-[linear-gradient(180deg,#080b0f_0%,#0a0a0a_55%,#000000_100%)] py-20">
+      <div className="pointer-events-none absolute inset-0">
+        <div className="absolute top-[-70px] left-[14%] h-64 w-64 rounded-full bg-gray-100/7 blur-3xl" />
+        <div className="absolute bottom-[-100px] right-[12%] h-80 w-80 rounded-full bg-slate-300/8 blur-3xl" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.08),transparent_28%),radial-gradient(circle_at_bottom_right,rgba(148,163,184,0.08),transparent_36%)]" />
+      </div>
+      <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="mb-10 flex items-center justify-between">
           <SectionTitle
             title="VAGAS EM DESTAQUE"

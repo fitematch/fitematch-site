@@ -23,12 +23,13 @@ import {
 } from 'react-icons/gi';
 import { PiPantsFill } from 'react-icons/pi';
 import { GrCertificate, GrDocumentText } from 'react-icons/gr';
-import { MdDiversity2, MdEventAvailable } from 'react-icons/md';
+import { MdDiversity2, MdEventAvailable, MdOutlinePlace } from 'react-icons/md';
 import { BsFiles } from 'react-icons/bs';
 import { IoCloudUploadOutline } from 'react-icons/io5';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select } from '@/components/ui/select';
+import { useAddressByZipCode } from '@/hooks/use-address-by-zipcode';
 import { useAuth } from '@/hooks/use-auth';
 import { UpdateMeRequest } from '@/services/auth/auth.types';
 import { useFlashMessage } from '@/contexts/flash-message-context';
@@ -158,6 +159,12 @@ import { useState } from 'react';
 export function CandidateProfileForm() {
   const { user, updateMe } = useAuth();
   const { showSuccess, showError } = useFlashMessage();
+  const {
+    searchZipCode,
+    clearError: clearZipCodeError,
+    isLoading: isZipCodeLoading,
+    error: zipCodeError,
+  } = useAddressByZipCode();
   const currentYear = new Date().getFullYear();
   const courseTypeOptions = Object.values(CourseTypeEnum).map((value) => ({
     value,
@@ -175,6 +182,7 @@ export function CandidateProfileForm() {
   }));
   const [showBasic, setShowBasic] = useState(true);
   const [showPhone, setShowPhone] = useState(true);
+  const [showAddress, setShowAddress] = useState(true);
   const [showContacts, setShowContacts] = useState(true);
   const [showMedia, setShowMedia] = useState(true);
   const [showEthnicity, setShowEthnicity] = useState(true);
@@ -206,7 +214,7 @@ export function CandidateProfileForm() {
   });
   const boxClassName = 'rounded-2xl border border-gray-500 bg-black p-6';
   const fieldClassName =
-    'rounded-xl border border-gray-500 bg-black text-gray-300 placeholder:text-gray-300';
+    'rounded-xl border border-gray-500 bg-black text-gray-300 placeholder:text-gray-500';
   const labelClassName = 'text-gray-300';
 
   const {
@@ -240,6 +248,7 @@ export function CandidateProfileForm() {
   });
   const nextEducationNumber = String(educationFields.length + 1).padStart(2, '0');
   const nextExperienceNumber = String(experienceFields.length + 1).padStart(2, '0');
+  const zipCodeField = register('candidateProfile.contacts.address.zipCode');
 
   async function submitCandidateUpdate(
     payload: UpdateMeRequest,
@@ -268,6 +277,10 @@ export function CandidateProfileForm() {
     control,
     name: 'candidateProfile.uniform.shoeSize',
   });
+  const zipCodeValue = useWatch({
+    control,
+    name: 'candidateProfile.contacts.address.zipCode',
+  });
   const shoeSizeUnitValue = useWatch({
     control,
     name: 'candidateProfile.uniform.shoeSizeUnit',
@@ -289,6 +302,39 @@ export function CandidateProfileForm() {
       Number((Number(currentValue || 0) + delta).toFixed(precision))
     );
     setValue(field, nextValue, { shouldDirty: true, shouldTouch: true });
+  }
+
+  async function handleZipCodeLookup(zipCode?: string) {
+    const result = await searchZipCode(zipCode || '');
+
+    if (!result) {
+      return;
+    }
+
+    setValue('candidateProfile.contacts.address.street', result.street, {
+      shouldDirty: true,
+      shouldTouch: true,
+    });
+    setValue('candidateProfile.contacts.address.complement', result.complement, {
+      shouldDirty: true,
+      shouldTouch: true,
+    });
+    setValue(
+      'candidateProfile.contacts.address.neighborhood',
+      result.neighborhood,
+      {
+        shouldDirty: true,
+        shouldTouch: true,
+      }
+    );
+    setValue('candidateProfile.contacts.address.city', result.city, {
+      shouldDirty: true,
+      shouldTouch: true,
+    });
+    setValue('candidateProfile.contacts.address.state', result.state, {
+      shouldDirty: true,
+      shouldTouch: true,
+    });
   }
 
   function updateEducationDraftYear(field: 'startYear' | 'endYear', delta: number) {
@@ -509,6 +555,36 @@ export function CandidateProfileForm() {
       },
       'Documentos atualizados com sucesso.',
       'Não foi possível atualizar os documentos.'
+    );
+  }
+
+  function handleSaveAddress() {
+    const address = getValues('candidateProfile.contacts.address');
+    const nextAddress = {
+      ...(hasValue(address?.zipCode) ? { zipCode: address?.zipCode } : {}),
+      ...(hasValue(address?.street) ? { street: address?.street } : {}),
+      ...(hasValue(address?.number) ? { number: address?.number } : {}),
+      ...(hasValue(address?.complement) ? { complement: address?.complement } : {}),
+      ...(hasValue(address?.neighborhood)
+        ? { neighborhood: address?.neighborhood }
+        : {}),
+      ...(hasValue(address?.city) ? { city: address?.city } : {}),
+      ...(hasValue(address?.state) ? { state: address?.state } : {}),
+      ...(hasValue(address?.country) ? { country: address?.country } : {}),
+    };
+
+    void submitCandidateUpdate(
+      {
+        candidateProfile: {
+          ...user?.candidateProfile,
+          contacts: {
+            ...user?.candidateProfile?.contacts,
+            ...(Object.keys(nextAddress).length > 0 ? { address: nextAddress } : {}),
+          },
+        },
+      },
+      'Endereço atualizado com sucesso.',
+      'Não foi possível atualizar o endereço.'
     );
   }
 
@@ -760,14 +836,14 @@ export function CandidateProfileForm() {
               label="Country"
               labelClassName={labelClassName}
               className={fieldClassName}
-              placeholder="Country"
+              placeholder="+55"
               {...register('candidateProfile.contacts.phone.country')}
             />
             <Input
               label="Number"
               labelClassName={labelClassName}
               className={fieldClassName}
-              placeholder="Number"
+              placeholder="11981726354"
               {...register('candidateProfile.contacts.phone.number')}
             />
             <div className="flex items-end">
@@ -809,6 +885,147 @@ export function CandidateProfileForm() {
 
       <div className={boxClassName}>
         <ProfileSectionTitle
+          title="Endereço"
+          icon={MdOutlinePlace}
+          onIconClick={() => setShowAddress((v) => !v)}
+          iconClickable
+          expanded={showAddress}
+        />
+        {showAddress && (
+          <div className="mt-6 grid gap-4 md:grid-cols-2">
+            <Input
+              label="CEP"
+              labelClassName={labelClassName}
+              className={fieldClassName}
+              placeholder="01310-100"
+              {...zipCodeField}
+              onChange={(event) => {
+                clearZipCodeError();
+                zipCodeField.onChange(event);
+              }}
+              onBlur={(event) => {
+                zipCodeField.onBlur(event);
+                void handleZipCodeLookup(event.target.value);
+              }}
+            />
+            <div className="hidden md:block" />
+            {isZipCodeLoading && (
+              <div className="md:col-span-2">
+                <p className="text-sm text-gray-300">Consultando CEP...</p>
+              </div>
+            )}
+            {zipCodeError && (
+              <div className="md:col-span-2">
+                <p className="text-sm text-red-100">{zipCodeError}</p>
+              </div>
+            )}
+
+            <Input
+              label="Rua"
+              labelClassName={labelClassName}
+              className={fieldClassName}
+              placeholder="Avenida Paulista"
+              {...register('candidateProfile.contacts.address.street')}
+            />
+            <div className="grid gap-4 md:grid-cols-2">
+              <Input
+                label="Número"
+                labelClassName={labelClassName}
+                className={fieldClassName}
+                placeholder="1578"
+                {...register('candidateProfile.contacts.address.number')}
+              />
+              <Input
+                label="Complemento"
+                labelClassName={labelClassName}
+                className={fieldClassName}
+                placeholder="Conjunto 201"
+                {...register('candidateProfile.contacts.address.complement')}
+              />
+            </div>
+
+            <div className="contents md:hidden">
+              <Input
+                label="Bairro"
+                labelClassName={labelClassName}
+                className={fieldClassName}
+                placeholder="Bairro"
+                {...register('candidateProfile.contacts.address.neighborhood')}
+              />
+              <Input
+                label="Cidade"
+                labelClassName={labelClassName}
+                className={fieldClassName}
+                placeholder="Cidade"
+                {...register('candidateProfile.contacts.address.city')}
+              />
+              <Input
+                label="Estado"
+                labelClassName={labelClassName}
+                className={fieldClassName}
+                placeholder="Estado"
+                {...register('candidateProfile.contacts.address.state')}
+              />
+              <Input
+                label="País"
+                labelClassName={labelClassName}
+                className={fieldClassName}
+                placeholder="País"
+                {...register('candidateProfile.contacts.address.country')}
+              />
+            </div>
+            <div className="hidden gap-4 md:grid md:grid-cols-2 md:col-span-2">
+              <div className="grid gap-4 grid-cols-2">
+                <Input
+                  label="Bairro"
+                  labelClassName={labelClassName}
+                  className={fieldClassName}
+                  placeholder="Bela Vista"
+                  {...register('candidateProfile.contacts.address.neighborhood')}
+                />
+                <Input
+                  label="Cidade"
+                  labelClassName={labelClassName}
+                  className={fieldClassName}
+                  placeholder="São Paulo"
+                  {...register('candidateProfile.contacts.address.city')}
+                />
+              </div>
+              <div className="grid gap-4 grid-cols-2">
+                <Input
+                  label="Estado"
+                  labelClassName={labelClassName}
+                  className={fieldClassName}
+                  placeholder="SP"
+                  {...register('candidateProfile.contacts.address.state')}
+                />
+                <Input
+                  label="País"
+                  labelClassName={labelClassName}
+                  className={fieldClassName}
+                  placeholder="Brasil"
+                  {...register('candidateProfile.contacts.address.country')}
+                />
+              </div>
+            </div>
+
+            <div className="flex justify-end md:col-span-2">
+              <Button
+                type="button"
+                variant="positive"
+                icon={<FaSave />}
+                disabled={isSubmitting}
+                onClick={handleSaveAddress}
+              >
+                Salvar
+              </Button>
+            </div>
+          </div>
+        )}
+      </div>
+
+      <div className={boxClassName}>
+        <ProfileSectionTitle
           title="Documentos"
           icon={FaPassport}
           onIconClick={() => setShowContacts((v) => !v)}
@@ -824,7 +1041,7 @@ export function CandidateProfileForm() {
                   label="Número"
                   labelClassName={labelClassName}
                   className={fieldClassName}
-                  placeholder="RG"
+                  placeholder="45.678.901-2"
                   {...register('candidateProfile.documents.rg.number')}
                 />
                 <div className="hidden md:block" />
@@ -832,14 +1049,14 @@ export function CandidateProfileForm() {
                   label="Órgão Emissor"
                   labelClassName={labelClassName}
                   className={fieldClassName}
-                  placeholder="Órgão Emissor"
+                  placeholder="SSP-SP"
                   {...register('candidateProfile.documents.rg.issuer')}
                 />
                 <Input
                   label="Estado Emissor"
                   labelClassName={labelClassName}
                   className={fieldClassName}
-                  placeholder="Estado"
+                  placeholder="SP"
                   {...register('candidateProfile.documents.rg.state')}
                 />
               </div>
@@ -852,7 +1069,7 @@ export function CandidateProfileForm() {
                   label="Número"
                   labelClassName={labelClassName}
                   className={fieldClassName}
-                  placeholder="CPF"
+                  placeholder="123.456.789-00"
                   {...register('candidateProfile.documents.cpf.number')}
                 />
                 <div className="hidden md:block" />
@@ -875,14 +1092,14 @@ export function CandidateProfileForm() {
                   label="CREF"
                   labelClassName={labelClassName}
                   className={fieldClassName}
-                  placeholder="CREF"
+                  placeholder="123456-G/SP"
                   {...register('candidateProfile.documents.cref.number')}
                 />
                 <Input
                   label="Categoria CREF"
                   labelClassName={labelClassName}
                   className={fieldClassName}
-                  placeholder="Categoria CREF"
+                  placeholder="Provisório"
                   {...register('candidateProfile.documents.cref.category')}
                 />
               </div>
@@ -897,7 +1114,7 @@ export function CandidateProfileForm() {
                   label="Código"
                   labelClassName={labelClassName}
                   className={fieldClassName}
-                  placeholder="Passaporte"
+                  placeholder="AB123456"
                   {...register('candidateProfile.documents.passport.number')}
                 />
                 <div className="hidden md:block" />
@@ -905,14 +1122,14 @@ export function CandidateProfileForm() {
                   label="País"
                   labelClassName={labelClassName}
                   className={fieldClassName}
-                  placeholder="País do passaporte"
+                  placeholder="Brasil"
                   {...register('candidateProfile.documents.passport.country')}
                 />
                 <Input
                   label="Validade"
                   labelClassName={labelClassName}
                   className={fieldClassName}
-                  placeholder="Validade do passaporte"
+                  placeholder="10/12/2030"
                   {...register('candidateProfile.documents.passport.expirationDate')}
                 />
               </div>
@@ -1109,7 +1326,7 @@ export function CandidateProfileForm() {
                     min={0}
                     step={0.01}
                     className="w-full bg-transparent text-center text-gray-300 outline-none appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
-                    placeholder="0"
+                    placeholder="1.60"
                     {...register('candidateProfile.physicalAttributes.height', {
                       valueAsNumber: true,
                     })}
@@ -1163,7 +1380,7 @@ export function CandidateProfileForm() {
                     min={0}
                     step={0.01}
                     className="w-full bg-transparent text-center text-gray-300 outline-none appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
-                    placeholder="0"
+                    placeholder="70"
                     {...register('candidateProfile.physicalAttributes.weight', {
                       valueAsNumber: true,
                     })}
@@ -1284,7 +1501,7 @@ export function CandidateProfileForm() {
                     step={1}
                     disabled={!hasShoeSizeUnit}
                     className="w-full bg-transparent text-center text-gray-300 outline-none appearance-none disabled:cursor-not-allowed [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
-                    placeholder="0"
+                    placeholder="36"
                     {...register('candidateProfile.uniform.shoeSize', {
                       valueAsNumber: true,
                       validate: (value) => {

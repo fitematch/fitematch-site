@@ -25,10 +25,10 @@ export function SessionCard({ session, onRevoke }: SessionCardProps) {
   }
 
   return (
-    <article className="rounded-xl border border-gray-900 p-6">
+    <article className="rounded-2xl border border-gray-500 bg-black p-6">
       <div className="flex items-start justify-between gap-6">
         <div>
-          <div className="flex items-center gap-3 text-gray-700">
+          <div className="flex items-center gap-3 text-gray-300">
             <FaDesktop />
             <span className="text-sm uppercase">
               {isRevoked ? 'Revogada' : 'Ativa'}
@@ -39,7 +39,7 @@ export function SessionCard({ session, onRevoke }: SessionCardProps) {
             {session.userAgent || 'Dispositivo desconhecido'}
           </h3>
 
-          <div className="mt-3 space-y-1 text-sm text-gray-700">
+          <div className="mt-3 space-y-1 text-xs text-gray-300">
             {session.ipAddress && <p>IP: {session.ipAddress}</p>}
             <p>Expira em: {String(session.expiresAt)}</p>
             {session.createdAt && <p>Criada em: {String(session.createdAt)}</p>}

@@ -25,7 +25,7 @@ export function ApplicationList() {
     <div className="grid gap-4">
       {applications.map((application) => (
         <ApplicationCard
-          key={application._id}
+          key={application._id || `${application.jobId}-${application.userId}-${application.createdAt || application.updatedAt || 'application'}`}
           application={application}
           onDeleted={refetch}
         />

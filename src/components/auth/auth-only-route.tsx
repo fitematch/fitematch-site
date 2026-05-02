@@ -15,7 +15,7 @@ export function AuthOnlyRoute({ children }: AuthOnlyRouteProps) {
 
   useEffect(() => {
     if (!isLoading && isAuthenticated) {
-      router.push(ROUTES.PROFILE);
+      router.push(ROUTES.HOME);
     }
   }, [isAuthenticated, isLoading, router]);
 

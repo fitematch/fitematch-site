@@ -1,10 +1,14 @@
 import Link from 'next/link';
 import { FaArrowRight, FaRegCheckCircle, FaRegCircle, FaGraduationCap } from 'react-icons/fa';
 import { FaSchool } from 'react-icons/fa6';
-import { TiMinus } from 'react-icons/ti';
-import { MdAttachMoney } from 'react-icons/md';
+import { MdAttachMoney, MdLanguage } from 'react-icons/md';
 import { LiaFileContractSolid } from 'react-icons/lia';
-import { JobEntity } from '@/types/entities/job.entity';
+import {
+  EducationLevelEnum,
+  JobEntity,
+  LanguagesEnum,
+  LanguagesLevelEnum,
+} from '@/types/entities/job.entity';
 import { PublicCompanyResponse } from '@/services/company/company.types';
 import { Button } from '@/components/ui/button';
 import { CARD_STYLES, TEXT_STYLES } from '@/constants/styles';
@@ -17,10 +21,53 @@ interface JobCardProps {
   hideDetailsButton?: boolean;
   customActions?: React.ReactNode;
   hideImageTitleAndLocation?: boolean;
+  className?: string;
 }
 
+function JobDivider() {
+  return (
+    <div className="my-4 flex items-center gap-3" aria-hidden="true">
+      <div className="h-px flex-1 bg-gradient-to-r from-transparent via-gray-700 to-transparent" />
+      <div className="h-1.5 w-1.5 rounded-full bg-gray-600/80" />
+      <div className="h-px flex-1 bg-gradient-to-r from-transparent via-gray-700 to-transparent" />
+    </div>
+  );
+}
 
-export function JobCard({ job, company, showRequirements, hideDetailsButton = false, customActions, hideImageTitleAndLocation = false }: JobCardProps) {
+function getLanguageLabel(value: LanguagesEnum) {
+  return {
+    [LanguagesEnum.PORTUGUESE]: 'Português',
+    [LanguagesEnum.ENGLISH]: 'Inglês',
+    [LanguagesEnum.SPANISH]: 'Espanhol',
+  }[value];
+}
+
+function getLanguageLevelLabel(value: LanguagesLevelEnum) {
+  return {
+    [LanguagesLevelEnum.BASIC]: 'Básico',
+    [LanguagesLevelEnum.INTERMEDIATE]: 'Intermediário',
+    [LanguagesLevelEnum.ADVANCED]: 'Avançado',
+    [LanguagesLevelEnum.FLUENT]: 'Fluente',
+    [LanguagesLevelEnum.NATIVE]: 'Nativo',
+  }[value];
+}
+
+function getEducationLevelLabel(value: EducationLevelEnum) {
+  return {
+    [EducationLevelEnum.HIGH_SCHOOL]: 'Ensino Médio',
+    [EducationLevelEnum.TECHNICAL]: 'Técnico',
+    [EducationLevelEnum.BACHELOR]: 'Bacharelado',
+    [EducationLevelEnum.ASSOCIATE]: 'Tecnólogo',
+    [EducationLevelEnum.POSTGRADUATE]: 'Pós-graduação',
+    [EducationLevelEnum.MBA]: 'MBA',
+    [EducationLevelEnum.MASTER]: 'Mestrado',
+    [EducationLevelEnum.DOCTORATE]: 'Doutorado',
+    [EducationLevelEnum.EXTENSION]: 'Extensão',
+    [EducationLevelEnum.OTHER]: 'Outro',
+  }[value];
+}
+
+export function JobCard({ job, company, showRequirements, hideDetailsButton = false, customActions, hideImageTitleAndLocation = false, className = '' }: JobCardProps) {
   // Prioriza dados vindos de job.company, fallback para prop company
   const jobCompany = (job as { company?: PublicCompanyResponse })?.company;
   const displayCompany = jobCompany || company;
@@ -35,7 +82,7 @@ export function JobCard({ job, company, showRequirements, hideDetailsButton = fa
     const isListCard = !hideDetailsButton;
 
     return (
-      <article className={CARD_STYLES.jobCard}>
+      <article className={`${CARD_STYLES.jobCard} ${isListCard ? 'overflow-hidden' : ''} ${className}`}>
         {/* Imagem de capa com título e localização sobrepostos */}
         {job.media?.coverUrl && (
           <div className="relative -mx-6 -mt-6 mb-0 overflow-hidden rounded-t-xl border-b border-gray-900">
@@ -45,93 +92,186 @@ export function JobCard({ job, company, showRequirements, hideDetailsButton = fa
               width={640}
               height={224}
               unoptimized
-              className="w-full h-44 object-cover"
+              className={`w-full object-cover ${isListCard ? 'h-36' : 'h-44'}`}
             />
+            <div className="absolute inset-0 bg-gradient-to-br from-black/55 via-black/25 to-black/70" />
+            {job.contractType && (
+              <div className="absolute top-4 right-4 inline-flex items-center gap-2 rounded-full border border-gray-200/25 bg-black/80 px-3 py-1.5 shadow-[0_10px_30px_rgba(0,0,0,0.35)] backdrop-blur-md">
+                <LiaFileContractSolid className="text-base text-gray-100" />
+                <span className="text-[11px] font-bold uppercase tracking-[0.14em] text-white">
+                  {job.contractType}
+                </span>
+              </div>
+            )}
             {!hideImageTitleAndLocation && (
-              <div className="absolute bottom-0 left-0 w-full bg-gradient-to-t from-black/80 to-transparent px-6 pb-3 pt-8 flex flex-col">
-                <span className="text-lg font-bold text-white drop-shadow-md">{job.title}</span>
+              <div className="absolute bottom-0 left-0 w-full bg-gradient-to-t from-black/90 via-black/45 to-transparent px-6 pb-4 pt-10 flex flex-col">
+                <span className="text-lg font-bold text-white drop-shadow-[0_2px_12px_rgba(0,0,0,0.45)]">
+                  {job.title}
+                </span>
                 {location && (
-                  <span className="text-sm text-gray-200 drop-shadow-md mt-1">{location}</span>
+                  <span className="mt-1 text-sm text-gray-200 drop-shadow-[0_2px_10px_rgba(0,0,0,0.35)]">
+                    {location}
+                  </span>
                 )}
               </div>
             )}
           </div>
         )}
 
-        <div className="px-1 pt-4">
+        <div className={`px-1 ${isListCard ? 'pt-3' : 'pt-4'}`}>
           {isListCard ? (
             <>
-              {/* ContractType, hífen e slots na mesma linha */}
-              {(job.contractType || job.slots) && (
-                <div className="flex items-center gap-2 mb-1 text-xs text-gray-300">
-                  {job.contractType && <><LiaFileContractSolid className="text-lg text-primary" /><span className="uppercase font-bold">{job.contractType}</span></>}
-                  <span>-</span>
-                  <span className="text-base font-medium text-gray-200">
-                    {job.slots === 1 ? '1 vaga disponível' : `${job.slots} vagas disponíveis`}
-                  </span>
-                </div>
-              )}
-              <hr className="my-3 border-green-100" />
-              {/* Apenas salário dos benefícios */}
-              {job.benefits?.salary && (
-                <p className="flex items-center text-sm text-green-400 font-semibold mb-2">
-                  <MdAttachMoney className="inline-block mr-1 text-lg" />
-                  {typeof job.benefits.salary === 'string' ? job.benefits.salary : `R$ ${job.benefits.salary.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`}
-                </p>
-              )}
-              {(educationLevels?.length || job.requirements?.minExperienceYears || job.requirements?.maxExperienceYears) && (
-                <ul className="mb-2 text-xs text-gray-300 space-y-1 ml-1">
-                  {educationLevels?.length ? (
-                    <li className="flex items-center gap-2">
-                      <FaSchool className="text-gray-400" />
-                      {educationLevels.map((level) => String(level).toUpperCase()).join(', ')}
-                    </li>
-                  ) : null}
-                  {(job.requirements?.minExperienceYears || job.requirements?.maxExperienceYears) && (
-                    <li className="flex items-center gap-2">
-                      <FaGraduationCap className="text-gray-400" />
-                      {job.requirements.minExperienceYears || 0}{job.requirements.maxExperienceYears ? ` a ${job.requirements.maxExperienceYears}` : ''} anos
-                    </li>
-                  )}
-                </ul>
-              )}
-              <hr className="my-3 border-green-100" />
+              <div className="space-y-3">
+                {job.slots ? (
+                  <div className="flex flex-wrap items-center gap-3">
+                    <div className="inline-flex items-center rounded-full border border-gray-700 bg-gradient-to-r from-gray-950 to-gray-900 px-3 py-1 text-xs font-semibold text-gray-200 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]">
+                      {job.slots === 1 ? '1 vaga disponível' : `${job.slots} vagas disponíveis`}
+                    </div>
+                    {job.benefits?.salary && (
+                      <p className="flex items-center text-sm font-semibold text-green-400">
+                        <MdAttachMoney className="mr-1 inline-block text-lg" />
+                        {typeof job.benefits.salary === 'string'
+                          ? job.benefits.salary
+                          : `R$ ${job.benefits.salary.toLocaleString('pt-BR', {
+                              minimumFractionDigits: 2,
+                            })}`}
+                      </p>
+                    )}
+                  </div>
+                ) : null}
+                {(educationLevels?.length ||
+                  job.requirements?.minExperienceYears ||
+                  job.requirements?.maxExperienceYears ||
+                  job.requirements?.languages?.length) && (
+                  <div className="rounded-2xl border border-gray-800 bg-black/45 px-3 py-3">
+                    <ul className="space-y-2 text-xs text-gray-300">
+                      {educationLevels?.length ? (
+                        <li className="flex items-center gap-2">
+                        <FaSchool className="shrink-0 text-gray-400" />
+                          <span>
+                            {educationLevels
+                              .map((level) =>
+                                getEducationLevelLabel(level as EducationLevelEnum)
+                              )
+                              .join(', ')}
+                          </span>
+                        </li>
+                      ) : null}
+                      {(job.requirements?.minExperienceYears ||
+                        job.requirements?.maxExperienceYears) && (
+                        <li className="flex items-center gap-2">
+                          <FaGraduationCap className="shrink-0 text-gray-400" />
+                          <span>
+                            {job.requirements.minExperienceYears || 0}
+                            {job.requirements.maxExperienceYears
+                              ? ` a ${job.requirements.maxExperienceYears}`
+                              : ''}{' '}
+                            anos
+                          </span>
+                        </li>
+                      )}
+                      {job.requirements?.languages?.map((language) => (
+                        <li
+                          key={`${language.name}-${language.level}`}
+                          className="flex items-center gap-2"
+                        >
+                          <MdLanguage className="shrink-0 text-gray-400" />
+                          <span>
+                            {`${getLanguageLabel(language.name)} - ${getLanguageLevelLabel(language.level)}`}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+                {job.benefits && (
+                  <div className="grid grid-cols-2 gap-2 text-xs text-gray-300">
+                    <div className="flex items-center gap-2 rounded-xl border border-gray-800 bg-black/35 px-3 py-2">
+                      {job.benefits.healthInsurance ? (
+                        <FaRegCheckCircle className="shrink-0 text-green-400" />
+                      ) : (
+                        <FaRegCircle className="shrink-0 text-gray-500" />
+                      )}
+                      <span>Plano de saúde</span>
+                    </div>
+                    <div className="flex items-center gap-2 rounded-xl border border-gray-800 bg-black/35 px-3 py-2">
+                      {job.benefits.dentalInsurance ? (
+                        <FaRegCheckCircle className="shrink-0 text-green-400" />
+                      ) : (
+                        <FaRegCircle className="shrink-0 text-gray-500" />
+                      )}
+                      <span>Odontológico</span>
+                    </div>
+                    <div className="flex items-center gap-2 rounded-xl border border-gray-800 bg-black/35 px-3 py-2">
+                      {job.benefits.alimentationVoucher ? (
+                        <FaRegCheckCircle className="shrink-0 text-green-400" />
+                      ) : (
+                        <FaRegCircle className="shrink-0 text-gray-500" />
+                      )}
+                      <span>Vale alimentação</span>
+                    </div>
+                    <div className="flex items-center gap-2 rounded-xl border border-gray-800 bg-black/35 px-3 py-2">
+                      {job.benefits.transportationVoucher ? (
+                        <FaRegCheckCircle className="shrink-0 text-green-400" />
+                      ) : (
+                        <FaRegCircle className="shrink-0 text-gray-500" />
+                      )}
+                      <span>Vale transporte</span>
+                    </div>
+                  </div>
+                )}
+              </div>
             </>
           ) : (
             <>
               {showRequirements && (
                 <>
-                  <ul className="mb-2 text-xs text-gray-300 space-y-1 ml-1">
+                  <ul className="mb-2 ml-1 space-y-2 text-sm text-gray-200">
                     {educationLevels?.length ? (
                       <li className="flex items-center gap-2">
-                        <TiMinus className="text-gray-400" />
-                        {educationLevels.map((level) => String(level).toUpperCase()).join(', ')}
+                        <FaSchool className="text-gray-300" />
+                        {educationLevels
+                          .map((level) =>
+                            getEducationLevelLabel(level as EducationLevelEnum)
+                          )
+                          .join(', ')}
                       </li>
                     ) : null}
                     {(job.requirements?.minExperienceYears || job.requirements?.maxExperienceYears) && (
                       <li className="flex items-center gap-2">
-                        <TiMinus className="text-gray-400" />
+                        <FaGraduationCap className="text-gray-300" />
                         {job.requirements.minExperienceYears || 0}
                         {job.requirements.maxExperienceYears ? ` a ${job.requirements.maxExperienceYears}` : ''} anos
                       </li>
                     )}
+                    {job.requirements?.languages?.map((language) => (
+                      <li
+                        key={`${language.name}-${language.level}`}
+                        className="flex items-center gap-2"
+                      >
+                        <MdLanguage className="text-gray-300" />
+                        {`${getLanguageLabel(language.name)} - ${getLanguageLevelLabel(language.level)}`}
+                      </li>
+                    ))}
                   </ul>
-                  <hr className="my-3 border-green-100" />
+                  <JobDivider />
                 </>
               )}
-              <p className={`text-base font-medium ${TEXT_STYLES.jobCardText}`}>
+              <div className="inline-flex items-center rounded-full border border-gray-700 bg-gradient-to-r from-gray-950 to-gray-900 px-3 py-1.5 text-base font-medium text-gray-200 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]">
                 {job.slots === 1 ? '1 vaga disponível' : `${job.slots} vagas disponíveis`}
-              </p>
-              <hr className="my-3 border-green-100" />
+              </div>
+              <JobDivider />
               {job.description && (
-                <p className="text-xs text-gray-400 mt-2 mb-2 whitespace-pre-line">{job.description}</p>
+                <p className="mt-2 mb-2 whitespace-pre-line text-sm leading-6 text-gray-300">
+                  {job.description}
+                </p>
               )}
-              <hr className="my-3 border-green-100" />
-              {/* Tipo de contrato */}
-              {job.contractType && (
-                <div className="flex items-center gap-2 mb-2 text-xs text-gray-300">
-                  <LiaFileContractSolid className="text-lg text-primary" />
-                  <p className="uppercase bold">{job.contractType}</p>
+              <JobDivider />
+              {/* Tipo de contrato como fallback apenas quando nao houver capa */}
+              {job.contractType && !job.media?.coverUrl && (
+                <div className="inline-flex items-center gap-2 rounded-full border border-gray-600 bg-gradient-to-r from-gray-950 to-gray-900 px-3 py-1.5 text-xs text-gray-200 shadow-[0_10px_24px_rgba(0,0,0,0.22)]">
+                  <LiaFileContractSolid className="text-lg text-gray-100" />
+                  <p className="uppercase font-bold tracking-[0.12em]">{job.contractType}</p>
                 </div>
               )}
               {/* Benefícios */}
@@ -139,13 +279,13 @@ export function JobCard({ job, company, showRequirements, hideDetailsButton = fa
                 <div className="mb-2">
                   {/* Salário */}
                   {job.benefits.salary && (
-                    <p className="flex items-center text-sm text-green-400 font-semibold mb-1">
-                      <MdAttachMoney className="inline-block mr-1 text-lg" />
+                    <p className="mb-2 flex items-center text-base font-semibold text-green-400">
+                      <MdAttachMoney className="mr-1 inline-block text-xl" />
                       {typeof job.benefits.salary === 'string' ? job.benefits.salary : `R$ ${job.benefits.salary.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`}
                     </p>
                   )}
                   {/* Lista de benefícios (todos, com ícone conforme valor) */}
-                  <ul className="text-xs text-gray-300 space-y-1 ml-1">
+                  <ul className="ml-1 space-y-2 text-sm text-gray-200">
                     <li className="flex items-center gap-2">
                       {job.benefits.healthInsurance ? (
                         <FaRegCheckCircle className="text-green-400" />
@@ -181,7 +321,7 @@ export function JobCard({ job, company, showRequirements, hideDetailsButton = fa
                   </ul>
                 </div>
               )}
-              <hr className="my-3 border-green-100" />
+              <JobDivider />
             </>
           )}
         </div>

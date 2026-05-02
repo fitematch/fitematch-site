@@ -78,8 +78,13 @@ const typedFeatures: Feature[] = features;
 
 export function FeaturesSection() {
   return (
-    <section className={`bg-gray-800 ${PAGE_STYLES.section}`}>
-      <div className={PAGE_STYLES.container}>
+    <section className={`relative overflow-hidden bg-[linear-gradient(180deg,#050505_0%,#0b0f14_42%,#10151b_100%)] ${PAGE_STYLES.section}`}>
+      <div className="pointer-events-none absolute inset-0">
+        <div className="absolute -top-20 left-[8%] h-72 w-72 rounded-full bg-gray-100/7 blur-3xl" />
+        <div className="absolute bottom-[-80px] right-[10%] h-80 w-80 rounded-full bg-slate-300/10 blur-3xl" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(243,244,246,0.08),transparent_35%),radial-gradient(circle_at_bottom_right,rgba(148,163,184,0.10),transparent_38%)]" />
+      </div>
+      <div className={`relative ${PAGE_STYLES.container}`}>
         <SectionTitle
           title="FUNCIONALIDADES DA PLATAFORMA"
           icon={<IoMdSettings />}
@@ -91,16 +96,18 @@ export function FeaturesSection() {
             return (
               <div
                 key={feature.title}
-                className="group rounded-xl border border-gray-100 bg-black p-6 transition-colors hover:bg-gray-100"
+                className="group rounded-[1.4rem] border border-slate-700/70 bg-zinc-950/92 p-6 shadow-[0_18px_40px_rgba(0,0,0,0.28)] transition-all hover:-translate-y-1 hover:border-slate-500 hover:bg-gray-100"
               >
                 <div className="flex items-center gap-3">
-                  <Icon className="h-8 w-8 text-gray-100 transition-colors group-hover:text-black" />
+                  <div className="rounded-xl border border-slate-700/70 bg-black/60 p-3 transition-colors group-hover:border-gray-300 group-hover:bg-white">
+                    <Icon className="h-6 w-6 text-gray-100 transition-colors group-hover:text-black" />
+                  </div>
                   <h3 className="text-xl font-semibold text-gray-100 transition-colors group-hover:text-black">
                     {feature.title}
                   </h3>
                 </div>
 
-                <p className="mt-3 text-sm text-gray-300 transition-colors group-hover:text-gray-700">
+                <p className="mt-4 text-sm leading-6 text-gray-300 transition-colors group-hover:text-gray-700">
                   {feature.description}
                 </p>
               </div>

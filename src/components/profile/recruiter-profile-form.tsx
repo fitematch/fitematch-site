@@ -34,7 +34,7 @@ export function RecruiterProfileForm() {
   const { showSuccess, showError } = useFlashMessage();
   const boxClassName = 'rounded-2xl border border-gray-500 bg-black p-6';
   const fieldClassName =
-    'rounded-xl border border-gray-500 bg-black text-gray-300 placeholder:text-gray-300 disabled:border-gray-500 disabled:bg-black disabled:text-gray-300 disabled:opacity-100';
+    'rounded-xl border border-gray-500 bg-black text-gray-300 placeholder:text-gray-500 disabled:border-gray-500 disabled:bg-black disabled:text-gray-300 disabled:opacity-100';
   const labelClassName = 'text-gray-300';
 
   const {

@@ -94,7 +94,7 @@ export const THEME = {
       card: 'rounded-xl p-6',
       title: 'text-white hover:text-green-200',
       text: 'text-gray-100 hover:text-green-200',
-      border: 'border border-green-500',
+      border: 'border border-slate-700/70',
       background: 'bg-black',
     },
 

@@ -26,7 +26,7 @@ export function SignInForm() {
     try {
       await signIn(data);
       showSuccess('Login realizado com sucesso.');
-      router.push(ROUTES.PROFILE);
+      router.push(ROUTES.HOME);
     } catch {
       showError('Não foi possível realizar login.');
     }
