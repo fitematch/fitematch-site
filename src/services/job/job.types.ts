@@ -8,13 +8,13 @@ export type ReadJobResponse = JobEntity;
 
 export type CreateJobRequest = Omit<
   JobEntity,
-  '_id' | 'slug' | 'status' | 'createdAt' | 'updatedAt'
+  '_id' | 'slug' | 'company' | 'status' | 'createdAt' | 'updatedAt'
 >;
 
 export type CreateJobResponse = JobEntity;
 
 export type UpdateJobRequest = Partial<
-  Omit<JobEntity, '_id' | 'slug' | 'createdAt' | 'updatedAt'>
+  Omit<JobEntity, '_id' | 'slug' | 'company' | 'createdAt' | 'updatedAt'>
 >;
 
 export type UpdateJobResponse = JobEntity;

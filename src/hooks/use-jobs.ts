@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { JobService } from '@/services/job/job.service';
-import { JobEntity } from '@/types/entities/job.entity';
+import { JobEntity, JobStatusEnum } from '@/types/entities/job.entity';
 
 interface UseJobsState {
   jobs: JobEntity[];
@@ -21,9 +21,10 @@ export function useJobs() {
     async function fetchJobs() {
       try {
         const jobs = await JobService.list();
+        const activeJobs = jobs.filter((job) => job.status === JobStatusEnum.ACTIVE);
 
         setState({
-          jobs,
+          jobs: activeJobs,
           isLoading: false,
           error: null,
         });

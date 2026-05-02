@@ -6,16 +6,30 @@ import { INPUT_STYLES } from '@/constants/styles';
 
 interface Props extends InputHTMLAttributes<HTMLInputElement> {
   icon?: ReactNode;
+  label?: string;
+  labelClassName?: string;
   error?: string;
 }
 
-export function Input({ icon, error, className = '', ...props }: Props) {
+export function Input({
+  icon,
+  label,
+  labelClassName = 'text-gray-300',
+  error,
+  className = '',
+  ...props
+}: Props) {
   const isPasswordField = props.type === 'password';
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const inputType = isPasswordField && isPasswordVisible ? 'text' : props.type;
 
   return (
     <div className="w-full">
+      {label && (
+        <label className={`mb-1 block text-sm font-medium ${labelClassName}`}>
+          {label}
+        </label>
+      )}
       <div className="relative">
         {icon && (
           <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-700">

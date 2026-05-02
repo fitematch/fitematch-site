@@ -1,3 +1,4 @@
+import { ReactNode } from 'react';
 import {
   FaAndroid,
   FaApple,
@@ -6,9 +7,9 @@ import {
   FaClipboardCheck,
   FaUserCheck,
 } from 'react-icons/fa';
+import { IoMdSettings } from 'react-icons/io';
+import { PAGE_STYLES } from '@/constants/styles';
 import { SectionTitle } from '@/components/ui/section-title';
-import { CARD_STYLES, PAGE_STYLES, TEXT_STYLES } from '@/constants/styles';
-import { THEME } from '@/constants/theme';
 
 const features = [
   {
@@ -19,7 +20,7 @@ const features = [
   {
     icon: FaUserCheck,
     title: 'Perfil completo de candidato',
-    description: 'Preencha dados profissionais, experiências, documentos e disponibilidade.',
+    description: 'Dados ricos para gerar matches mais precisos entre perfil e vaga.',
   },
   {
     icon: FaBuilding,
@@ -29,44 +30,77 @@ const features = [
   {
     icon: FaClipboardCheck,
     title: 'Gestão de aplicações',
-    description: 'Candidatos aplicam e recrutadores acompanham os status.',
+    description: 'Candidatos aplicam e recrutadores filtram perfis e acompanham os status.',
   },
   {
     icon: FaAndroid,
     title: 'Aplicativo Android',
-    description: 'Em desenvolvimento. Em breve disponível na Play Store.',
+    description: (
+      <>
+        Aplicativo em desenvolvimento para{' '}
+        <a
+          href="https://play.google.com/store"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="underline"
+        >
+          Play Store
+        </a>
+      </>
+    ),
   },
   {
     icon: FaApple,
     title: 'Aplicativo iOS',
-    description: 'Em desenvolvimento. Em breve disponível na Apple Store.',
+    description: (
+      <>
+        Aplicativo em desenvolvimento para{' '}
+        <a
+          href="https://www.apple.com/app-store/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="underline"
+        >
+          Apple Store
+        </a>
+      </>
+    ),
   },
 ];
 
+type Feature = {
+  icon: typeof FaBriefcase;
+  title: string;
+  description: ReactNode;
+};
+
+const typedFeatures: Feature[] = features;
+
 export function FeaturesSection() {
   return (
-    <section className={`${THEME.layout.background} ${PAGE_STYLES.section}`}>
+    <section className={`bg-gray-800 ${PAGE_STYLES.section}`}>
       <div className={PAGE_STYLES.container}>
         <SectionTitle
-          title="Funcionalidades da plataforma"
+          title="FUNCIONALIDADES DA PLATAFORMA"
+          icon={<IoMdSettings />}
         />
         <div className="mt-10 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {features.map((feature) => {
+          {typedFeatures.map((feature) => {
             const Icon = feature.icon;
 
             return (
               <div
                 key={feature.title}
-                className={CARD_STYLES.featureBox}
+                className="group rounded-xl border border-gray-100 bg-black p-6 transition-colors hover:bg-gray-100"
               >
                 <div className="flex items-center gap-3">
-                  <Icon className={CARD_STYLES.featureIcon} />
-                  <h3 className={TEXT_STYLES.featureTitle}>
+                  <Icon className="h-8 w-8 text-gray-100 transition-colors group-hover:text-black" />
+                  <h3 className="text-xl font-semibold text-gray-100 transition-colors group-hover:text-black">
                     {feature.title}
                   </h3>
                 </div>
 
-                <p className={`mt-3 ${TEXT_STYLES.featureText}`}>
+                <p className="mt-3 text-sm text-gray-300 transition-colors group-hover:text-gray-700">
                   {feature.description}
                 </p>
               </div>

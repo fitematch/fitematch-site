@@ -1,99 +1,233 @@
 'use client';
 
+import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
-import { FaBirthdayCake, FaEnvelope, FaPhone, FaSave, FaUser } from 'react-icons/fa';
+import { FaSave, FaUserTie } from 'react-icons/fa';
+import { GrDocumentText } from 'react-icons/gr';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useAuth } from '@/hooks/use-auth';
-import { UpdateMeRequest } from '@/services/auth/auth.types';
 import { useFlashMessage } from '@/contexts/flash-message-context';
-import { CARD_STYLES } from '@/constants/styles';
+import { UpdateMeRequest } from '@/services/auth/auth.types';
 import { ProfileSectionTitle } from './profile-section-title';
 
+function formatBirthday(value?: string | Date) {
+  if (!value) {
+    return '';
+  }
+
+  if (typeof value === 'string' && /^\d{2}\/\d{2}\/\d{4}$/.test(value)) {
+    return value;
+  }
+
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return String(value);
+  }
+
+  return date.toLocaleDateString('pt-BR');
+}
+
 export function RecruiterProfileForm() {
-  const { user, updateMe } = useAuth();
+  const { user, refreshMe, updateMe } = useAuth();
   const { showSuccess, showError } = useFlashMessage();
+  const boxClassName = 'rounded-2xl border border-gray-500 bg-black p-6';
+  const fieldClassName =
+    'rounded-xl border border-gray-500 bg-black text-gray-300 placeholder:text-gray-300 disabled:border-gray-500 disabled:bg-black disabled:text-gray-300 disabled:opacity-100';
+  const labelClassName = 'text-gray-300';
 
   const {
     register,
-    handleSubmit,
+    reset,
+    getValues,
     formState: { isSubmitting },
   } = useForm<UpdateMeRequest>({
     defaultValues: {
-      name: user?.name,
-      birthday: user?.birthday,
-      recruiterProfile: user?.recruiterProfile,
+      name: user?.name || '',
+      recruiterProfile: {
+        tradeName: user?.recruiterProfile?.tradeName || '',
+        position: user?.recruiterProfile?.position || '',
+        contacts: {
+          phone: {
+            country: user?.recruiterProfile?.contacts?.phone?.country || '',
+            number: user?.recruiterProfile?.contacts?.phone?.number || '',
+          },
+        },
+      },
     },
   });
 
-  async function onSubmit(data: UpdateMeRequest) {
+  useEffect(() => {
+    if (!user?.recruiterProfile?.companyId || user?.recruiterProfile?.tradeName) {
+      return;
+    }
+
+    queueMicrotask(() => {
+      void refreshMe();
+    });
+  }, [refreshMe, user?.recruiterProfile?.companyId, user?.recruiterProfile?.tradeName]);
+
+  useEffect(() => {
+    reset({
+      name: user?.name || '',
+      recruiterProfile: {
+        tradeName: user?.recruiterProfile?.tradeName || '',
+        position: user?.recruiterProfile?.position || '',
+        contacts: {
+          phone: {
+            country: user?.recruiterProfile?.contacts?.phone?.country || '',
+            number: user?.recruiterProfile?.contacts?.phone?.number || '',
+          },
+        },
+      },
+    });
+  }, [reset, user]);
+
+  async function handleSaveBasic() {
     try {
-      await updateMe(data);
-      showSuccess('Perfil atualizado com sucesso.');
+      await updateMe({
+        name: getValues('name'),
+      });
+      showSuccess('Dados básicos atualizados com sucesso.');
     } catch {
-      showError('Não foi possível atualizar seu perfil.');
+      showError('Não foi possível atualizar os dados básicos.');
+    }
+  }
+
+  async function handleSaveRecruiter() {
+    const values = getValues();
+
+    try {
+      await updateMe({
+        recruiterProfile: {
+          ...user?.recruiterProfile,
+          tradeName: values.recruiterProfile?.tradeName,
+          position: values.recruiterProfile?.position,
+          contacts: {
+            ...user?.recruiterProfile?.contacts,
+            phone: {
+              ...user?.recruiterProfile?.contacts?.phone,
+              country: values.recruiterProfile?.contacts?.phone?.country,
+              number: values.recruiterProfile?.contacts?.phone?.number,
+            },
+          },
+        },
+      });
+      showSuccess('Dados do recrutador atualizados com sucesso.');
+    } catch {
+      showError('Não foi possível atualizar os dados do recrutador.');
     }
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
-      <div className={CARD_STYLES.featureBox}>
-        <ProfileSectionTitle title="Dados básicos" />
+    <div className="space-y-8">
+      <div className={boxClassName}>
+        <ProfileSectionTitle
+          title="Dados básicos"
+          icon={GrDocumentText}
+          titleClassName="text-gray-300"
+          iconClassName="text-gray-300"
+          toggleIconClassName="text-gray-300"
+        />
 
         <div className="mt-6 grid gap-4 md:grid-cols-2">
-          <Input icon={<FaUser />} placeholder="Nome" {...register('name')} />
+          <Input
+            label="Nome"
+            labelClassName={labelClassName}
+            className={fieldClassName}
+            placeholder="Nome"
+            {...register('name')}
+          />
+          <div className="hidden md:block" />
 
           <Input
-            icon={<FaBirthdayCake />}
-            type="date"
-            placeholder="Data de nascimento"
-            {...register('birthday')}
+            label="E-mail"
+            labelClassName={labelClassName}
+            className={fieldClassName}
+            placeholder="E-mail"
+            value={user?.email || ''}
+            disabled
           />
 
           <Input
-            icon={<FaEnvelope />}
-            placeholder="E-mail"
-            value={user?.email}
+            label="Data de nascimento"
+            labelClassName={labelClassName}
+            className={fieldClassName}
+            placeholder="Data de nascimento"
+            value={formatBirthday(user?.birthday)}
             disabled
           />
         </div>
+
+        <div className="mt-6 flex justify-end">
+          <Button
+            type="button"
+            variant="positive"
+            icon={<FaSave />}
+            disabled={isSubmitting}
+            onClick={handleSaveBasic}
+          >
+            Salvar
+          </Button>
+        </div>
       </div>
 
-      <div className={CARD_STYLES.featureBox}>
-        <ProfileSectionTitle title="Dados do recrutador" />
+      <div className={boxClassName}>
+        <ProfileSectionTitle
+          title="Dados do recrutador"
+          icon={FaUserTie}
+          titleClassName="text-gray-300"
+          iconClassName="text-gray-300"
+          toggleIconClassName="text-gray-300"
+        />
 
         <div className="mt-6 grid gap-4 md:grid-cols-2">
           <Input
+            label="Empresa"
+            labelClassName={labelClassName}
+            className={fieldClassName}
+            placeholder="Empresa"
+            {...register('recruiterProfile.tradeName')}
+          />
+
+          <Input
+            label="Cargo"
+            labelClassName={labelClassName}
+            className={fieldClassName}
             placeholder="Cargo"
             {...register('recruiterProfile.position')}
           />
 
           <Input
-            icon={<FaPhone />}
-            placeholder="Telefone"
-            {...register('recruiterProfile.contacts.phone.number')}
-          />
-
-          <Input
+            label="País"
+            labelClassName={labelClassName}
+            className={fieldClassName}
             placeholder="País"
             {...register('recruiterProfile.contacts.phone.country')}
           />
 
           <Input
-            placeholder="ID da empresa"
-            {...register('recruiterProfile.companyId')}
+            label="Telefone"
+            labelClassName={labelClassName}
+            className={fieldClassName}
+            placeholder="Telefone"
+            {...register('recruiterProfile.contacts.phone.number')}
           />
         </div>
-      </div>
 
-      <Button
-        type="submit"
-        variant="positive"
-        icon={<FaSave />}
-        disabled={isSubmitting}
-      >
-        Salvar perfil
-      </Button>
-    </form>
+        <div className="mt-6 flex justify-end">
+          <Button
+            type="button"
+            variant="positive"
+            icon={<FaSave />}
+            disabled={isSubmitting}
+            onClick={handleSaveRecruiter}
+          >
+            Salvar
+          </Button>
+        </div>
+      </div>
+    </div>
   );
 }

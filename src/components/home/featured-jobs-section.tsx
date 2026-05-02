@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { FaArrowRight, FaBriefcase } from 'react-icons/fa';
+import { FaArrowRight } from 'react-icons/fa';
+import { MdOutlineFindInPage } from 'react-icons/md';
 import { Button } from '@/components/ui/button';
 import { ROUTES } from '@/constants/routes';
 import { useJobs } from '@/hooks/use-jobs';
@@ -63,8 +64,8 @@ export function FeaturedJobsSection() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="mb-10 flex items-center justify-between">
           <SectionTitle
-            title="Vagas em destaque"
-            icon={<FaBriefcase className="h-6 w-6" />}
+            title="VAGAS EM DESTAQUE"
+            icon={<MdOutlineFindInPage className="h-6 w-6" />}
           />
 
           <Link href={ROUTES.JOBS}>

@@ -1,97 +1,67 @@
 'use client';
 
-import { useEffect, useReducer } from 'react';
+import { useEffect, useState } from 'react';
 import ApplyEntity from '@/types/entities/apply.entity';
 import { ApplyService } from '@/services/apply/apply.service';
 
-interface UseJobApplicationsState {
-  applications: ApplyEntity[];
-  isLoading: boolean;
-  error: string | null;
-}
-
-type UseJobApplicationsAction =
-  | { type: 'fetch:start' }
-  | { type: 'fetch:success'; applications: ApplyEntity[] }
-  | { type: 'fetch:error'; message: string }
-  | { type: 'fetch:reset' };
-
-const initialState: UseJobApplicationsState = {
-  applications: [],
-  isLoading: true,
-  error: null,
-};
-
-function jobApplicationsReducer(
-  state: UseJobApplicationsState,
-  action: UseJobApplicationsAction
-): UseJobApplicationsState {
-  switch (action.type) {
-    case 'fetch:start':
-      return {
-        ...state,
-        isLoading: true,
-        error: null,
-      };
-    case 'fetch:success':
-      return {
-        applications: action.applications,
-        isLoading: false,
-        error: null,
-      };
-    case 'fetch:error':
-      return {
-        applications: [],
-        isLoading: false,
-        error: action.message,
-      };
-    case 'fetch:reset':
-      return {
-        applications: [],
-        isLoading: false,
-        error: null,
-      };
-    default:
-      return state;
-  }
+interface UseJobApplicationsHandlers {
+  setApplications: React.Dispatch<React.SetStateAction<ApplyEntity[]>>;
+  setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
+  setError: React.Dispatch<React.SetStateAction<string | null>>;
 }
 
 async function loadJobApplications(
-  jobId: string,
-  dispatch: React.ActionDispatch<[action: UseJobApplicationsAction]>
+  jobId: string | undefined,
+  handlers: UseJobApplicationsHandlers
 ) {
+  const { setApplications, setIsLoading, setError } = handlers;
+
   if (!jobId) {
-    dispatch({ type: 'fetch:reset' });
+    setIsLoading(false);
     return;
   }
 
-  dispatch({ type: 'fetch:start' });
-
   try {
+    setIsLoading(true);
+
     const response = await ApplyService.listByJob(jobId);
 
-    dispatch({ type: 'fetch:success', applications: response });
+    setApplications(response);
+    setError(null);
   } catch {
-    dispatch({
-      type: 'fetch:error',
-      message: 'Não foi possível carregar as aplicações da vaga.',
-    });
+    setError('Não foi possível carregar as candidaturas da vaga.');
+  } finally {
+    setIsLoading(false);
   }
 }
 
-export function useJobApplications(jobId: string) {
-  const [state, dispatch] = useReducer(jobApplicationsReducer, initialState);
+export function useJobApplications(jobId?: string) {
+  const [applications, setApplications] = useState<ApplyEntity[]>([]);
+  const [isLoading, setIsLoading] = useState(Boolean(jobId));
+  const [error, setError] = useState<string | null>(null);
 
   async function fetchApplications() {
-    await loadJobApplications(jobId, dispatch);
+    await loadJobApplications(jobId, {
+      setApplications,
+      setIsLoading,
+      setError,
+    });
   }
 
   useEffect(() => {
-    void loadJobApplications(jobId, dispatch);
+    queueMicrotask(() => {
+      void loadJobApplications(jobId, {
+        setApplications,
+        setIsLoading,
+        setError,
+      });
+    });
   }, [jobId]);
 
   return {
-    ...state,
+    applications,
+    isLoading,
+    error,
     refetch: fetchApplications,
   };
 }

@@ -1,78 +1,59 @@
 'use client';
 
-import { useEffect, useReducer } from 'react';
+import { useEffect, useState } from 'react';
 import { ApplyService } from '@/services/apply/apply.service';
 import ApplyEntity from '@/types/entities/apply.entity';
 
-interface UseApplicationsState {
-  applications: ApplyEntity[];
-  isLoading: boolean;
-  error: string | null;
+interface UseApplicationsHandlers {
+  setApplications: React.Dispatch<React.SetStateAction<ApplyEntity[]>>;
+  setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
+  setError: React.Dispatch<React.SetStateAction<string | null>>;
 }
 
-type UseApplicationsAction =
-  | { type: 'fetch:start' }
-  | { type: 'fetch:success'; applications: ApplyEntity[] }
-  | { type: 'fetch:error'; message: string };
+async function loadApplications(handlers: UseApplicationsHandlers) {
+  const { setApplications, setIsLoading, setError } = handlers;
 
-const initialState: UseApplicationsState = {
-  applications: [],
-  isLoading: true,
-  error: null,
-};
+  try {
+    setIsLoading(true);
 
-function applicationsReducer(
-  state: UseApplicationsState,
-  action: UseApplicationsAction
-): UseApplicationsState {
-  switch (action.type) {
-    case 'fetch:start':
-      return {
-        ...state,
-        isLoading: true,
-        error: null,
-      };
-    case 'fetch:success':
-      return {
-        applications: action.applications,
-        isLoading: false,
-        error: null,
-      };
-    case 'fetch:error':
-      return {
-        applications: [],
-        isLoading: false,
-        error: action.message,
-      };
-    default:
-      return state;
+    const response = await ApplyService.listMine();
+
+    setApplications(response);
+    setError(null);
+  } catch {
+    setError('Não foi possível carregar suas candidaturas.');
+  } finally {
+    setIsLoading(false);
   }
 }
 
 export function useApplications() {
-  const [state, dispatch] = useReducer(applicationsReducer, initialState);
+  const [applications, setApplications] = useState<ApplyEntity[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   async function fetchApplications() {
-    dispatch({ type: 'fetch:start' });
-
-    try {
-      const response = await ApplyService.listMine();
-
-      dispatch({ type: 'fetch:success', applications: response });
-    } catch {
-      dispatch({
-        type: 'fetch:error',
-        message: 'Não foi possível carregar suas candidaturas.',
-      });
-    }
+    await loadApplications({
+      setApplications,
+      setIsLoading,
+      setError,
+    });
   }
 
   useEffect(() => {
-    fetchApplications();
+    queueMicrotask(() => {
+      void loadApplications({
+        setApplications,
+        setIsLoading,
+        setError,
+      });
+    });
   }, []);
 
   return {
-    ...state,
+    applications,
+    isLoading,
+    error,
     refetch: fetchApplications,
   };
 }

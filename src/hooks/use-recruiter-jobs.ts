@@ -1,78 +1,59 @@
 'use client';
 
-import { useEffect, useReducer } from 'react';
-import { JobEntity } from '@/types/entities/job.entity';
+import { useEffect, useState } from 'react';
 import { JobService } from '@/services/job/job.service';
+import { JobEntity } from '@/types/entities/job.entity';
 
-interface UseRecruiterJobsState {
-  jobs: JobEntity[];
-  isLoading: boolean;
-  error: string | null;
+interface UseRecruiterJobsHandlers {
+  setJobs: React.Dispatch<React.SetStateAction<JobEntity[]>>;
+  setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
+  setError: React.Dispatch<React.SetStateAction<string | null>>;
 }
 
-type UseRecruiterJobsAction =
-  | { type: 'fetch:start' }
-  | { type: 'fetch:success'; jobs: JobEntity[] }
-  | { type: 'fetch:error'; message: string };
+async function loadRecruiterJobs(handlers: UseRecruiterJobsHandlers) {
+  const { setJobs, setIsLoading, setError } = handlers;
 
-const initialState: UseRecruiterJobsState = {
-  jobs: [],
-  isLoading: true,
-  error: null,
-};
+  try {
+    setIsLoading(true);
 
-function recruiterJobsReducer(
-  state: UseRecruiterJobsState,
-  action: UseRecruiterJobsAction
-): UseRecruiterJobsState {
-  switch (action.type) {
-    case 'fetch:start':
-      return {
-        ...state,
-        isLoading: true,
-        error: null,
-      };
-    case 'fetch:success':
-      return {
-        jobs: action.jobs,
-        isLoading: false,
-        error: null,
-      };
-    case 'fetch:error':
-      return {
-        jobs: [],
-        isLoading: false,
-        error: action.message,
-      };
-    default:
-      return state;
+    const response = await JobService.listMine();
+
+    setJobs(response);
+    setError(null);
+  } catch {
+    setError('Não foi possível carregar suas vagas.');
+  } finally {
+    setIsLoading(false);
   }
 }
 
 export function useRecruiterJobs() {
-  const [state, dispatch] = useReducer(recruiterJobsReducer, initialState);
+  const [jobs, setJobs] = useState<JobEntity[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   async function fetchJobs() {
-    dispatch({ type: 'fetch:start' });
-
-    try {
-      const response = await JobService.listMine();
-
-      dispatch({ type: 'fetch:success', jobs: response });
-    } catch {
-      dispatch({
-        type: 'fetch:error',
-        message: 'Não foi possível carregar suas vagas.',
-      });
-    }
+    await loadRecruiterJobs({
+      setJobs,
+      setIsLoading,
+      setError,
+    });
   }
 
   useEffect(() => {
-    fetchJobs();
+    queueMicrotask(() => {
+      void loadRecruiterJobs({
+        setJobs,
+        setIsLoading,
+        setError,
+      });
+    });
   }, []);
 
   return {
-    ...state,
+    jobs,
+    isLoading,
+    error,
     refetch: fetchJobs,
   };
 }

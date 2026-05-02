@@ -10,8 +10,14 @@ export function SectionTitle({
 }) {
   return (
     <div className="flex items-center gap-3">
-      {icon && <span className="text-gray-700">{icon}</span>}
-      <h2 className={TEXT_STYLES.sectionTitle}>{title}</h2>
+      {icon && (
+        <span className={`flex items-center ${TEXT_STYLES.sectionIcon}`}>
+          {icon}
+        </span>
+      )}
+      <h2 className={`${TEXT_STYLES.sectionTitle} mt-0 leading-none`}>
+        {title}
+      </h2>
     </div>
   );
 }

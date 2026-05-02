@@ -11,11 +11,20 @@ export interface PublicCompanyResponse {
   _id: string;
   slug: string;
   tradeName: string;
-  logo?: string; // URL do logo vinda da API
+  logo?: string;
   contacts?: {
+    website?: string;
     address?: {
+      street?: string;
+      number?: string;
+      complement?: string;
+      neighborhood?: string;
       city?: string;
       state?: string;
+      zipCode?: string;
+    };
+    phone?: {
+      number?: string;
     };
   };
   media?: {

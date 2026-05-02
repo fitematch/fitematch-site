@@ -35,11 +35,22 @@ interface AuthProviderProps {
 
 export function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = useState<AuthUser | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   const refreshMe = useCallback(async () => {
+    const hasStoredToken = TokenStorage.getAccessToken() !== null;
+
+    if (!hasStoredToken) {
+      setUser(null);
+      setIsLoading(false);
+      return;
+    }
+
     try {
+      setIsLoading(true);
+
       const me = await AuthService.me();
+
       setUser(me);
     } catch {
       TokenStorage.clearTokens();
@@ -51,6 +62,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   const signIn = useCallback(async (payload: SignInRequest) => {
     const response = await AuthService.signIn(payload);
+
     setUser(response.user);
 
     return response;
@@ -58,31 +70,38 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   const signOut = useCallback(async () => {
     await AuthService.signOut();
+
     setUser(null);
   }, []);
 
   const updateMe = useCallback(async (payload: UpdateMeRequest) => {
     const updatedUser = await AuthService.updateMe(payload);
+
     setUser(updatedUser);
 
     return updatedUser;
   }, []);
 
   useEffect(() => {
-    const hasStoredToken = TokenStorage.getAccessToken() !== null;
-
-    if (!hasStoredToken) {
-      return;
-    }
-
     let isActive = true;
 
     const loadMe = async () => {
-      if (isActive) {
-        setIsLoading(true);
+      const hasStoredToken = TokenStorage.getAccessToken() !== null;
+
+      if (!hasStoredToken) {
+        if (isActive) {
+          setUser(null);
+          setIsLoading(false);
+        }
+
+        return;
       }
 
       try {
+        if (isActive) {
+          setIsLoading(true);
+        }
+
         const me = await AuthService.me();
 
         if (isActive) {

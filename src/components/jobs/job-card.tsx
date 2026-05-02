@@ -1,5 +1,6 @@
 import Link from 'next/link';
-import { FaArrowRight, FaRegCheckCircle, FaRegCircle } from 'react-icons/fa';
+import { FaArrowRight, FaRegCheckCircle, FaRegCircle, FaGraduationCap } from 'react-icons/fa';
+import { FaSchool } from 'react-icons/fa6';
 import { TiMinus } from 'react-icons/ti';
 import { MdAttachMoney } from 'react-icons/md';
 import { LiaFileContractSolid } from 'react-icons/lia';
@@ -9,35 +10,21 @@ import { Button } from '@/components/ui/button';
 import { CARD_STYLES, TEXT_STYLES } from '@/constants/styles';
 import Image from 'next/image';
 
-function formatDate(dateString?: Date | string) {
-  if (!dateString) return '';
-  const date = new Date(dateString);
-  const day = String(date.getDate()).padStart(2, '0');
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const year = String(date.getFullYear()).slice(-2);
-  const hours = String(date.getHours()).padStart(2, '0');
-  const minutes = String(date.getMinutes()).padStart(2, '0');
-  return `${day}/${month}/${year} às ${hours}:${minutes}`;
-}
-
-
-
 interface JobCardProps {
   job: JobEntity;
   company?: PublicCompanyResponse;
   showRequirements?: boolean;
   hideDetailsButton?: boolean;
   customActions?: React.ReactNode;
-  hideCompanyLogoAndTitle?: boolean;
   hideImageTitleAndLocation?: boolean;
-  hidePublishedDate?: boolean;
 }
 
 
-export function JobCard({ job, company, showRequirements, hideDetailsButton = false, customActions, hideCompanyLogoAndTitle = false, hideImageTitleAndLocation = false, hidePublishedDate = false }: JobCardProps) {
+export function JobCard({ job, company, showRequirements, hideDetailsButton = false, customActions, hideImageTitleAndLocation = false }: JobCardProps) {
   // Prioriza dados vindos de job.company, fallback para prop company
   const jobCompany = (job as { company?: PublicCompanyResponse })?.company;
   const displayCompany = jobCompany || company;
+  const educationLevels = job.requirements?.educationLevel;
   // Novo: city e state vêm de company.contacts.address
   const address = displayCompany?.contacts?.address;
   const location = address
@@ -92,17 +79,18 @@ export function JobCard({ job, company, showRequirements, hideDetailsButton = fa
                   {typeof job.benefits.salary === 'string' ? job.benefits.salary : `R$ ${job.benefits.salary.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`}
                 </p>
               )}
-              {/* Requisitos (educationLevel, min/maxExperienceYears) com títulos em negrito e sem ícones */}
-              {(job.requirements?.educationLevel?.length > 0 || job.requirements?.minExperienceYears || job.requirements?.maxExperienceYears) && (
+              {(educationLevels?.length || job.requirements?.minExperienceYears || job.requirements?.maxExperienceYears) && (
                 <ul className="mb-2 text-xs text-gray-300 space-y-1 ml-1">
-                  {job.requirements?.educationLevel && job.requirements.educationLevel.length > 0 && (
-                    <li>
-                      <span className="font-bold text-gray-200">Nível de Escolaridade:</span> {job.requirements.educationLevel.map((level) => String(level).toUpperCase()).join(', ')}
+                  {educationLevels?.length ? (
+                    <li className="flex items-center gap-2">
+                      <FaSchool className="text-gray-400" />
+                      {educationLevels.map((level) => String(level).toUpperCase()).join(', ')}
                     </li>
-                  )}
+                  ) : null}
                   {(job.requirements?.minExperienceYears || job.requirements?.maxExperienceYears) && (
-                    <li>
-                      <span className="font-bold text-gray-200">Experiência Desejada:</span> {job.requirements.minExperienceYears || 0}{job.requirements.maxExperienceYears ? ` a ${job.requirements.maxExperienceYears}` : ''} anos
+                    <li className="flex items-center gap-2">
+                      <FaGraduationCap className="text-gray-400" />
+                      {job.requirements.minExperienceYears || 0}{job.requirements.maxExperienceYears ? ` a ${job.requirements.maxExperienceYears}` : ''} anos
                     </li>
                   )}
                 </ul>
@@ -114,12 +102,12 @@ export function JobCard({ job, company, showRequirements, hideDetailsButton = fa
               {showRequirements && (
                 <>
                   <ul className="mb-2 text-xs text-gray-300 space-y-1 ml-1">
-                    {job.requirements?.educationLevel && job.requirements.educationLevel.length > 0 && (
+                    {educationLevels?.length ? (
                       <li className="flex items-center gap-2">
                         <TiMinus className="text-gray-400" />
-                        {job.requirements.educationLevel.map((level) => String(level).toUpperCase()).join(', ')}
+                        {educationLevels.map((level) => String(level).toUpperCase()).join(', ')}
                       </li>
-                    )}
+                    ) : null}
                     {(job.requirements?.minExperienceYears || job.requirements?.maxExperienceYears) && (
                       <li className="flex items-center gap-2">
                         <TiMinus className="text-gray-400" />

@@ -1,12 +1,15 @@
 'use client';
 
+import Image from 'next/image';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { FaArrowLeft, FaWhatsapp, FaFacebook, FaLinkedinIn, FaPhone } from 'react-icons/fa';
+import { FaArrowLeft, FaWhatsapp, FaFacebook, FaLinkedinIn } from 'react-icons/fa';
+import { MdOutlinePlace } from 'react-icons/md';
 import { SlGlobe } from 'react-icons/sl';
 import { FaXTwitter } from 'react-icons/fa6';
 import { useJob } from '@/hooks/use-job';
 import { usePublicCompanies } from '@/hooks/use-public-companies';
+import { useApplications } from '@/hooks/use-applications';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert } from '@/components/ui/alert';
 import { ApplyJobButton } from '@/components/jobs/apply-job-button';
@@ -21,6 +24,12 @@ export default function JobDetailsPage() {
   const params = useParams();
   const jobId = params.jobId as string;
 
+  const { applications } = useApplications();
+
+  const hasAlreadyApplied = applications.some(
+    (app) => app.jobId === jobId,
+  );
+
   const { job, isLoading, error } = useJob(jobId);
   const {
     companies,
@@ -28,12 +37,10 @@ export default function JobDetailsPage() {
     error: companiesError,
   } = usePublicCompanies();
 
-  // Prioriza company do job, depois busca na lista pública
   const company = job?.company
     ? {
         ...job.company,
-        // compatibiliza id/_id
-        _id: job.company.id || job.company._id,
+        _id: job.company._id || job.company._id,
       }
     : (job && companies.find((item) => item._id === job.companyId))
       ? companies.find((item) => item._id === job.companyId)
@@ -78,9 +85,7 @@ export default function JobDetailsPage() {
               company={company}
               showRequirements={true}
               hideDetailsButton={true}
-              hideCompanyLogoAndTitle={true}
               hideImageTitleAndLocation={true}
-              hidePublishedDate={true}
               customActions={
                 <>
                   <Link href={ROUTES.JOBS}>
@@ -88,21 +93,23 @@ export default function JobDetailsPage() {
                       Vagas
                     </Button>
                   </Link>
-                  <ApplyJobButton jobId={job._id} />
+                  <ApplyJobButton jobId={job._id} hasAlreadyApplied={hasAlreadyApplied} />
                 </>
               }
             />
           </div>
-          {/* Sidebar */}
           <aside className="space-y-8">
             {/* Sobre a empresa (com mapa) */}
             {company && (
               <div className={CARD_STYLES.jobCard}>
                 <div className="flex items-center gap-4 mb-4">
                   {company.media?.logoUrl ? (
-                    <img
+                    <Image
                       src={company.media.logoUrl}
                       alt={company.tradeName}
+                      width={48}
+                      height={48}
+                      unoptimized
                       className="h-12 w-12 rounded-lg border border-gray-800 object-cover"
                     />
                   ) : (
@@ -125,51 +132,53 @@ export default function JobDetailsPage() {
                     {company.contacts.website}
                   </a>
                 )}
-                {/* Telefone */}
-                {company.contacts?.phone?.number && (
-                  <div className="flex items-center gap-2 text-xs text-gray-400 mb-2">
-                    <FaPhone className="text-base" />
-                    {company.contacts.phone.number}
-                  </div>
-                )}
-                {/* Endereço formatado */}
+
                 {company.contacts?.address && (
                   <div className="text-xs text-gray-400 space-y-1 mb-2">
-                    {/* Rua, número, complemento */}
                     {(company.contacts.address.street || company.contacts.address.number) && (
-                      <div>
-                        {company.contacts.address.street || ''}
-                        {company.contacts.address.number ? `, ${company.contacts.address.number}` : ''}
-                        {company.contacts.address.complement ? ` - ${company.contacts.address.complement}` : ''}
+                      <div className="flex items-center gap-2">
+                        <MdOutlinePlace className="text-gray-400" />
+                        <span>
+                          {company.contacts.address.street || ''}
+                          {company.contacts.address.number ? `, ${company.contacts.address.number}` : ''}
+                          {company.contacts.address.complement ? ` - ${company.contacts.address.complement}` : ''}
+                          {company.contacts.address.neighborhood ? ` - ${company.contacts.address.neighborhood}` : ''}
+                          {company.contacts.address.city ? ` - ${company.contacts.address.city}` : ''}
+                          {company.contacts.address.state ? ` / ${company.contacts.address.state}` : ''}
+                        </span>
                       </div>
-                    )}
-                    {/* Cidade - Estado */}
-                    {(company.contacts.address.city || company.contacts.address.state) && (
-                      <div>
-                        {company.contacts.address.city || ''}
-                        {company.contacts.address.state ? ` - ${company.contacts.address.state}` : ''}
-                      </div>
-                    )}
-                    {/* CEP */}
-                    {company.contacts.address.zipCode && (
-                      <div>{company.contacts.address.zipCode}</div>
                     )}
                   </div>
                 )}
                 {/* Mapa dentro do card */}
-                {company.contacts?.address?.city && company.contacts?.address?.state && (
-                  <div className="mt-4">
-                    <iframe
-                      title="Mapa da empresa"
-                      width="100%"
-                      height="180"
-                      style={{ border: 0 }}
-                      loading="lazy"
-                      allowFullScreen
-                      referrerPolicy="no-referrer-when-downgrade"
-                      src={`https://www.google.com/maps?q=${encodeURIComponent(company.contacts.address.city + ', ' + company.contacts.address.state)}&output=embed`}
-                    ></iframe>
-                  </div>
+                {company.contacts?.address && (
+                  (() => {
+                    const addr = company.contacts.address;
+                    const addressParts = [
+                      addr.street,
+                      addr.number,
+                      addr.neighborhood,
+                      addr.complement,
+                      addr.city,
+                      addr.state
+                    ].filter(Boolean);
+                    const fullAddress = addressParts.join(', ');
+                    const mapQuery = fullAddress || [addr.city, addr.state].filter(Boolean).join(', ');
+                    return (addr.city && addr.state) ? (
+                      <div className="mt-4">
+                        <iframe
+                          title="Mapa da empresa"
+                          width="100%"
+                          height="180"
+                          style={{ border: 0 }}
+                          loading="lazy"
+                          allowFullScreen
+                          referrerPolicy="no-referrer-when-downgrade"
+                          src={`https://www.google.com/maps?q=${encodeURIComponent(mapQuery)}&output=embed`}
+                        ></iframe>
+                      </div>
+                    ) : null;
+                  })()
                 )}
               </div>
             )}

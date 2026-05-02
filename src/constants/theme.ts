@@ -118,7 +118,7 @@ export const THEME = {
   },
   sectionProfile: {
     profileCard: 'rounded-xl border border-gray-200 bg-white p-6 mb-6',
-    profileCardTitle: 'text-2xl font-bold text-red-900',
+    profileCardTitle: 'text-2xl font-bold text-red-900 uppercase',
     profileCardText: 'text-gray-700 mb-4',
     profileCardFormLabel: 'block text-sm font-medium text-gray-700 mb-1',
     profileCardFormInput: 'border border-gray-300 rounded-md px-3 py-2 w-full text-gray-900 bg-white focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50',

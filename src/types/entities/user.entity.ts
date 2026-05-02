@@ -134,13 +134,12 @@ export interface UniformEntity {
 export enum CourseTypeEnum {
   HIGH_SCHOOL = 'high_school',
   TECHNICAL = 'technical',
+  TECHNOLOGIST = 'technologist',
   BACHELOR = 'bachelor',
-  ASSOCIATE = 'associate',
+  LICENTIATE = 'licentiate',
   POSTGRADUATE = 'postgraduate',
-  MBA = 'mba',
   MASTER = 'master',
   DOCTORATE = 'doctorate',
-  EXTENSION = 'extension',
   OTHER = 'other',
 }
 
@@ -195,6 +194,10 @@ export interface CandidateProfileEntity {
 
 export interface RecruiterProfileEntity {
   companyId?: string;
+  tradeName?: string;
+  company?: {
+    tradeName?: string;
+  };
   position?: string;
   contacts?: RecruiterContactsEntity;
 }

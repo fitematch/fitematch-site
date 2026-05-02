@@ -9,10 +9,12 @@ import { ROUTES } from '@/constants/routes';
 
 interface CancelApplicationButtonProps {
   applyId: string;
+  onDeleted?: () => Promise<void> | void;
 }
 
 export function CancelApplicationButton({
   applyId,
+  onDeleted,
 }: CancelApplicationButtonProps) {
   const router = useRouter();
   const { showSuccess, showError } = useFlashMessage();
@@ -21,6 +23,7 @@ export function CancelApplicationButton({
     try {
       await ApplyService.delete(applyId);
       showSuccess('Candidatura cancelada com sucesso.');
+      await onDeleted?.();
       router.push(ROUTES.APPLICATIONS);
     } catch {
       showError('Não foi possível cancelar sua candidatura.');

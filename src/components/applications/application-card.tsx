@@ -1,35 +1,58 @@
-import Link from 'next/link';
-import { FaArrowRight, FaClipboardCheck } from 'react-icons/fa';
-import ApplyEntity from '@/types/entities/apply.entity';
-import { Button } from '@/components/ui/button';
-import { ROUTES } from '@/constants/routes';
+'use client';
 
-interface ApplicationCardProps {
+import { useState } from 'react';
+import { FaTrash } from 'react-icons/fa';
+import { Button } from '@/components/ui/button';
+import { ApplyService } from '@/services/apply/apply.service';
+import ApplyEntity from '@/types/entities/apply.entity';
+import { useFlashMessage } from '@/contexts/flash-message-context';
+
+interface Props {
   application: ApplyEntity;
+  onDeleted?: () => void;
 }
 
-export function ApplicationCard({ application }: ApplicationCardProps) {
+export function ApplicationCard({ application, onDeleted }: Props) {
+  const { showSuccess, showError } = useFlashMessage();
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  async function handleDelete() {
+    try {
+      setIsDeleting(true);
+
+      await ApplyService.delete(application._id);
+
+      showSuccess('Candidatura cancelada com sucesso.');
+      onDeleted?.();
+    } catch {
+      showError('Erro ao cancelar candidatura.');
+    } finally {
+      setIsDeleting(false);
+    }
+  }
+
   return (
-    <article className="rounded-xl border border-gray-900 p-6">
-      <div className="flex items-center gap-3 text-gray-700">
-        <FaClipboardCheck />
-        <span className="text-sm uppercase">{application.status}</span>
-      </div>
+    <article className="rounded-2xl border border-gray-900 bg-black p-6">
+      <div className="flex justify-between items-center">
+        <div>
+          <p className="text-sm text-gray-400">Vaga</p>
+          <h2 className="text-lg font-semibold text-gray-100">
+            {application.jobId}
+          </h2>
 
-      <h3 className="mt-4 text-xl font-semibold text-gray-100">
-        Aplicação #{application._id}
-      </h3>
+          <p className="text-sm text-gray-400 mt-2">
+            Status: {application.status}
+          </p>
+        </div>
 
-      <p className="mt-2 text-sm text-gray-700">
-        Job ID: {application.jobId}
-      </p>
-
-      <div className="mt-6">
-        <Link href={`${ROUTES.APPLICATIONS}/${application._id}`}>
-          <Button variant="login" icon={<FaArrowRight />}>
-            Ver aplicação
-          </Button>
-        </Link>
+        <Button
+          variant="danger"
+          icon={<FaTrash />}
+          onClick={handleDelete}
+          disabled={isDeleting}
+        >
+          Cancelar
+        </Button>
       </div>
     </article>
   );

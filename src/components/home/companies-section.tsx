@@ -18,7 +18,7 @@ export function CompaniesSection() {
     <section className="bg-black py-20">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <SectionTitle
-          title="Empresas que usam a plataforma"
+          title="EMPRESAS QUE USAM A PLATAFORMA"
           icon={<FaBuilding className="h-6 w-6" />}
         />
 
@@ -35,10 +35,10 @@ export function CompaniesSection() {
 
           {!isLoading && !error && companies.length > 0 && (
             <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6">
-              {companies.map((company) => (
+              {companies.map((company, index) => (
                 <div
-                  key={company._id}
-                  className="flex h-24 items-center justify-center rounded-xl border border-gray-900 bg-black px-4 text-center"
+                  key={company._id || company.slug || `${company.tradeName}-${index}`}
+                  className="flex h-24 items-center justify-center rounded-xl border border-gray-500 bg-gray-100 px-4 text-center"
                 >
                   {company.media?.logoUrl ? (
                     <Image

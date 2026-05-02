@@ -60,8 +60,10 @@ export const TEXT_STYLES = {
   
   
   
-    sectionTitle:
-    `text-3xl md:text-4xl font-bold tracking-tight mt-8 ${THEME.text.sectionTitle}`,
+  sectionTitle:
+    `text-xl font-semibold ${THEME.text.sectionTitle}`,
+  sectionIcon:
+    `h-8 w-8 ${THEME.text.sectionTitle}`,
 
   sectionSubtitle:
     `mt-3 text-base ${THEME.text.sectionSubtitle}`,
@@ -87,7 +89,7 @@ export const TEXT_STYLES = {
   
   card: {
     profile: {
-      title: `text-2xl font-bold text-red-900`,
+      title: `text-2xl font-bold text-gray-300`,
     }
   }
 };

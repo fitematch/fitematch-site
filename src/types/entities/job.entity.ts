@@ -1,3 +1,5 @@
+import { CompanyEntity } from "./company.entity";
+
 export enum LanguagesEnum {
   PORTUGUESE = 'portuguese',
   ENGLISH = 'english',
@@ -129,6 +131,7 @@ export interface JobEntity {
   benefits?: BenefitsEntity;
   media?: JobMediaEntity;
   contractType?: string;
+  company: CompanyEntity;
   status: JobStatusEnum;
   createdAt?: Date;
   updatedAt?: Date;

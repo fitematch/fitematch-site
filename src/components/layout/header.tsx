@@ -60,6 +60,18 @@ export function Header() {
                 Vagas
               </Link>
               <Link
+                href={ROUTES.RECRUITER_COMPANY}
+                className={`transition-colors hover:text-white ${pathname.startsWith(ROUTES.RECRUITER_COMPANY) ? THEME.navigation.linkActive : THEME.navigation.link}`}
+              >
+                Empresa
+              </Link>
+              <Link
+                href={ROUTES.RECRUITER_JOBS}
+                className={`transition-colors hover:text-white ${pathname.startsWith(ROUTES.RECRUITER_JOBS) ? THEME.navigation.linkActive : THEME.navigation.link}`}
+              >
+                Vagas
+              </Link>
+              <Link
                 href={ROUTES.FAQ}
                 className={`transition-colors hover:text-white ${pathname.startsWith(ROUTES.FAQ) ? THEME.navigation.linkActive : THEME.navigation.link}`}
               >
@@ -132,6 +144,20 @@ export function Header() {
             </div>
             <Link
               href={ROUTES.JOBS}
+              className={`flex w-full items-center justify-center rounded border border-gray-700 bg-black px-3 py-2 text-sm font-medium text-gray-300 transition-colors hover:bg-gray-700 hover:text-white ${pathname.startsWith(ROUTES.JOBS) ? 'font-bold' : ''}`}
+              onClick={closeMenu}
+            >
+              Vagas
+            </Link>
+            <Link
+              href={ROUTES.RECRUITER_COMPANY}
+              className={`flex w-full items-center justify-center rounded border border-gray-700 bg-black px-3 py-2 text-sm font-medium text-gray-300 transition-colors hover:bg-gray-700 hover:text-white ${pathname.startsWith(ROUTES.JOBS) ? 'font-bold' : ''}`}
+              onClick={closeMenu}
+            >
+              Empresa
+            </Link>
+            <Link
+              href={ROUTES.RECRUITER_JOBS}
               className={`flex w-full items-center justify-center rounded border border-gray-700 bg-black px-3 py-2 text-sm font-medium text-gray-300 transition-colors hover:bg-gray-700 hover:text-white ${pathname.startsWith(ROUTES.JOBS) ? 'font-bold' : ''}`}
               onClick={closeMenu}
             >
