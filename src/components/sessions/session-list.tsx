@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Alert } from '@/components/ui/alert';
 import { EmptyState } from '@/components/ui/empty-state';
 import { PaginationBox } from '@/components/ui/pagination-box';
@@ -13,16 +13,11 @@ export function SessionList() {
   const [page, setPage] = useState(1);
   const itemsPerPage = 10;
   const totalPages = Math.ceil(sessions.length / itemsPerPage);
+  const safePage = totalPages > 0 ? Math.min(page, totalPages) : 1;
   const paginatedSessions = sessions.slice(
-    (page - 1) * itemsPerPage,
-    page * itemsPerPage
+    (safePage - 1) * itemsPerPage,
+    safePage * itemsPerPage
   );
-
-  useEffect(() => {
-    if (page > totalPages && totalPages > 0) {
-      setPage(totalPages);
-    }
-  }, [page, totalPages]);
 
   if (isLoading) {
     return (
@@ -54,7 +49,7 @@ export function SessionList() {
         />
       ))}
       <PaginationBox
-        currentPage={page}
+        currentPage={safePage}
         totalPages={totalPages}
         onPageChange={setPage}
       />
