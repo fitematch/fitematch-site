@@ -55,6 +55,20 @@ async function refreshAccessToken(): Promise<boolean> {
   return true;
 }
 
+async function parseResponseBody<T>(response: Response): Promise<T | undefined> {
+  if (response.status === 204) {
+    return undefined;
+  }
+
+  const rawBody = await response.text();
+
+  if (!rawBody.trim()) {
+    return undefined;
+  }
+
+  return JSON.parse(rawBody) as T;
+}
+
 export async function apiClient<T>(
   endpoint: string,
   options: ApiClientOptions = {},
@@ -84,7 +98,9 @@ export async function apiClient<T>(
   }
 
   if (!response.ok) {
-    const errorBody = await response.json().catch(() => null);
+    const errorBody = await parseResponseBody<{ message?: string }>(response).catch(
+      () => null,
+    );
 
     throw new ApiError(
       errorBody?.message || 'Não foi possível completar a requisição.',
@@ -93,9 +109,5 @@ export async function apiClient<T>(
     );
   }
 
-  if (response.status === 204) {
-    return undefined as T;
-  }
-
-  return response.json() as Promise<T>;
+  return (await parseResponseBody<T>(response)) as T;
 }

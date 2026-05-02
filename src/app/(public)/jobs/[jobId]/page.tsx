@@ -21,12 +21,19 @@ import { ROUTES } from '@/constants/routes';
 import { Breadcrumb } from '@/components/ui/breadcrumb';
 import { CARD_STYLES, TEXT_STYLES } from '@/constants/styles';
 import { JobLocationMapTest } from '@/components/jobs/job-location-map-test';
+import { useAuth } from '@/hooks/use-auth';
+import { ProductRoleEnum } from '@/types/entities/user.entity';
 
 export default function JobDetailsPage() {
   const params = useParams();
   const jobId = params.jobId as string;
+  const { user, isAuthenticated } = useAuth();
+  const canLoadApplications =
+    isAuthenticated && user?.productRole === ProductRoleEnum.CANDIDATE;
 
-  const { applications } = useApplications();
+  const { applications, refetch } = useApplications({
+    enabled: canLoadApplications,
+  });
 
   const hasAlreadyApplied = applications.some(
     (app) => app.jobId === jobId,
@@ -96,7 +103,11 @@ export default function JobDetailsPage() {
                       Vagas
                     </Button>
                   </Link>
-                  <ApplyJobButton jobId={job._id} hasAlreadyApplied={hasAlreadyApplied} />
+                  <ApplyJobButton
+                    jobId={job._id}
+                    hasAlreadyApplied={hasAlreadyApplied}
+                    refetch={refetch}
+                  />
                 </>
               }
             />

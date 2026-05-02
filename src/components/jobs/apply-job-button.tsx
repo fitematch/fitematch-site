@@ -13,12 +13,14 @@ interface ApplyJobButtonProps {
   jobId: string;
   hasAlreadyApplied?: boolean;
   onApplied?: () => void;
+  refetch?: () => Promise<void> | void;
 }
 
 export function ApplyJobButton({
   jobId,
   hasAlreadyApplied = false,
   onApplied,
+  refetch,
 }: ApplyJobButtonProps) {
   const router = useRouter();
   const { user, isAuthenticated } = useAuth();
@@ -59,6 +61,7 @@ export function ApplyJobButton({
       });
 
       showSuccess('Candidatura realizada com sucesso.');
+      await refetch?.();
       onApplied?.();
       router.refresh();
     } catch {

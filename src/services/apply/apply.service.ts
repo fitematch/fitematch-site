@@ -10,40 +10,53 @@ import {
   UpdateApplyStatusRequest,
   UpdateApplyStatusResponse,
 } from './apply.types';
+import { normalizeApply, normalizeApplyList } from './apply.utils';
 
 export const ApplyService = {
-  create(payload: CreateApplyRequest): Promise<CreateApplyResponse> {
-    return apiClient<CreateApplyResponse>(API_ENDPOINTS.APPLY, {
+  async create(payload: CreateApplyRequest): Promise<CreateApplyResponse> {
+    const response = await apiClient<CreateApplyResponse>(API_ENDPOINTS.APPLY, {
       method: 'POST',
       body: JSON.stringify(payload),
     });
+
+    return normalizeApply(response);
   },
 
-  listMine(): Promise<ListMyAppliesResponse> {
-    return apiClient<ListMyAppliesResponse>(API_ENDPOINTS.APPLY_ME);
+  async listMine(): Promise<ListMyAppliesResponse> {
+    const response = await apiClient<ListMyAppliesResponse>(API_ENDPOINTS.APPLY_ME);
+
+    return normalizeApplyList(response);
   },
 
-  listByJob(jobId: string): Promise<ListAppliesByJobResponse> {
-    return apiClient<ListAppliesByJobResponse>(
+  async listByJob(jobId: string): Promise<ListAppliesByJobResponse> {
+    const response = await apiClient<ListAppliesByJobResponse>(
       API_ENDPOINTS.APPLY_BY_JOB_ID(jobId),
     );
+
+    return normalizeApplyList(response);
   },
 
-  read(applyId: string): Promise<ReadApplyResponse> {
-    return apiClient<ReadApplyResponse>(API_ENDPOINTS.APPLY_BY_ID(applyId));
+  async read(applyId: string): Promise<ReadApplyResponse> {
+    const response = await apiClient<ReadApplyResponse>(
+      API_ENDPOINTS.APPLY_BY_ID(applyId),
+    );
+
+    return normalizeApply(response);
   },
 
-  updateStatus(
+  async updateStatus(
     applyId: string,
     payload: UpdateApplyStatusRequest,
   ): Promise<UpdateApplyStatusResponse> {
-    return apiClient<UpdateApplyStatusResponse>(
+    const response = await apiClient<UpdateApplyStatusResponse>(
       API_ENDPOINTS.APPLY_BY_ID(applyId),
       {
         method: 'PATCH',
         body: JSON.stringify(payload),
       },
     );
+
+    return normalizeApply(response);
   },
 
   delete(applyId: string): Promise<DeleteApplyResponse> {
