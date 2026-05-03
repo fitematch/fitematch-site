@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { ApplyService } from '@/services/apply/apply.service';
 import ApplyEntity from '@/types/entities/apply.entity';
 
@@ -12,7 +12,7 @@ export function useApplications(options?: UseApplicationsOptions) {
   const isEnabled = options?.enabled ?? true;
 
   const [applications, setApplications] = useState<ApplyEntity[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(isEnabled);
   const [hasLoaded, setHasLoaded] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -35,18 +35,23 @@ export function useApplications(options?: UseApplicationsOptions) {
 
       setApplications(sortedApplications);
       setError(null);
-      setHasLoaded(true);
     } catch {
       setError('Não foi possível carregar suas candidaturas.');
-      setHasLoaded(true);
     } finally {
+      setHasLoaded(true);
       setIsLoading(false);
     }
   }, [isEnabled]);
 
-  const loadApplications = useCallback(() => {
-    void fetchApplications();
-  }, [fetchApplications]);
+  useEffect(() => {
+    if (!isEnabled) {
+      return;
+    }
+
+    queueMicrotask(() => {
+      void fetchApplications();
+    });
+  }, [fetchApplications, isEnabled]);
 
   return {
     applications: isEnabled ? applications : [],
@@ -54,13 +59,13 @@ export function useApplications(options?: UseApplicationsOptions) {
     error: isEnabled ? error : null,
     hasLoaded: isEnabled ? hasLoaded : true,
     refetch: fetchApplications,
-    loadApplications,
+    loadApplications: fetchApplications,
   };
 }
 
 export function useApplication(applyId?: string) {
   const [application, setApplication] = useState<ApplyEntity | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(Boolean(applyId));
   const [hasLoaded, setHasLoaded] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -76,18 +81,23 @@ export function useApplication(applyId?: string) {
 
       setApplication(response);
       setError(null);
-      setHasLoaded(true);
     } catch {
       setError('Não foi possível carregar os dados da candidatura.');
-      setHasLoaded(true);
     } finally {
+      setHasLoaded(true);
       setIsLoading(false);
     }
   }, [applyId]);
 
-  const loadApplication = useCallback(() => {
-    void fetchApplication();
-  }, [fetchApplication]);
+  useEffect(() => {
+    if (!applyId) {
+      return;
+    }
+
+    queueMicrotask(() => {
+      void fetchApplication();
+    });
+  }, [applyId, fetchApplication]);
 
   return {
     application,
@@ -95,6 +105,6 @@ export function useApplication(applyId?: string) {
     error,
     hasLoaded,
     refetch: fetchApplication,
-    loadApplication,
+    loadApplication: fetchApplication,
   };
 }
