@@ -1,142 +1,100 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { useAuth } from '@/hooks/use-auth';
+import { useCallback, useState } from 'react';
 import { ApplyService } from '@/services/apply/apply.service';
 import ApplyEntity from '@/types/entities/apply.entity';
-import { ProductRoleEnum } from '@/types/entities/user.entity';
-
-interface UseApplicationsHandlers {
-  setApplications: React.Dispatch<React.SetStateAction<ApplyEntity[]>>;
-  setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
-  setError: React.Dispatch<React.SetStateAction<string | null>>;
-}
-
-interface UseApplicationHandlers {
-  setApplication: React.Dispatch<React.SetStateAction<ApplyEntity | null>>;
-  setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
-  setError: React.Dispatch<React.SetStateAction<string | null>>;
-}
-
-async function loadApplications(handlers: UseApplicationsHandlers) {
-  const { setApplications, setIsLoading, setError } = handlers;
-
-  try {
-    setIsLoading(true);
-
-    const response = await ApplyService.listMine();
-
-    setApplications(response);
-    setError(null);
-  } catch {
-    setError('Não foi possível carregar suas candidaturas.');
-  } finally {
-    setIsLoading(false);
-  }
-}
-
-async function loadApplication(
-  applyId: string | undefined,
-  handlers: UseApplicationHandlers,
-) {
-  const { setApplication, setIsLoading, setError } = handlers;
-
-  if (!applyId) {
-    setApplication(null);
-    setIsLoading(false);
-    setError(null);
-    return;
-  }
-
-  try {
-    setIsLoading(true);
-
-    const response = await ApplyService.read(applyId);
-
-    setApplication(response);
-    setError(null);
-  } catch {
-    setError('Não foi possível carregar a candidatura.');
-  } finally {
-    setIsLoading(false);
-  }
-}
 
 interface UseApplicationsOptions {
   enabled?: boolean;
 }
 
-export function useApplications(options: UseApplicationsOptions = {}) {
-  const { enabled } = options;
-  const { user, isAuthenticated, isLoading: isAuthLoading } = useAuth();
+export function useApplications(options?: UseApplicationsOptions) {
+  const isEnabled = options?.enabled ?? true;
+
   const [applications, setApplications] = useState<ApplyEntity[]>([]);
-  const isCandidate = user?.productRole === ProductRoleEnum.CANDIDATE;
-  const isEnabled = enabled ?? (isAuthenticated && isCandidate);
-  const [isLoading, setIsLoading] = useState(isAuthLoading || isEnabled);
+  const [isLoading, setIsLoading] = useState(false);
+  const [hasLoaded, setHasLoaded] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  async function fetchApplications() {
+  const fetchApplications = useCallback(async () => {
     if (!isEnabled) {
-      setApplications([]);
-      setError(null);
-      setIsLoading(false);
       return;
     }
 
-    await loadApplications({
-      setApplications,
-      setIsLoading,
-      setError,
-    });
-  }
+    try {
+      setIsLoading(true);
 
-  useEffect(() => {
-    if (isAuthLoading) {
-      return;
-    }
+      const response = await ApplyService.listMine();
 
-    if (!isEnabled) {
-      setApplications([]);
-      setError(null);
-      setIsLoading(false);
-      return;
-    }
+      const sortedApplications = [...response].sort((a, b) => {
+        const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+        const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
 
-    queueMicrotask(() => {
-      void loadApplications({
-        setApplications,
-        setIsLoading,
-        setError,
+        return dateB - dateA;
       });
-    });
-  }, [isAuthLoading, isEnabled]);
+
+      setApplications(sortedApplications);
+      setError(null);
+      setHasLoaded(true);
+    } catch {
+      setError('Não foi possível carregar suas candidaturas.');
+      setHasLoaded(true);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [isEnabled]);
+
+  const loadApplications = useCallback(() => {
+    void fetchApplications();
+  }, [fetchApplications]);
 
   return {
-    applications,
-    isLoading: isAuthLoading || (isEnabled ? isLoading : false),
-    error,
+    applications: isEnabled ? applications : [],
+    isLoading: isEnabled ? isLoading : false,
+    error: isEnabled ? error : null,
+    hasLoaded: isEnabled ? hasLoaded : true,
     refetch: fetchApplications,
+    loadApplications,
   };
 }
 
 export function useApplication(applyId?: string) {
   const [application, setApplication] = useState<ApplyEntity | null>(null);
-  const [isLoading, setIsLoading] = useState(Boolean(applyId));
+  const [isLoading, setIsLoading] = useState(false);
+  const [hasLoaded, setHasLoaded] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    queueMicrotask(() => {
-      void loadApplication(applyId, {
-        setApplication,
-        setIsLoading,
-        setError,
-      });
-    });
+  const fetchApplication = useCallback(async () => {
+    if (!applyId) {
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+
+      const response = await ApplyService.read(applyId);
+
+      setApplication(response);
+      setError(null);
+      setHasLoaded(true);
+    } catch {
+      setError('Não foi possível carregar os dados da candidatura.');
+      setHasLoaded(true);
+    } finally {
+      setIsLoading(false);
+    }
   }, [applyId]);
+
+  const loadApplication = useCallback(() => {
+    void fetchApplication();
+  }, [fetchApplication]);
 
   return {
     application,
     isLoading,
     error,
+    hasLoaded,
+    refetch: fetchApplication,
+    loadApplication,
   };
 }

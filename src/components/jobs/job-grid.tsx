@@ -1,28 +1,30 @@
 'use client';
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { JobCard } from './job-card';
 import { useJobs } from '@/hooks/use-jobs';
-import { usePublicCompanies } from '@/hooks/use-public-companies';
 import { Skeleton } from '@/components/ui/skeleton';
 import { EmptyState } from '@/components/ui/empty-state';
 import { Alert } from '@/components/ui/alert';
 import { PaginationBox } from '@/components/ui/pagination-box';
 import { useBreakpoint } from '@/hooks/use-breakpoint';
+import { Select } from '@/components/ui/select';
 
-export function JobGrid() {
+interface JobGridProps {
+  search: string;
+}
+
+export function JobGrid({ search }: JobGridProps) {
   const { jobs, isLoading, error } = useJobs();
-  const {
-    companies,
-    isLoading: isLoadingCompanies,
-    error: companiesError,
-  } = usePublicCompanies();
   const breakpoint = useBreakpoint();
-  const [page, setPage] = useState(1);
 
-  // Define quantos itens por página conforme o breakpoint
+  const [page, setPage] = useState(1);
+  const [contractType, setContractType] = useState('');
+
+  // Responsividade
   let itemsPerPage = 6;
   let gridCols = 'md:grid-cols-2 lg:grid-cols-3';
+
   if (breakpoint === 'tablet') {
     itemsPerPage = 4;
     gridCols = 'md:grid-cols-2 lg:grid-cols-2';
@@ -31,11 +33,38 @@ export function JobGrid() {
     gridCols = 'md:grid-cols-1 lg:grid-cols-1';
   }
 
-  const companiesById = Object.fromEntries(
-    companies.map((company) => [company._id, company]),
-  );
+  // Filtro
+  const filteredJobs = useMemo(() => {
+    return jobs.filter((job) => {
+      const matchesSearch = job.title
+        .toLowerCase()
+        .includes(search.toLowerCase());
 
-  if (isLoading || isLoadingCompanies) {
+      const matchesContract =
+        !contractType || job.contractType === contractType;
+
+      return matchesSearch && matchesContract;
+    });
+  }, [jobs, search, contractType]);
+
+  // Paginação segura (sem setState no render/effect)
+  const totalPages = Math.ceil(filteredJobs.length / itemsPerPage);
+  const safePage = totalPages > 0 ? Math.min(page, totalPages) : 1;
+
+  const startIdx = (safePage - 1) * itemsPerPage;
+  const endIdx = startIdx + itemsPerPage;
+  const jobsToShow = filteredJobs.slice(startIdx, endIdx);
+
+  function handleContractTypeChange(value: string) {
+    setContractType(value);
+    setPage(1);
+  }
+
+  function handlePageChange(nextPage: number) {
+    setPage(nextPage);
+  }
+
+  if (isLoading) {
     return (
       <div className={`grid gap-6 ${gridCols}`}>
         {Array.from({ length: itemsPerPage }).map((_, index) => (
@@ -49,42 +78,45 @@ export function JobGrid() {
     return <Alert type="error" message={error} />;
   }
 
-  if (companiesError) {
-    return <Alert type="error" message={companiesError} />;
-  }
-
-  if (jobs.length === 0) {
-    return <EmptyState message="Nenhuma vaga encontrada." />;
-  }
-
-  // Paginação
-  const totalPages = Math.ceil(jobs.length / itemsPerPage);
-  const startIdx = (page - 1) * itemsPerPage;
-  const endIdx = startIdx + itemsPerPage;
-  const jobsToShow = jobs.slice(startIdx, endIdx);
-
-  // Se mudar o breakpoint e a página atual ficar inválida, volta para a última página válida
-  if (page > totalPages && totalPages > 0) {
-    setPage(totalPages);
-    return null;
-  }
-
   return (
     <>
-      <div className={`grid gap-6 ${gridCols}`}>
-        {jobsToShow.map((job) => (
-          <JobCard
-            key={job._id}
-            job={job}
-            company={companiesById[job.companyId]}
-          />
-        ))}
+      {/* Filtro */}
+      <div className="mb-6">
+        <Select
+          value={contractType}
+          onChange={(event) => handleContractTypeChange(event.target.value)}
+          options={[
+            { value: '', label: 'Todos os tipos' },
+            { value: 'clt', label: 'CLT' },
+            { value: 'pj', label: 'PJ' },
+            { value: 'freelance', label: 'Freelance' },
+            { value: 'internship', label: 'Estágio' },
+            { value: 'temporary', label: 'Temporário' },
+            { value: 'part_time', label: 'Meio período' },
+            { value: 'full_time', label: 'Tempo integral' },
+            { value: 'autonomous', label: 'Autônomo' },
+          ]}
+        />
       </div>
-      <PaginationBox
-        currentPage={page}
-        totalPages={totalPages}
-        onPageChange={setPage}
-      />
+
+      {/* Conteúdo */}
+      {filteredJobs.length === 0 ? (
+        <EmptyState message="Nenhuma vaga encontrada." />
+      ) : (
+        <>
+          <div className={`grid gap-6 ${gridCols}`}>
+            {jobsToShow.map((job) => (
+              <JobCard key={job._id} job={job} />
+            ))}
+          </div>
+
+          <PaginationBox
+            currentPage={safePage}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
+          />
+        </>
+      )}
     </>
   );
 }

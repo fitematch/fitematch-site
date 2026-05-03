@@ -11,7 +11,7 @@ import {
 } from '@/types/entities/job.entity';
 import { PublicCompanyResponse } from '@/services/company/company.types';
 import { Button } from '@/components/ui/button';
-import { CARD_STYLES, TEXT_STYLES } from '@/constants/styles';
+import { CARD_STYLES } from '@/constants/styles';
 import Image from 'next/image';
 
 interface JobCardProps {

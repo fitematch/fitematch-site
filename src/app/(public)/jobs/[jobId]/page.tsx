@@ -4,7 +4,6 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { FaArrowLeft, FaWhatsapp, FaFacebook, FaInstagram, FaLinkedinIn } from 'react-icons/fa';
-import { MdOutlinePlace } from 'react-icons/md';
 import { SlGlobe } from 'react-icons/sl';
 import { CiShare2 } from 'react-icons/ci';
 import { FaXTwitter } from 'react-icons/fa6';
