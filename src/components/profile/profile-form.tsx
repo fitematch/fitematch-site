@@ -44,8 +44,9 @@ import {
   AvailabilityShiftEnum,
   CourseTypeEnum,
 } from '@/types/entities/user.entity';
-import { RecruiterProfileForm } from './recruiter-profile-form';
-import { ProfileSectionTitle } from './profile-section-title';
+import { RecruiterProfileForm } from '@/components/profile/recruiter-profile-form';
+import { ProfileSectionTitle } from '@/components/profile/profile-section-title';
+import { PhoneInput } from '@/components/form/phone-input';
 
 function formatBirthday(value?: string | Date) {
   if (!value) {
@@ -280,6 +281,14 @@ export function CandidateProfileForm() {
   const shoeSizeUnitValue = useWatch({
     control,
     name: 'candidateProfile.uniform.shoeSizeUnit',
+  });
+  const phoneCountryValue = useWatch({
+    control,
+    name: 'candidateProfile.contacts.phone.country',
+  });
+  const phoneNumberValue = useWatch({
+    control,
+    name: 'candidateProfile.contacts.phone.number',
   });
   const hasShoeSizeUnit = Boolean(shoeSizeUnitValue);
 
@@ -832,23 +841,29 @@ export function CandidateProfileForm() {
           expanded={showPhone}
         />
         {showPhone && (
-          <div className="mt-6 grid gap-4 md:grid-cols-3">
-            <Input
-              label="Country"
-              labelClassName={labelClassName}
-              className={fieldClassName}
-              placeholder="+55"
-              {...register('candidateProfile.contacts.phone.country')}
-            />
-            <Input
-              label="Number"
-              labelClassName={labelClassName}
-              className={fieldClassName}
-              placeholder="11981726354"
-              {...register('candidateProfile.contacts.phone.number')}
-            />
-            <div className="flex items-end">
-              <div className="flex w-full gap-3">
+          <div className="mt-6 grid gap-4 md:grid-cols-2">
+            <div className="md:col-span-2 md:col-start-1 md:row-start-1">
+              <PhoneInput
+                label="Telefone"
+                labelClassName={labelClassName}
+                countryValue={phoneCountryValue || '+55'}
+                numberValue={phoneNumberValue || ''}
+                onCountryChange={(value) =>
+                  setValue('candidateProfile.contacts.phone.country', value, {
+                    shouldDirty: true,
+                    shouldTouch: true,
+                  })
+                }
+                onNumberChange={(value) =>
+                  setValue('candidateProfile.contacts.phone.number', value, {
+                    shouldDirty: true,
+                    shouldTouch: true,
+                  })
+                }
+              />
+            </div>
+            <div className="flex items-end md:col-start-1 md:row-start-2">
+              <div className="grid w-full gap-3 md:grid-cols-2">
                 <label className="flex flex-1 items-center gap-2 rounded-xl border border-gray-500 bg-black px-4 py-3 text-gray-100 placeholder:text-gray-300">
                   <input
                     type="checkbox"
@@ -869,7 +884,7 @@ export function CandidateProfileForm() {
                 </label>
               </div>
             </div>
-            <div className="flex justify-end md:col-span-3">
+            <div className="flex justify-end md:col-span-2">
               <Button
                 type="button"
                 variant="positive"

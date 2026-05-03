@@ -1,4 +1,3 @@
-
 import { THEME } from '@/constants/theme';
 import { SignUpForm } from '@/components/auth/sign-up-form';
 
