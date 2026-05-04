@@ -87,7 +87,7 @@ export interface LanguageRequirement {
 }
 
 export interface RequirementsEntity {
-  educationLevel?: EducationLevelEnum[];
+  educationLevel?: EducationLevelEnum;
   minExperienceYears?: number;
   maxExperienceYears?: number;
   languages?: LanguageRequirement[];
@@ -115,8 +115,9 @@ export interface JobMediaEntity {
 
 export enum JobStatusEnum {
   PENDING = 'pending',
+  DRAFT = 'draft',
   ACTIVE = 'active',
-  DENIED = 'denied',
+  PAUSED = 'paused',
   CLOSED = 'closed',
 }
 

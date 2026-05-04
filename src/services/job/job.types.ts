@@ -18,3 +18,23 @@ export type UpdateJobRequest = Partial<
 >;
 
 export type UpdateJobResponse = JobEntity;
+
+export type CreateMyJobRequest = Omit<
+  JobEntity,
+  | '_id'
+  | 'slug'
+  | 'company'
+  | 'status'
+  | 'createdAt'
+  | 'updatedAt'
+> & {
+  slug?: string;
+};
+
+export type CreateMyJobResponse = JobEntity;
+
+export type UpdateMyJobRequest = Partial<CreateMyJobRequest>;
+
+export type UpdateMyJobResponse = JobEntity;
+
+export type DeleteMyJobResponse = void;

@@ -3,18 +3,25 @@
 import { useParams } from 'next/navigation';
 import { RecruiterPageHeader } from '@/components/recruiter/recruiter-page-header';
 import { RecruiterJobForm } from '@/components/recruiter/jobs/recruiter-job-form';
-import { useJob } from '@/hooks/use-job';
+import { ROUTES } from '@/constants/routes';
+import { PAGE_STYLES } from '@/constants/styles';
+import { useMyJob } from '@/hooks/use-my-job';
 
 export default function RecruiterEditJobPage() {
   const params = useParams<{ jobId: string }>();
   const jobId = params.jobId;
 
-  const { job, isLoading, error } = useJob(jobId);
+  const { job, isLoading, error } = useMyJob(jobId);
 
   return (
-    <section className="min-h-screen bg-black px-4 py-20">
-      <div className="mx-auto max-w-5xl">
+    <section className={`${PAGE_STYLES.body} py-20`}>
+      <div className={PAGE_STYLES.container}>
         <RecruiterPageHeader
+          breadcrumbs={[
+            { label: 'Home', href: ROUTES.HOME },
+            { label: 'Minhas vagas', href: ROUTES.RECRUITER_JOBS },
+            { label: 'Editar vaga' },
+          ]}
           title="Editar vaga"
           description="Atualize os dados da vaga selecionada."
         />

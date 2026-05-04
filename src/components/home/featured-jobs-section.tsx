@@ -10,7 +10,6 @@ import { useJobs } from '@/hooks/use-jobs';
 import { usePublicCompanies } from '@/hooks/use-public-companies';
 import { Skeleton } from '@/components/ui/skeleton';
 import { SectionTitle } from '@/components/ui/section-title';
-import { EmptyState } from '@/components/ui/empty-state';
 import { Alert } from '@/components/ui/alert';
 import { JobCard } from '@/components/jobs/job-card';
 
@@ -59,6 +58,10 @@ export function FeaturedJobsSection() {
     };
   }, [jobs.length]);
 
+  if (!isLoading && !isLoadingCompanies && !error && !companiesError && featuredJobs.length === 0) {
+    return null;
+  }
+
   return (
     <section className="bg-[#07090c] py-20">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -86,10 +89,6 @@ export function FeaturedJobsSection() {
         {error && <Alert type="error" message={error} />}
 
         {companiesError && <Alert type="error" message={companiesError} />}
-
-        {!isLoading && !isLoadingCompanies && !error && !companiesError && featuredJobs.length === 0 && (
-          <EmptyState message="Nenhuma vaga em destaque encontrada." />
-        )}
 
         {!isLoading && !isLoadingCompanies && !error && !companiesError && featuredJobs.length > 0 && (
           <div

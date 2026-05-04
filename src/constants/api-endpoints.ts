@@ -20,6 +20,7 @@ export const API_ENDPOINTS = {
 
   JOB: '/job',
   JOB_ME: '/job/me',
+  JOB_ME_BY_ID: (jobId: string) => `/job/me/${jobId}`,
   JOB_BY_ID: (jobId: string) => `/job/${jobId}`,
 
   APPLY: '/apply',

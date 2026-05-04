@@ -71,7 +71,7 @@ export function JobCard({ job, company, showRequirements, hideDetailsButton = fa
   // Prioriza dados vindos de job.company, fallback para prop company
   const jobCompany = (job as { company?: PublicCompanyResponse })?.company;
   const displayCompany = jobCompany || company;
-  const educationLevels = job.requirements?.educationLevel;
+  const educationLevel = job.requirements?.educationLevel;
   // Novo: city e state vêm de company.contacts.address
   const address = displayCompany?.contacts?.address;
   const location = address
@@ -139,21 +139,17 @@ export function JobCard({ job, company, showRequirements, hideDetailsButton = fa
                     )}
                   </div>
                 ) : null}
-                {(educationLevels?.length ||
+                {(educationLevel ||
                   job.requirements?.minExperienceYears ||
                   job.requirements?.maxExperienceYears ||
                   job.requirements?.languages?.length) && (
                   <div className="rounded-2xl border border-gray-800 bg-black/45 px-3 py-3">
                     <ul className="space-y-2 text-xs text-gray-300">
-                      {educationLevels?.length ? (
+                      {educationLevel ? (
                         <li className="flex items-center gap-2">
                         <FaSchool className="shrink-0 text-gray-400" />
                           <span>
-                            {educationLevels
-                              .map((level) =>
-                                getEducationLevelLabel(level as EducationLevelEnum)
-                              )
-                              .join(', ')}
+                            {getEducationLevelLabel(educationLevel as EducationLevelEnum)}
                           </span>
                         </li>
                       ) : null}
@@ -227,14 +223,10 @@ export function JobCard({ job, company, showRequirements, hideDetailsButton = fa
               {showRequirements && (
                 <>
                   <ul className="mb-2 ml-1 space-y-2 text-sm text-gray-200">
-                    {educationLevels?.length ? (
+                    {educationLevel ? (
                       <li className="flex items-center gap-2">
                         <FaSchool className="text-gray-300" />
-                        {educationLevels
-                          .map((level) =>
-                            getEducationLevelLabel(level as EducationLevelEnum)
-                          )
-                          .join(', ')}
+                        {getEducationLevelLabel(educationLevel as EducationLevelEnum)}
                       </li>
                     ) : null}
                     {(job.requirements?.minExperienceYears || job.requirements?.maxExperienceYears) && (
