@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { ROUTES } from '@/constants/routes';
 import { useAuth } from '@/hooks/use-auth';
 import { ProductRoleEnum } from '@/types/entities/user.entity';
+import { PageLoading } from '@/components/ui/page-loading';
 
 interface RoleRouteProps {
   children: ReactNode;
@@ -35,11 +36,7 @@ export function RoleRoute({
   }, [hasAllowedRole, isAuthenticated, isLoading, redirectTo, router]);
 
   if (isLoading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center text-gray-700">
-        Carregando...
-      </div>
-    );
+    return <PageLoading />;
   }
 
   if (!isAuthenticated || !hasAllowedRole) {

@@ -8,7 +8,7 @@ import { EmptyState } from '@/components/ui/empty-state';
 import { Alert } from '@/components/ui/alert';
 import { PaginationBox } from '@/components/ui/pagination-box';
 import { useBreakpoint } from '@/hooks/use-breakpoint';
-import { Select } from '@/components/ui/select';
+import { LanguagesEnum } from '@/types/entities/job.entity';
 
 interface JobGridProps {
   search: string;
@@ -19,7 +19,6 @@ export function JobGrid({ search }: JobGridProps) {
   const breakpoint = useBreakpoint();
 
   const [page, setPage] = useState(1);
-  const [contractType, setContractType] = useState('');
 
   // Responsividade
   let itemsPerPage = 6;
@@ -33,19 +32,48 @@ export function JobGrid({ search }: JobGridProps) {
     gridCols = 'md:grid-cols-1 lg:grid-cols-1';
   }
 
-  // Filtro
+  function normalizeSearchValue(value: string) {
+    return value
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase();
+  }
+
+  function getLanguageLabel(value: LanguagesEnum) {
+    return {
+      [LanguagesEnum.PORTUGUESE]: 'portugues',
+      [LanguagesEnum.ENGLISH]: 'ingles',
+      [LanguagesEnum.SPANISH]: 'espanhol',
+    }[value];
+  }
+
   const filteredJobs = useMemo(() => {
+    const normalizedSearch = normalizeSearchValue(search.trim());
+
     return jobs.filter((job) => {
-      const matchesSearch = job.title
-        .toLowerCase()
-        .includes(search.toLowerCase());
+      if (!normalizedSearch) {
+        return true;
+      }
 
-      const matchesContract =
-        !contractType || job.contractType === contractType;
+      const companyAddress = job.company?.contacts?.address;
+      const languageTerms = (job.requirements?.languages || [])
+        .flatMap((language) => [language.name, getLanguageLabel(language.name)])
+        .filter(Boolean);
 
-      return matchesSearch && matchesContract;
+      const searchableTerms = [
+        job.title,
+        job.contractType,
+        companyAddress?.city,
+        companyAddress?.state,
+        job.company?.tradeName,
+        ...languageTerms,
+      ]
+        .filter(Boolean)
+        .map((term) => normalizeSearchValue(String(term)));
+
+      return searchableTerms.some((term) => term.includes(normalizedSearch));
     });
-  }, [jobs, search, contractType]);
+  }, [jobs, search]);
 
   // Paginação segura (sem setState no render/effect)
   const totalPages = Math.ceil(filteredJobs.length / itemsPerPage);
@@ -54,11 +82,6 @@ export function JobGrid({ search }: JobGridProps) {
   const startIdx = (safePage - 1) * itemsPerPage;
   const endIdx = startIdx + itemsPerPage;
   const jobsToShow = filteredJobs.slice(startIdx, endIdx);
-
-  function handleContractTypeChange(value: string) {
-    setContractType(value);
-    setPage(1);
-  }
 
   function handlePageChange(nextPage: number) {
     setPage(nextPage);
@@ -80,26 +103,6 @@ export function JobGrid({ search }: JobGridProps) {
 
   return (
     <>
-      {/* Filtro */}
-      <div className="mb-6">
-        <Select
-          value={contractType}
-          onChange={(event) => handleContractTypeChange(event.target.value)}
-          options={[
-            { value: '', label: 'Todos os tipos' },
-            { value: 'clt', label: 'CLT' },
-            { value: 'pj', label: 'PJ' },
-            { value: 'freelance', label: 'Freelance' },
-            { value: 'internship', label: 'Estágio' },
-            { value: 'temporary', label: 'Temporário' },
-            { value: 'part_time', label: 'Meio período' },
-            { value: 'full_time', label: 'Tempo integral' },
-            { value: 'autonomous', label: 'Autônomo' },
-          ]}
-        />
-      </div>
-
-      {/* Conteúdo */}
       {filteredJobs.length === 0 ? (
         <EmptyState message="Nenhuma vaga encontrada." />
       ) : (

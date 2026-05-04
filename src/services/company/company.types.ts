@@ -7,6 +7,21 @@ export type CreateCompanyRequest = Omit<
 
 export type CreateCompanyResponse = CompanyEntity;
 
+export type ReadMyCompanyResponse = CompanyEntity;
+
+export type CreateMyCompanyRequest = Omit<
+  CompanyEntity,
+  '_id' | 'slug' | 'status' | 'audit' | 'approval' | 'createdAt' | 'updatedAt'
+> & {
+  slug?: string;
+};
+
+export type CreateMyCompanyResponse = CompanyEntity;
+
+export type UpdateMyCompanyRequest = Partial<CreateMyCompanyRequest>;
+
+export type UpdateMyCompanyResponse = CompanyEntity;
+
 export interface PublicCompanyResponse {
   _id: string;
   slug: string;
@@ -24,7 +39,10 @@ export interface PublicCompanyResponse {
       zipCode?: string;
     };
     phone?: {
+      country?: string;
       number?: string;
+      isWhatsapp?: boolean;
+      isTelegram?: boolean;
     };
   };
   media?: {

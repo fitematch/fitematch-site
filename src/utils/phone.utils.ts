@@ -21,28 +21,25 @@ export function applyPhoneMask(value: string, mask?: string) {
   }
 
   let digitIndex = 0;
-  let hasWrittenDigit = false;
+  let maskedValue = '';
 
-  return mask
-    .split('')
-    .map((char) => {
-      if (char !== '#') {
-        return hasWrittenDigit ? char : '';
-      }
+  for (const char of mask) {
+    if (char !== '#') {
+      maskedValue += char;
+      continue;
+    }
 
-      const digit = digits[digitIndex];
+    const digit = digits[digitIndex];
 
-      if (!digit) {
-        return '';
-      }
+    if (!digit) {
+      break;
+    }
 
-      digitIndex += 1;
-      hasWrittenDigit = true;
+    maskedValue += digit;
+    digitIndex += 1;
+  }
 
-      return digit;
-    })
-    .join('')
-    .trim();
+  return maskedValue.trim();
 }
 
 export function formatPhoneWithDialCode(

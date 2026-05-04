@@ -19,22 +19,13 @@ export default function JobsPage() {
             { label: 'Vagas' },
           ]}
         />
-
         <h1 className={`${TEXT_STYLES.pageTitle} mt-8`}>
           Vagas
         </h1>
-
-        <p className={TEXT_STYLES.pageSubtitle}>
-          Encontre sua próxima oportunidade de carreira.
-        </p>
-
-        {/* Busca */}
         <div className="mt-8">
           <JobSearchInput value={search} onChange={setSearch} />
         </div>
-
-        {/* Grid */}
-        <div className="mt-10">
+        <div className="mt-12">
           <JobGrid search={search} />
         </div>
       </div>

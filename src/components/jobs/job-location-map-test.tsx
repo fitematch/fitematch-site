@@ -1,12 +1,15 @@
 'use client';
 
+import Link from 'next/link';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { FaHome } from 'react-icons/fa';
 import { MdOutlineSocialDistance, MdPlace } from 'react-icons/md';
 import { useAuth } from '@/hooks/use-auth';
+import { ROUTES } from '@/constants/routes';
 import { PublicCompanyResponse } from '@/services/company/company.types';
 import { CARD_STYLES } from '@/constants/styles';
+import { ProductRoleEnum } from '@/types/entities/user.entity';
 
 type Coordinates = {
   lat: number;
@@ -235,6 +238,10 @@ export function JobLocationMapTest({ company }: JobLocationMapTestProps) {
     companyCoordinates && candidateCoordinates
       ? calculateDistanceInKm(candidateCoordinates, companyCoordinates)
       : null;
+  const shouldShowUnavailableDistanceMessage =
+    isAuthenticated &&
+    user?.productRole === ProductRoleEnum.CANDIDATE &&
+    !candidateCoordinates;
   const companyLocation = [
     company?.contacts?.address?.street,
     company?.contacts?.address?.number,
@@ -295,12 +302,18 @@ export function JobLocationMapTest({ company }: JobLocationMapTestProps) {
                 <MdOutlineSocialDistance className="h-4 w-4 shrink-0 text-gray-100" />
                 <p>{distance?.toFixed(2)} km</p>
               </div>
-            ) : (
+            ) : shouldShowUnavailableDistanceMessage ? (
               <div className="flex items-center gap-3 rounded-xl border border-slate-700/70 bg-black/50 px-3 py-3">
                 <MdOutlineSocialDistance className="h-4 w-4 shrink-0 text-gray-100" />
-                <p>Indisponível. Complete seu endereço no perfil para calcular.</p>
+                <p>
+                  Indisponível. Complete seu{' '}
+                  <Link href={ROUTES.PROFILE} className="underline hover:text-gray-100">
+                    perfil
+                  </Link>{' '}
+                  para calcular.
+                </p>
               </div>
-            )}
+            ) : null}
           </div>
         </>
       )}

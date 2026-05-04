@@ -17,7 +17,7 @@ export interface CompanyAuditEntity {
 }
 
 export interface CompanyApprovalEntity {
-  approvedAt?: Date;
+  approvedAt?: Date | string;
   approvedByUserId?: string;
 }
 
@@ -48,6 +48,6 @@ export interface CompanyEntity {
   audit?: CompanyAuditEntity;
   approval?: CompanyApprovalEntity;
   status: CompanyStatusEnum;
-  createdAt?: Date;
-  updatedAt?: Date;
+  createdAt?: Date | string;
+  updatedAt?: Date | string;
 }

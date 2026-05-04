@@ -18,7 +18,7 @@ export function ApplicationList() {
   }
 
   if (applications.length === 0) {
-    return <EmptyState message="Você ainda não se candidatou a nenhuma vaga." />;
+    return <EmptyState message="Você ainda não se candidatou a nenhuma vaga!" />;
   }
 
   return (

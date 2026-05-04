@@ -4,6 +4,7 @@ import { ReactNode, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { ROUTES } from '@/constants/routes';
 import { useAuth } from '@/hooks/use-auth';
+import { PageLoading } from '@/components/ui/page-loading';
 
 interface PrivateRouteProps {
   children: ReactNode;
@@ -20,11 +21,7 @@ export function PrivateRoute({ children }: PrivateRouteProps) {
   }, [isAuthenticated, isLoading, router]);
 
   if (isLoading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center text-gray-700">
-        Carregando...
-      </div>
-    );
+    return <PageLoading />;
   }
 
   if (!isAuthenticated) {

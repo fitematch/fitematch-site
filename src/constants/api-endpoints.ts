@@ -14,7 +14,9 @@ export const API_ENDPOINTS = {
     `/auth/sessions/${sessionId}/revoke`,
 
   COMPANY: '/company',
+  COMPANY_ME: '/company/me',
   COMPANY_PUBLIC: '/company/public',
+  COMPANY_BY_ID: (companyId: string) => `/company/${companyId}`,
 
   JOB: '/job',
   JOB_ME: '/job/me',
