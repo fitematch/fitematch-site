@@ -29,7 +29,7 @@ export const THEME = {
   },
 
   text: {
-    title: 'text-2xl font-bold text-gray-900',
+    title: 'text-2xl font-bold text-gray-500',
     sectionTitle: 'text-2xl font-bold text-gray-100',
     sectionSubtitle: 'text-base text-gray-100 mb-6',
     subtitle: 'text-base text-gray-600 mb-6',

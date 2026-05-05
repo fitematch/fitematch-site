@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm, useWatch, useFieldArray } from 'react-hook-form';
 import {
   FaGlobeAmericas,
@@ -222,6 +222,7 @@ export function CandidateProfileForm() {
     control,
     register,
     getValues,
+    reset,
     setValue,
     formState: { errors, isSubmitting },
   } = useForm<UpdateMeRequest>({
@@ -231,6 +232,15 @@ export function CandidateProfileForm() {
       candidateProfile: user?.candidateProfile,
     },
   });
+
+  useEffect(() => {
+    reset({
+      name: user?.name,
+      birthday: user?.birthday,
+      candidateProfile: user?.candidateProfile,
+    });
+  }, [reset, user]);
+
   const {
     fields: educationFields,
     append: appendEducation,

@@ -8,7 +8,7 @@ export default function SignInPage() {
     <section className={`flex min-h-screen items-center justify-center ${THEME.layout.background} px-4`}>
       <div className="w-full">
         <h1 className={`mb-8 text-center text-3xl font-bold ${THEME.text.title}`}>
-          Entre na sua conta
+          fitematch | LOGIN
         </h1>
 
         <SignInForm />

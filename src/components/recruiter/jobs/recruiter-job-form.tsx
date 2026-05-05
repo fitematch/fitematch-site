@@ -11,7 +11,7 @@ import { useAuth } from '@/hooks/use-auth';
 import { useFlashMessage } from '@/contexts/flash-message-context';
 import { CompanyService } from '@/services/company/company.service';
 import { ApiError } from '@/services/http/api-error';
-import { CompanyEntity } from '@/types/entities/company.entity';
+import { CompanyEntity, CompanyStatusEnum } from '@/types/entities/company.entity';
 import { JobService } from '@/services/job/job.service';
 import {
   EducationLevelEnum,
@@ -126,6 +126,7 @@ export function RecruiterJobForm({
   const [isLanguageModalOpen, setIsLanguageModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [companyDetails, setCompanyDetails] = useState<CompanyEntity | null>(null);
+  const [isLoadingCompanyDetails, setIsLoadingCompanyDetails] = useState(false);
   const [languageDraft, setLanguageDraft] = useState<LanguageDraft>({
     name: '',
     level: '',
@@ -175,16 +176,21 @@ export function RecruiterJobForm({
     }
 
     async function loadCompanyDetails() {
+      setIsLoadingCompanyDetails(true);
       try {
         const company = await CompanyService.readMine();
         setCompanyDetails(company);
       } catch {
         setCompanyDetails(null);
+      } finally {
+        setIsLoadingCompanyDetails(false);
       }
     }
 
     void loadCompanyDetails();
   }, [companyId]);
+
+  const canPublishJob = hasCompany && companyDetails?.status === CompanyStatusEnum.ACTIVE;
 
   useEffect(() => {
     if (errors.slug?.type === 'conflict' && previousTitleRef.current !== titleValue) {
@@ -436,11 +442,12 @@ export function RecruiterJobForm({
         onSubmit={handleSubmit(onSubmit, onInvalidSubmit)}
         className="rounded-2xl border border-gray-500 bg-black p-6"
       >
-        {!hasCompany && (
-          <div className="mb-6 rounded-xl border border-red-100 bg-red-900 p-4 text-sm text-red-100">
-            Você precisa cadastrar sua empresa antes de publicar vagas.
+        {!canPublishJob && !isLoadingCompanyDetails ? (
+          <div className="rounded-xl border border-red-100 bg-red-900 p-4 text-sm text-red-100">
+            Você precisa cadastrar sua empresa e esperar que ela seja aprovada pela plataforma antes de publicar vagas.
           </div>
-        )}
+        ) : (
+          <>
 
         <div className="grid gap-4">
           <div className="grid gap-4 md:grid-cols-2">
@@ -808,12 +815,14 @@ export function RecruiterJobForm({
             type="submit"
             variant="positive"
             icon={<FaSave />}
-            disabled={isSubmitting || !hasCompany}
-        >
-          {currentMode === 'create' ? 'Criar' : 'Atualizar'}
-        </Button>
-      </div>
-    </form>
+            disabled={isSubmitting || !canPublishJob}
+          >
+            {currentMode === 'create' ? 'Criar' : 'Atualizar'}
+          </Button>
+        </div>
+          </>
+        )}
+      </form>
 
       {isLanguageModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 px-4">

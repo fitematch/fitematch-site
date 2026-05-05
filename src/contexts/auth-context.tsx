@@ -61,11 +61,21 @@ export function AuthProvider({ children }: AuthProviderProps) {
   }, []);
 
   const signIn = useCallback(async (payload: SignInRequest) => {
-    const response = await AuthService.signIn(payload);
+    setIsLoading(true);
 
-    setUser(response.user);
+    try {
+      const response = await AuthService.signIn(payload);
+      const me = await AuthService.me();
 
-    return response;
+      setUser(me);
+
+      return {
+        ...response,
+        user: me,
+      };
+    } finally {
+      setIsLoading(false);
+    }
   }, []);
 
   const signOut = useCallback(async () => {
