@@ -5,14 +5,15 @@ import { FieldErrors, useForm, useWatch } from 'react-hook-form';
 import { FaBuilding, FaSave } from 'react-icons/fa';
 import { Button } from '@/components/ui/button';
 import { PhoneInput } from '@/components/form/phone-input';
+import { FileUpload } from '@/components/ui/file-upload';
 import { Input } from '@/components/ui/input';
 import { useAddressByZipCode } from '@/hooks/use-address-by-zipcode';
 import { useCompanyByCnpj } from '@/hooks/use-company-by-cnpj';
 import { CompanyService } from '@/services/company/company.service';
 import { ApiError } from '@/services/http/api-error';
+import { UploadService } from '@/services/upload/upload.service';
 import { CompanyEntity } from '@/types/entities/company.entity';
 import { useFlashMessage } from '@/contexts/flash-message-context';
-import { LogoUploadCropper } from './logo-upload-cropper';
 
 interface RecruiterCompanyFormValues {
   tradeName: string;
@@ -67,7 +68,6 @@ function formatCnpj(value: string) {
 
 export function RecruiterCompanyForm() {
   const { showSuccess, showError } = useFlashMessage();
-  const [croppedLogoUrl, setCroppedLogoUrl] = useState<string | null>(null);
   const [isLoadingCompany, setIsLoadingCompany] = useState(true);
   const [hasCompany, setHasCompany] = useState(false);
   const {
@@ -110,16 +110,10 @@ export function RecruiterCompanyForm() {
     control,
     name: 'phoneNumber',
   });
-  const handleCroppedImageChange = useCallback(
-    (value: string | null) => {
-      setCroppedLogoUrl(value);
-      setValue('logoUrl', value || '', {
-        shouldDirty: true,
-        shouldTouch: true,
-      });
-    },
-    [setValue]
-  );
+  const logoUrlValue = useWatch({
+    control,
+    name: 'logoUrl',
+  });
 
   const reloadCompany = useCallback(
     async (options?: { silentNotFound?: boolean }) => {
@@ -127,12 +121,10 @@ export function RecruiterCompanyForm() {
         const company = await CompanyService.readMine();
 
         setHasCompany(true);
-        setCroppedLogoUrl(company.media?.logoUrl || null);
         reset(mapCompanyToFormValues(company));
       } catch (error) {
         if (error instanceof ApiError && error.statusCode === 404) {
           setHasCompany(false);
-          setCroppedLogoUrl(null);
 
           if (options?.silentNotFound) {
             return;
@@ -188,7 +180,7 @@ export function RecruiterCompanyForm() {
         isVerified: false,
       },
       media: {
-        logoUrl: croppedLogoUrl || data.logoUrl,
+        logoUrl: data.logoUrl,
       },
     };
 
@@ -303,6 +295,32 @@ export function RecruiterCompanyForm() {
       <div className="space-y-4">
         <div className="grid gap-4 md:grid-cols-2">
           <div>
+            <FileUpload
+              label="Logo da empresa"
+              accept="image/*"
+              value={logoUrlValue}
+              onUpload={async (file) => {
+                const response = await UploadService.uploadCompanyLogo(file);
+
+                setValue('logoUrl', response.url, {
+                  shouldDirty: true,
+                  shouldTouch: true,
+                  shouldValidate: true,
+                });
+
+                return response.url;
+              }}
+            />
+          </div>
+          <div className="hidden md:block" />
+        </div>
+        <input
+          type="hidden"
+          {...register('logoUrl')}
+        />
+
+        <div className="grid gap-4 md:grid-cols-2">
+          <div>
             <Input
               label="CNPJ"
               labelClassName={labelClassName}
@@ -394,16 +412,6 @@ export function RecruiterCompanyForm() {
             />
           </div>
         </div>
-
-        <LogoUploadCropper
-          label="Logo da empresa"
-          labelClassName={labelClassName}
-          onCroppedImageChange={handleCroppedImageChange}
-        />
-        <input
-          type="hidden"
-          {...register('logoUrl')}
-        />
 
         <div className="grid gap-4 md:grid-cols-2">
           <div>

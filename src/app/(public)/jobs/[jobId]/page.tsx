@@ -22,6 +22,7 @@ import { CARD_STYLES, TEXT_STYLES } from '@/constants/styles';
 import { JobLocationMapTest } from '@/components/jobs/job-location-map-test';
 import { useAuth } from '@/hooks/use-auth';
 import { ProductRoleEnum } from '@/types/entities/user.entity';
+import { resolveFileUrl } from '@/utils/file-url';
 
 export default function JobDetailsPage() {
   const params = useParams();
@@ -118,7 +119,7 @@ export default function JobDetailsPage() {
                 <div className="mb-5 flex items-center gap-4">
                   {company.media?.logoUrl ? (
                     <Image
-                      src={company.media.logoUrl}
+                      src={resolveFileUrl(company.media.logoUrl)}
                       alt={company.tradeName}
                       width={48}
                       height={48}

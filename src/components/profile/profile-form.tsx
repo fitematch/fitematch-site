@@ -12,7 +12,6 @@ import {
   FaTshirt,
   FaWhatsapp,
 } from 'react-icons/fa';
-import { FaFilePdf } from 'react-icons/fa6';
 import { FiMinusCircle, FiPlusCircle } from 'react-icons/fi';
 import {
   GiBodyHeight,
@@ -26,13 +25,14 @@ import { PiPantsFill } from 'react-icons/pi';
 import { GrCertificate, GrDocumentText } from 'react-icons/gr';
 import { MdDiversity2, MdEventAvailable, MdOutlinePlace } from 'react-icons/md';
 import { BsFiles } from 'react-icons/bs';
-import { IoCloudUploadOutline } from 'react-icons/io5';
 import { Button } from '@/components/ui/button';
+import { FileUpload } from '@/components/ui/file-upload';
 import { Input } from '@/components/ui/input';
 import { Select } from '@/components/ui/select';
 import { useAddressByZipCode } from '@/hooks/use-address-by-zipcode';
 import { useAuth } from '@/hooks/use-auth';
 import { UpdateMeRequest } from '@/services/auth/auth.types';
+import { UploadService } from '@/services/upload/upload.service';
 import { useFlashMessage } from '@/contexts/flash-message-context';
 import {
   ProductRoleEnum,
@@ -64,18 +64,6 @@ function formatBirthday(value?: string | Date) {
   }
 
   return date.toLocaleDateString('pt-BR');
-}
-
-function formatFileSize(size: number) {
-  if (size < 1024) {
-    return `${size} B`;
-  }
-
-  if (size < 1024 * 1024) {
-    return `${(size / 1024).toFixed(1)} KB`;
-  }
-
-  return `${(size / (1024 * 1024)).toFixed(1)} MB`;
 }
 
 function getEthnicityLabel(value: EthnicityTypeEnum) {
@@ -197,7 +185,6 @@ export function CandidateProfileForm() {
   const [isExperienceModalOpen, setIsExperienceModalOpen] = useState(false);
   const [educationIndexToDelete, setEducationIndexToDelete] = useState<number | null>(null);
   const [experienceIndexToDelete, setExperienceIndexToDelete] = useState<number | null>(null);
-  const [resumeFile, setResumeFile] = useState<File | null>(null);
   const [educationDraft, setEducationDraft] = useState({
     isOngoing: false,
     courseType: '',
@@ -299,6 +286,10 @@ export function CandidateProfileForm() {
   const phoneNumberValue = useWatch({
     control,
     name: 'candidateProfile.contacts.phone.number',
+  });
+  const resumeUrlValue = useWatch({
+    control,
+    name: 'candidateProfile.media.resumeUrl',
   });
   const hasShoeSizeUnit = Boolean(shoeSizeUnitValue);
 
@@ -609,7 +600,18 @@ export function CandidateProfileForm() {
   }
 
   function handleSaveMedia() {
-    showError('O upload de currículo ainda não está integrado ao salvamento da API.');
+    void submitCandidateUpdate(
+      {
+        candidateProfile: {
+          ...user?.candidateProfile,
+          media: {
+            resumeUrl: getValues('candidateProfile.media.resumeUrl'),
+          },
+        },
+      },
+      'Currículo atualizado com sucesso.',
+      'Não foi possível atualizar o currículo.'
+    );
   }
 
   function handleSaveEthnicity() {
@@ -1185,39 +1187,24 @@ export function CandidateProfileForm() {
         />
         {showMedia && (
           <div className="mt-6 grid gap-4 md:grid-cols-2">
-            <div>
-              <label className={`mb-1 block text-sm font-medium ${labelClassName}`}>
-                URL do currículo em PDF
-              </label>
-              <label className="flex min-h-[50px] w-full cursor-pointer items-center justify-between rounded-xl border border-gray-500 bg-black px-4 py-3 text-gray-300">
-                <span className="truncate text-sm">
-                  {resumeFile ? resumeFile.name : 'Nenhum arquivo selecionado'}
-                </span>
-                <span className="flex shrink-0 items-center gap-2 rounded-md bg-gray-100 px-3 py-2 text-sm font-medium text-black">
-                  <IoCloudUploadOutline className="h-4 w-4" />
-                  <span>Choose File</span>
-                </span>
-                <input
-                  type="file"
-                  accept=".pdf"
-                  onChange={(event) =>
-                    setResumeFile(event.target.files?.[0] ?? null)
-                  }
-                  className="hidden"
-                />
-              </label>
-            </div>
-            <div className="flex items-end">
-              {resumeFile ? (
-                <div className="flex min-h-[50px] w-full items-center gap-3 px-1 py-3 text-gray-100">
-                  <FaFilePdf className="h-5 w-5 shrink-0 text-current" />
-                  <span className="truncate">
-                    {resumeFile.name} - {formatFileSize(resumeFile.size)}
-                  </span>
-                </div>
-              ) : (
-                <div className="hidden md:block" />
-              )}
+            <div className="md:col-span-2">
+              <FileUpload
+                label="Currículo em PDF"
+                accept=".pdf,application/pdf"
+                value={resumeUrlValue}
+                onUpload={async (file) => {
+                  const response = await UploadService.uploadResume(file);
+
+                  setValue('candidateProfile.media.resumeUrl', response.url, {
+                    shouldDirty: true,
+                    shouldTouch: true,
+                    shouldValidate: true,
+                  });
+
+                  return response.url;
+                }}
+              />
+              <input type="hidden" {...register('candidateProfile.media.resumeUrl')} />
             </div>
             <div className="flex justify-end md:col-span-2">
               <Button

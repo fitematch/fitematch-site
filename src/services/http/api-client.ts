@@ -20,6 +20,7 @@ function buildApiUrl(endpoint: string): string {
 
 interface ApiClientOptions extends RequestInit {
   auth?: boolean;
+  isMultipart?: boolean;
   retry?: boolean;
 }
 
@@ -73,17 +74,28 @@ export async function apiClient<T>(
   endpoint: string,
   options: ApiClientOptions = {},
 ): Promise<T> {
-  const { auth = true, retry = true, headers, ...rest } = options;
+  const {
+    auth = true,
+    isMultipart = false,
+    retry = true,
+    headers,
+    ...rest
+  } = options;
 
   const accessToken = TokenStorage.getAccessToken();
+  const requestHeaders = new Headers(headers);
+
+  if (!isMultipart && !requestHeaders.has('Content-Type')) {
+    requestHeaders.set('Content-Type', 'application/json');
+  }
+
+  if (auth && accessToken && !requestHeaders.has('Authorization')) {
+    requestHeaders.set('Authorization', `Bearer ${accessToken}`);
+  }
 
   const response = await fetch(buildApiUrl(endpoint), {
     ...rest,
-    headers: {
-      'Content-Type': 'application/json',
-      ...(auth && accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
-      ...headers,
-    },
+    headers: requestHeaders,
   });
 
   if (response.status === 401 && auth && retry) {

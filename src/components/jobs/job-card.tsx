@@ -13,6 +13,7 @@ import { PublicCompanyResponse } from '@/services/company/company.types';
 import { Button } from '@/components/ui/button';
 import { CARD_STYLES } from '@/constants/styles';
 import Image from 'next/image';
+import { resolveFileUrl } from '@/utils/file-url';
 
 interface JobCardProps {
   job: JobEntity;
@@ -87,7 +88,7 @@ export function JobCard({ job, company, showRequirements, hideDetailsButton = fa
         {job.media?.coverUrl && (
           <div className="relative -mx-6 -mt-6 mb-0 overflow-hidden rounded-t-xl border-b border-gray-900">
             <Image
-              src={job.media.coverUrl}
+              src={resolveFileUrl(job.media.coverUrl)}
               alt={job.title}
               width={640}
               height={224}

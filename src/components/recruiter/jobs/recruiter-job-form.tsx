@@ -3,14 +3,20 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { FieldErrors, useForm, useWatch } from 'react-hook-form';
-import { FaPlus, FaSave, FaTrash } from 'react-icons/fa';
-import { MdKeyboardDoubleArrowDown } from 'react-icons/md';
+import { FaBus, FaPlus, FaSave, FaTrash } from 'react-icons/fa';
+import { CiCircleMinus, CiCirclePlus } from 'react-icons/ci';
+import { GiHealthNormal } from 'react-icons/gi';
+import { FaRegSquare, FaRegSquareCheck } from 'react-icons/fa6';
+import { LuSalad } from 'react-icons/lu';
+import { MdHealthAndSafety, MdKeyboardDoubleArrowDown } from 'react-icons/md';
 import { Button } from '@/components/ui/button';
+import { FileUpload } from '@/components/ui/file-upload';
 import { ROUTES } from '@/constants/routes';
 import { useAuth } from '@/hooks/use-auth';
 import { useFlashMessage } from '@/contexts/flash-message-context';
 import { CompanyService } from '@/services/company/company.service';
 import { ApiError } from '@/services/http/api-error';
+import { UploadService } from '@/services/upload/upload.service';
 import { CompanyEntity, CompanyStatusEnum } from '@/types/entities/company.entity';
 import { JobService } from '@/services/job/job.service';
 import {
@@ -111,6 +117,121 @@ function getLanguageLevelLabel(value: LanguagesLevelEnum) {
   );
 }
 
+function formatCurrencyInput(value?: number) {
+  if (value === undefined || Number.isNaN(value)) {
+    return '';
+  }
+
+  return new Intl.NumberFormat('pt-BR', {
+    style: 'currency',
+    currency: 'BRL',
+  }).format(value);
+}
+
+function parseCurrencyInput(value: string) {
+  const digits = value.replace(/\D/g, '');
+
+  if (!digits) {
+    return undefined;
+  }
+
+  return Number(digits) / 100;
+}
+
+function NumberStepper({
+  label,
+  value,
+  onChange,
+  min = 0,
+  error,
+}: {
+  label: string;
+  value?: number;
+  onChange: (value: number) => void;
+  min?: number;
+  error?: string;
+}) {
+  return (
+    <div>
+      <label className="text-sm text-gray-300">{label}</label>
+      <div className="relative mt-2">
+        <button
+          type="button"
+          onClick={() => onChange(Math.max(min, (value ?? min) - 1))}
+          className="absolute left-2 top-1/2 inline-flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-md bg-gray-100 text-black transition hover:bg-gray-300"
+          aria-label={`Diminuir ${label}`}
+        >
+          <CiCircleMinus className="h-6 w-6" />
+        </button>
+        <input
+          type="text"
+          inputMode="numeric"
+          value={value ?? min}
+          onChange={(event) => {
+            const nextValue = Number(event.target.value.replace(/\D/g, ''));
+            onChange(Number.isNaN(nextValue) ? min : Math.max(min, nextValue));
+          }}
+          className="mt-0 h-[50px] w-full rounded-xl border border-gray-300 bg-black px-12 py-3 text-center text-gray-300 outline-none placeholder:text-gray-300"
+        />
+        <button
+          type="button"
+          onClick={() => onChange((value ?? min) + 1)}
+          className="absolute right-2 top-1/2 inline-flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-md bg-gray-100 text-black transition hover:bg-gray-300"
+          aria-label={`Aumentar ${label}`}
+        >
+          <CiCirclePlus className="h-6 w-6" />
+        </button>
+      </div>
+      {error && <p className="mt-1 text-sm text-red-100">{error}</p>}
+    </div>
+  );
+}
+
+function BenefitCheckbox({
+  label,
+  description,
+  icon,
+  checked,
+  onChange,
+}: {
+  label: string;
+  description: string;
+  icon: React.ReactNode;
+  checked: boolean;
+  onChange: (checked: boolean) => void;
+}) {
+  return (
+    <label className="flex cursor-pointer items-center gap-4 rounded-2xl border border-gray-500 bg-black/60 px-4 py-4 text-gray-300 transition hover:border-gray-300 hover:bg-white/5">
+      <input
+        type="checkbox"
+        className="sr-only"
+        checked={checked}
+        onChange={(event) => onChange(event.target.checked)}
+      />
+      <div
+        className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border bg-gray-100 text-black transition ${
+          checked
+            ? 'border-green-500 bg-green-800 text-green-100'
+            : 'border-gray-500'
+        }`}
+      >
+        {icon}
+      </div>
+      <div className="min-w-0 flex-1">
+        <p className="text-sm font-semibold text-gray-100">{label}</p>
+        <p className="mt-1 text-xs text-gray-400">{description}</p>
+      </div>
+      <div className={`shrink-0 transition ${checked ? 'text-green-400' : 'text-gray-400'}`}>
+        {checked ? (
+          <FaRegSquareCheck className="h-5 w-5" />
+        ) : (
+          <FaRegSquare className="h-5 w-5" />
+        )}
+      </div>
+    </label>
+  );
+}
+
 export function RecruiterJobForm({
   mode,
   jobId,
@@ -125,6 +246,7 @@ export function RecruiterJobForm({
   const [currentJobId, setCurrentJobId] = useState<string | undefined>(jobId);
   const [isLanguageModalOpen, setIsLanguageModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [hasConfirmedDelete, setHasConfirmedDelete] = useState(false);
   const [companyDetails, setCompanyDetails] = useState<CompanyEntity | null>(null);
   const [isLoadingCompanyDetails, setIsLoadingCompanyDetails] = useState(false);
   const [languageDraft, setLanguageDraft] = useState<LanguageDraft>({
@@ -139,8 +261,6 @@ export function RecruiterJobForm({
     'mt-2 w-full rounded-xl border border-gray-300 bg-black px-4 py-3 text-gray-300 outline-none placeholder:text-gray-300';
   const disabledFieldClassName =
     `${fieldClassName} disabled:cursor-not-allowed disabled:opacity-100`;
-  const checkboxClassName =
-    'h-4 w-4 rounded border border-gray-400 bg-black accent-gray-300';
   const hasCompany = Boolean(user?.recruiterProfile?.companyId);
   const companyId = user?.recruiterProfile?.companyId || '';
   const companyName =
@@ -167,6 +287,42 @@ export function RecruiterJobForm({
   const contractTypeValue = useWatch({
     control,
     name: 'contractType',
+  });
+  const slotsValue = useWatch({
+    control,
+    name: 'slots',
+  });
+  const minExperienceYearsValue = useWatch({
+    control,
+    name: 'minExperienceYears',
+  });
+  const maxExperienceYearsValue = useWatch({
+    control,
+    name: 'maxExperienceYears',
+  });
+  const salaryValue = useWatch({
+    control,
+    name: 'salary',
+  });
+  const healthInsuranceValue = useWatch({
+    control,
+    name: 'healthInsurance',
+  });
+  const dentalInsuranceValue = useWatch({
+    control,
+    name: 'dentalInsurance',
+  });
+  const alimentationVoucherValue = useWatch({
+    control,
+    name: 'alimentationVoucher',
+  });
+  const transportationVoucherValue = useWatch({
+    control,
+    name: 'transportationVoucher',
+  });
+  const coverUrlValue = useWatch({
+    control,
+    name: 'coverUrl',
   });
   const previousTitleRef = useRef(titleValue);
 
@@ -205,21 +361,15 @@ export function RecruiterJobForm({
       : initialValues?.slug && currentMode === 'edit' && !titleValue
       ? initialValues.slug
       : buildJobSlug([
-          titleValue || initialValues?.title || '',
           companyDetails?.tradeName || companyName,
           companyDetails?.contacts?.address?.city,
-          companyDetails?.contacts?.address?.state,
+          titleValue || initialValues?.title || '',
         ]);
-  const slugTitlePart = titleValue?.trim()
-    ? buildJobSlug([titleValue])
-    : '';
-  const slugSuffixPart = slugTitlePart
-    ? buildJobSlug([
-        companyDetails?.tradeName || companyName,
-        companyDetails?.contacts?.address?.city,
-        companyDetails?.contacts?.address?.state,
-      ])
-    : '';
+  const slugPrefixPart = buildJobSlug([
+    companyDetails?.tradeName || companyName,
+    companyDetails?.contacts?.address?.city,
+  ]);
+  const slugTitlePart = titleValue?.trim() ? buildJobSlug([titleValue]) : '';
 
   useEffect(() => {
     setValue('slug', slugValue, {
@@ -257,26 +407,6 @@ export function RecruiterJobForm({
     },
     []
   );
-
-  useEffect(() => {
-    if (mode !== 'create' || jobId || initialValues) {
-      return;
-    }
-
-    async function bootstrapFromMine() {
-      try {
-        const existingJob = await refreshJobFromMine();
-
-        if (existingJob) {
-          hydrateFromJob(existingJob);
-        }
-      } catch {
-        // Keep empty create mode when recruiter has no jobs or the fetch fails.
-      }
-    }
-
-    void bootstrapFromMine();
-  }, [hydrateFromJob, initialValues, jobId, mode, refreshJobFromMine]);
 
   async function onSubmit(data: RecruiterJobFormValues) {
     if (!hasCompany) {
@@ -488,18 +618,33 @@ export function RecruiterJobForm({
 
           <div className="grid gap-4 md:grid-cols-2">
             <div className="md:col-span-2">
+              <label className="text-sm text-gray-300">Título</label>
+              <input
+                className={fieldClassName}
+                {...register('title', {
+                  required: 'Informe o título da vaga.',
+                })}
+              />
+              {errors.title && (
+                <p className="mt-1 text-sm text-red-100">{errors.title.message}</p>
+              )}
+            </div>
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="md:col-span-2">
               <label className="text-sm text-gray-300">Slug</label>
               <div
                 className={`${disabledFieldClassName} flex min-h-[50px] items-center overflow-hidden break-all ${errors.slug ? 'border-red-100 text-red-100' : ''}`}
               >
-                {slugTitlePart ? (
+                {slugPrefixPart ? (
                   <>
-                    <span className={errors.slug ? 'text-red-100' : 'text-green-400'}>
-                      {slugTitlePart}
+                    <span className={errors.slug ? 'text-red-100' : 'text-gray-300'}>
+                      {slugPrefixPart}
                     </span>
-                    {slugSuffixPart ? (
-                      <span className={errors.slug ? 'text-red-100' : 'text-gray-300'}>
-                        {`-${slugSuffixPart}`}
+                    {slugTitlePart ? (
+                      <span className={errors.slug ? 'text-red-100' : 'text-green-400'}>
+                        {`-${slugTitlePart}`}
                       </span>
                     ) : null}
                   </>
@@ -515,21 +660,6 @@ export function RecruiterJobForm({
               />
               {errors.slug && (
                 <p className="mt-1 text-sm text-red-100">{errors.slug.message}</p>
-              )}
-            </div>
-          </div>
-
-          <div className="grid gap-4 md:grid-cols-2">
-            <div className="md:col-span-2">
-              <label className="text-sm text-gray-300">Título</label>
-              <input
-                className={fieldClassName}
-                {...register('title', {
-                  required: 'Informe o título da vaga.',
-                })}
-              />
-              {errors.title && (
-                <p className="mt-1 text-sm text-red-100">{errors.title.message}</p>
               )}
             </div>
           </div>
@@ -554,11 +684,42 @@ export function RecruiterJobForm({
 
           <div className="grid gap-4 md:grid-cols-2">
             <div>
-              <label className="text-sm text-gray-300">Quantidade de vagas</label>
+              <FileUpload
+                label="Imagem da vaga"
+                accept="image/*"
+                value={coverUrlValue}
+                cropAspectRatio={20 / 7}
+                onUpload={async (file) => {
+                  const response = await UploadService.uploadJobCover(file);
+
+                  setValue('coverUrl', response.url, {
+                    shouldDirty: true,
+                    shouldTouch: true,
+                    shouldValidate: true,
+                  });
+
+                  return response.url;
+                }}
+              />
               <input
-                type="number"
-                min={1}
-                className={fieldClassName}
+                type="hidden"
+                {...register('coverUrl', {
+                  required: 'Informe a imagem da vaga.',
+                })}
+              />
+              {errors.coverUrl && (
+                <p className="mt-1 text-sm text-red-100">
+                  {errors.coverUrl.message}
+                </p>
+              )}
+            </div>
+            <div className="hidden md:block" />
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-2">
+            <div>
+              <input
+                type="hidden"
                 {...register('slots', {
                   required: 'Informe a quantidade de vagas.',
                   valueAsNumber: true,
@@ -568,16 +729,26 @@ export function RecruiterJobForm({
                   },
                 })}
               />
-              {errors.slots && (
-                <p className="mt-1 text-sm text-red-100">{errors.slots.message}</p>
-              )}
+              <NumberStepper
+                label="Quantidade de vagas"
+                value={slotsValue}
+                min={1}
+                onChange={(value) =>
+                  setValue('slots', value, {
+                    shouldDirty: true,
+                    shouldTouch: true,
+                    shouldValidate: true,
+                  })
+                }
+                error={errors.slots?.message}
+              />
             </div>
             <div className="hidden md:block" />
           </div>
 
           <fieldset className="rounded-2xl border border-gray-500 p-5">
             <legend className="px-2 text-sm font-semibold uppercase text-gray-100">
-              Requirements
+              Requisitos
             </legend>
 
             <div className="grid gap-4">
@@ -608,58 +779,74 @@ export function RecruiterJobForm({
                     </p>
                   )}
                 </div>
+                <div className="hidden md:block" />
+              </div>
 
-                <div className="grid gap-4 md:grid-cols-2">
-                  <div>
-                    <label className="text-sm text-gray-300">
-                      Experiência mínima
-                    </label>
-                    <input
-                      type="number"
-                      min={0}
-                      className={fieldClassName}
-                      {...register('minExperienceYears', {
-                        required: 'Informe a experiência mínima.',
-                        valueAsNumber: true,
-                        min: {
-                          value: 0,
-                          message: 'Informe um valor válido.',
-                        },
-                      })}
-                    />
-                    {errors.minExperienceYears && (
-                      <p className="mt-1 text-sm text-red-100">
-                        {errors.minExperienceYears.message}
-                      </p>
-                    )}
-                  </div>
+              <div className="grid gap-4 md:grid-cols-2">
+                <div>
+                  <input
+                    type="hidden"
+                    {...register('minExperienceYears', {
+                      required: 'Informe a experiência mínima.',
+                      valueAsNumber: true,
+                      min: {
+                        value: 0,
+                        message: 'Informe um valor válido.',
+                      },
+                    })}
+                  />
+                  <NumberStepper
+                    label="Experiência mínima"
+                    value={minExperienceYearsValue}
+                    min={0}
+                    onChange={(value) =>
+                      setValue('minExperienceYears', value, {
+                        shouldDirty: true,
+                        shouldTouch: true,
+                        shouldValidate: true,
+                      })
+                    }
+                    error={errors.minExperienceYears?.message}
+                  />
+                </div>
 
-                  <div>
-                    <label className="text-sm text-gray-300">
-                      Experiência máxima
-                    </label>
-                    <input
-                      type="number"
-                      min={0}
-                      className={fieldClassName}
-                      {...register('maxExperienceYears', {
-                        required: 'Informe a experiência máxima.',
-                        valueAsNumber: true,
-                        min: {
-                          value: 0,
-                          message: 'Informe um valor válido.',
-                        },
-                      })}
-                    />
-                    {errors.maxExperienceYears && (
-                      <p className="mt-1 text-sm text-red-100">
-                        {errors.maxExperienceYears.message}
-                      </p>
-                    )}
-                  </div>
+                <div>
+                  <input
+                    type="hidden"
+                    {...register('maxExperienceYears', {
+                      required: 'Informe a experiência máxima.',
+                      valueAsNumber: true,
+                      min: {
+                        value: 0,
+                        message: 'Informe um valor válido.',
+                      },
+                    })}
+                  />
+                  <NumberStepper
+                    label="Experiência máxima"
+                    value={maxExperienceYearsValue}
+                    min={0}
+                    onChange={(value) =>
+                      setValue('maxExperienceYears', value, {
+                        shouldDirty: true,
+                        shouldTouch: true,
+                        shouldValidate: true,
+                      })
+                    }
+                    error={errors.maxExperienceYears?.message}
+                  />
                 </div>
               </div>
 
+            </div>
+          </fieldset>
+
+          <fieldset className="rounded-2xl border border-gray-500 p-5">
+            <legend className="px-2 text-sm font-semibold uppercase text-gray-100">
+              Idiomas
+            </legend>
+
+            <div className="grid gap-4">
               <div className="grid gap-4 md:grid-cols-2">
                 <div>
                   <Button
@@ -721,12 +908,24 @@ export function RecruiterJobForm({
                 <div>
                   <label className="text-sm text-gray-300">Salário</label>
                   <input
-                    type="number"
-                    className={fieldClassName}
+                    type="hidden"
                     {...register('salary', {
                       required: 'Informe o salário.',
                       valueAsNumber: true,
                     })}
+                  />
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    className={fieldClassName}
+                    value={formatCurrencyInput(salaryValue)}
+                    onChange={(event) => {
+                      setValue('salary', parseCurrencyInput(event.target.value), {
+                        shouldDirty: true,
+                        shouldTouch: true,
+                        shouldValidate: true,
+                      });
+                    }}
                   />
                   {errors.salary && (
                     <p className="mt-1 text-sm text-red-100">
@@ -738,64 +937,62 @@ export function RecruiterJobForm({
               </div>
 
               <div className="grid gap-4 md:grid-cols-2">
-                <div className="grid gap-4 md:grid-cols-2">
-                  <label className="flex items-center gap-3 rounded-xl border border-gray-500 px-4 py-3 text-sm text-gray-300">
-                    <input
-                      type="checkbox"
-                      className={checkboxClassName}
-                      {...register('healthInsurance')}
-                    />
-                    <span>Plano de saúde</span>
-                  </label>
-                  <label className="flex items-center gap-3 rounded-xl border border-gray-500 px-4 py-3 text-sm text-gray-300">
-                    <input
-                      type="checkbox"
-                      className={checkboxClassName}
-                      {...register('dentalInsurance')}
-                    />
-                    <span>Plano odontológico</span>
-                  </label>
-                </div>
-
-                <div className="grid gap-4 md:grid-cols-2">
-                  <label className="flex items-center gap-3 rounded-xl border border-gray-500 px-4 py-3 text-sm text-gray-300">
-                    <input
-                      type="checkbox"
-                      className={checkboxClassName}
-                      {...register('alimentationVoucher')}
-                    />
-                    <span>Vale alimentação</span>
-                  </label>
-                  <label className="flex items-center gap-3 rounded-xl border border-gray-500 px-4 py-3 text-sm text-gray-300">
-                    <input
-                      type="checkbox"
-                      className={checkboxClassName}
-                      {...register('transportationVoucher')}
-                    />
-                    <span>Vale transporte</span>
-                  </label>
-                </div>
+                <BenefitCheckbox
+                  label="Plano de saúde"
+                  description="Cobertura médica para os colaboradores."
+                  icon={<MdHealthAndSafety className="h-6 w-6" />}
+                  checked={Boolean(healthInsuranceValue)}
+                  onChange={(checked) =>
+                    setValue('healthInsurance', checked, {
+                      shouldDirty: true,
+                      shouldTouch: true,
+                      shouldValidate: true,
+                    })
+                  }
+                />
+                <BenefitCheckbox
+                  label="Plano odontológico"
+                  description="Assistência odontológica como benefício."
+                  icon={<GiHealthNormal className="h-6 w-6" />}
+                  checked={Boolean(dentalInsuranceValue)}
+                  onChange={(checked) =>
+                    setValue('dentalInsurance', checked, {
+                      shouldDirty: true,
+                      shouldTouch: true,
+                      shouldValidate: true,
+                    })
+                  }
+                />
+                <BenefitCheckbox
+                  label="Vale alimentação"
+                  description="Apoio no custo de alimentação do dia a dia."
+                  icon={<LuSalad className="h-6 w-6" />}
+                  checked={Boolean(alimentationVoucherValue)}
+                  onChange={(checked) =>
+                    setValue('alimentationVoucher', checked, {
+                      shouldDirty: true,
+                      shouldTouch: true,
+                      shouldValidate: true,
+                    })
+                  }
+                />
+                <BenefitCheckbox
+                  label="Vale transporte"
+                  description="Auxílio de deslocamento para o trabalho."
+                  icon={<FaBus className="h-5 w-5" />}
+                  checked={Boolean(transportationVoucherValue)}
+                  onChange={(checked) =>
+                    setValue('transportationVoucher', checked, {
+                      shouldDirty: true,
+                      shouldTouch: true,
+                      shouldValidate: true,
+                    })
+                  }
+                />
               </div>
             </div>
           </fieldset>
 
-          <div className="grid gap-4 md:grid-cols-2">
-            <div>
-              <label className="text-sm text-gray-300">Imagem da vaga</label>
-              <input
-                className={fieldClassName}
-                {...register('coverUrl', {
-                  required: 'Informe a imagem da vaga.',
-                })}
-              />
-              {errors.coverUrl && (
-                <p className="mt-1 text-sm text-red-100">
-                  {errors.coverUrl.message}
-                </p>
-              )}
-            </div>
-            <div className="hidden md:block" />
-          </div>
         </div>
 
         <div className="mt-6 flex justify-end gap-3">
@@ -805,6 +1002,7 @@ export function RecruiterJobForm({
               variant="danger"
               icon={<FaTrash />}
               onClick={() => {
+                setHasConfirmedDelete(false);
                 setIsDeleteModalOpen(true);
               }}
             >
@@ -813,7 +1011,7 @@ export function RecruiterJobForm({
           )}
           <Button
             type="submit"
-            variant="positive"
+            variant="login"
             icon={<FaSave />}
             disabled={isSubmitting || !canPublishJob}
           >
@@ -920,7 +1118,10 @@ export function RecruiterJobForm({
               </div>
               <button
                 type="button"
-                onClick={() => setIsDeleteModalOpen(false)}
+                onClick={() => {
+                  setHasConfirmedDelete(false);
+                  setIsDeleteModalOpen(false);
+                }}
                 className="text-2xl leading-none text-gray-300 transition-colors hover:text-gray-100"
                 aria-label="Fechar modal"
               >
@@ -930,56 +1131,34 @@ export function RecruiterJobForm({
 
             <div className="space-y-4">
               <p className="text-gray-300">
-                Confirme a exclusão da vaga abaixo.
+                {`Deseja realmente deletar a vaga ${titleValue || initialValues?.title || ''}?`}
               </p>
 
-              <div className="grid gap-4 rounded-2xl border border-gray-500 bg-black p-6 md:grid-cols-2">
-                <div>
-                  <label className="text-sm text-gray-300">Empresa</label>
-                  <input
-                    value={companyName}
-                    disabled
-                    className={disabledFieldClassName}
-                  />
-                </div>
-                <div>
-                  <label className="text-sm text-gray-300">Tipo de contrato</label>
-                  <input
-                    value={
-                      contractTypeOptions.find(
-                        (option) =>
-                          option.value ===
-                          (contractTypeValue ||
-                            (initialValues?.contractType as JobContractTypeEnum))
-                      )?.label || ''
-                    }
-                    disabled
-                    className={disabledFieldClassName}
-                  />
-                </div>
-                <div className="md:col-span-2">
-                  <label className="text-sm text-gray-300">Título</label>
-                  <input
-                    value={titleValue || initialValues?.title || ''}
-                    disabled
-                    className={disabledFieldClassName}
-                  />
-                </div>
-                <div className="md:col-span-2">
-                  <label className="text-sm text-gray-300">Slug</label>
-                  <input
-                    value={slugValue}
-                    disabled
-                    className={disabledFieldClassName}
-                  />
-                </div>
+              <div className="rounded-2xl border border-red-900/60 bg-red-950/40 p-5">
+                <p className="text-sm text-red-100">
+                  Ao deletar a vaga, não será possível reativá-la posteriormente.
+                  Os dados dos candidatos aplicados também serão perdidos de forma definitiva.
+                </p>
               </div>
+
+              <label className="flex items-center gap-3 rounded-xl border border-gray-500 px-4 py-3 text-sm text-gray-300">
+                <input
+                  type="checkbox"
+                  className="h-4 w-4 rounded border border-gray-400 bg-black accent-gray-300"
+                  checked={hasConfirmedDelete}
+                  onChange={(event) => setHasConfirmedDelete(event.target.checked)}
+                />
+                <span>Confirmo que desejo deletar esta vaga permanentemente.</span>
+              </label>
 
               <div className="flex justify-end gap-3">
                 <Button
                   type="button"
                   variant="profile"
-                  onClick={() => setIsDeleteModalOpen(false)}
+                  onClick={() => {
+                    setHasConfirmedDelete(false);
+                    setIsDeleteModalOpen(false);
+                  }}
                 >
                   Cancelar
                 </Button>
@@ -987,7 +1166,7 @@ export function RecruiterJobForm({
                   type="button"
                   variant="danger"
                   icon={<FaTrash />}
-                  disabled={isSubmitting}
+                  disabled={isSubmitting || !hasConfirmedDelete}
                   onClick={() => {
                     void handleDeleteJob();
                   }}

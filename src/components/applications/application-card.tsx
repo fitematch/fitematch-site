@@ -9,6 +9,7 @@ import { ApplyService } from '@/services/apply/apply.service';
 import ApplyEntity from '@/types/entities/apply.entity';
 import { useFlashMessage } from '@/contexts/flash-message-context';
 import { CARD_STYLES } from '@/constants/styles';
+import { resolveFileUrl } from '@/utils/file-url';
 
 interface Props {
   application: ApplyEntity;
@@ -66,7 +67,7 @@ export function ApplicationCard({ application, onDeleted }: Props) {
           <div className="flex min-w-0 items-center gap-4">
             {logoUrl ? (
               <Image
-                src={logoUrl}
+                src={resolveFileUrl(logoUrl)}
                 alt={companyName}
                 width={56}
                 height={56}
@@ -137,7 +138,7 @@ export function ApplicationCard({ application, onDeleted }: Props) {
                 <div className="flex items-center gap-4">
                   {logoUrl ? (
                     <Image
-                      src={logoUrl}
+                      src={resolveFileUrl(logoUrl)}
                       alt={companyName}
                       width={48}
                       height={48}

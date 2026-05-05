@@ -6,6 +6,7 @@ import { usePublicCompanies } from '@/hooks/use-public-companies';
 import { SectionTitle } from '@/components/ui/section-title';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert } from '@/components/ui/alert';
+import { resolveFileUrl } from '@/utils/file-url';
 
 export function CompaniesSection() {
   const { companies, isLoading, error } = usePublicCompanies();
@@ -42,7 +43,7 @@ export function CompaniesSection() {
                 >
                   {company.media?.logoUrl ? (
                     <Image
-                      src={company.media.logoUrl}
+                      src={resolveFileUrl(company.media.logoUrl)}
                       alt={company.tradeName}
                       width={160}
                       height={48}

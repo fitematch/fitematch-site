@@ -13,6 +13,10 @@ export const API_ENDPOINTS = {
   AUTH_REVOKE_SESSION: (sessionId: string) =>
     `/auth/sessions/${sessionId}/revoke`,
 
+  UPLOAD_COMPANY_LOGO: '/upload/company-logo',
+  UPLOAD_JOB_COVER: '/upload/job-cover',
+  UPLOAD_RESUME: '/upload/candidate-resume',
+
   COMPANY: '/company',
   COMPANY_ME: '/company/me',
   COMPANY_PUBLIC: '/company/public',

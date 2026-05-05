@@ -2,6 +2,7 @@ import Image from 'next/image';
 import { JobEntity } from '@/types/entities/job.entity';
 import { PublicCompanyResponse } from '@/services/company/company.types';
 import { THEME } from '@/constants/theme';
+import { resolveFileUrl } from '@/utils/file-url';
 
 interface JobCompanyHeaderProps {
   job: JobEntity;
@@ -26,7 +27,7 @@ export function JobCompanyHeader({
       {job.media?.coverUrl && (
         <div className="-mx-6 -mt-6 mb-5 overflow-hidden rounded-t-xl border-b border-gray-900">
           <Image
-            src={job.media.coverUrl}
+            src={resolveFileUrl(job.media.coverUrl)}
             alt={job.title}
             width={640}
             height={coverMode === 'detail' ? 640 : 224}
@@ -44,7 +45,7 @@ export function JobCompanyHeader({
         <div className="mb-5 flex items-center gap-3">
           {company.media?.logoUrl ? (
             <Image
-              src={company.media.logoUrl}
+              src={resolveFileUrl(company.media.logoUrl)}
               alt={company.tradeName}
               width={48}
               height={48}
