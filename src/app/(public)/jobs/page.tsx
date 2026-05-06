@@ -1,30 +1,30 @@
-'use client';
+import { Metadata } from 'next';
+import { JobsPageContent } from '@/components/jobs/jobs-page-content';
+import { DEFAULT_OG_IMAGE, SITE_NAME, absoluteUrl } from '@/constants/seo';
 
-import { useState } from 'react';
-import { Breadcrumb } from '@/components/ui/breadcrumb';
-import { JobSearchInput } from '@/components/jobs/job-search-input';
-import { THEME } from '@/constants/theme';
-import { JobGrid } from '@/components/jobs/job-grid';
+export const metadata: Metadata = {
+  title: 'Vagas',
+  description:
+    'Encontre vagas para profissionais de educação física em academias, studios e empresas fitness.',
+  alternates: {
+    canonical: absoluteUrl('/jobs'),
+  },
+  openGraph: {
+    title: `Vagas | ${SITE_NAME}`,
+    description:
+      'Encontre vagas para profissionais de educação física em academias, studios e empresas fitness.',
+    url: absoluteUrl('/jobs'),
+    images: [{ url: absoluteUrl(DEFAULT_OG_IMAGE) }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: `Vagas | ${SITE_NAME}`,
+    description:
+      'Encontre vagas para profissionais de educação física em academias, studios e empresas fitness.',
+    images: [absoluteUrl(DEFAULT_OG_IMAGE)],
+  },
+};
 
 export default function JobsPage() {
-  const [search, setSearch] = useState('');
-
-  return (
-    <section className={`min-h-screen ${THEME.layout.background} py-20`}>
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <Breadcrumb
-          items={[
-            { label: 'Home', href: '/' },
-            { label: 'Vagas' },
-          ]}
-        />
-        <div className="mt-8">
-          <JobSearchInput value={search} onChange={setSearch} />
-        </div>
-        <div className="mt-12">
-          <JobGrid search={search} />
-        </div>
-      </div>
-    </section>
-  );
+  return <JobsPageContent />;
 }

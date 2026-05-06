@@ -1,5 +1,14 @@
+import { Metadata } from 'next';
 import { RecruiterPageHeader } from '@/components/recruiter/recruiter-page-header';
 import { RecruiterJobForm } from '@/components/recruiter/jobs/recruiter-job-form';
+
+export const metadata: Metadata = {
+  title: 'Nova vaga',
+  robots: {
+    index: false,
+    follow: false,
+  },
+};
 
 export default function RecruiterNewJobPage() {
   return (

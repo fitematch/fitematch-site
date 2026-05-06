@@ -7,7 +7,8 @@ export function resolveFileUrl(url?: string) {
     return url;
   }
 
-  const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+  const apiBaseUrl =
+    process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_API_BASE_URL;
 
   if (!apiBaseUrl) {
     return url;

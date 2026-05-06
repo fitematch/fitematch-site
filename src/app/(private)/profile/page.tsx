@@ -1,8 +1,17 @@
+import { Metadata } from 'next';
 import { PrivateRoute } from '@/components/auth/private-route';
 import { ProfileForm } from '@/components/profile/profile-form';
 import { Breadcrumb } from '@/components/ui/breadcrumb';
 import { ROUTES } from '@/constants/routes';
 import { PAGE_STYLES, TEXT_STYLES } from '@/constants/styles';
+
+export const metadata: Metadata = {
+  title: 'Profile',
+  robots: {
+    index: false,
+    follow: false,
+  },
+};
 
 export default function ProfilePage() {
   return (

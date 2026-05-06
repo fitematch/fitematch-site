@@ -1,9 +1,31 @@
+import { Metadata } from 'next';
 import { FaFileContract } from 'react-icons/fa';
 import { Breadcrumb } from '@/components/ui/breadcrumb';
 import { TermsOfUseContent } from '@/components/legal/terms-of-use-content';
 import { ROUTES } from '@/constants/routes';
 import { CARD_STYLES, PAGE_STYLES, TEXT_STYLES } from '@/constants/styles';
 import { THEME } from '@/constants/theme';
+import { DEFAULT_OG_IMAGE, SITE_NAME, absoluteUrl } from '@/constants/seo';
+
+export const metadata: Metadata = {
+  title: 'Termos de Uso',
+  description: 'Leia os termos de uso da fitematch.',
+  alternates: {
+    canonical: absoluteUrl('/terms-of-use'),
+  },
+  openGraph: {
+    title: `Termos de Uso | ${SITE_NAME}`,
+    description: 'Leia os termos de uso da fitematch.',
+    url: absoluteUrl('/terms-of-use'),
+    images: [{ url: absoluteUrl(DEFAULT_OG_IMAGE) }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: `Termos de Uso | ${SITE_NAME}`,
+    description: 'Leia os termos de uso da fitematch.',
+    images: [absoluteUrl(DEFAULT_OG_IMAGE)],
+  },
+};
 
 export default function TermsOfUsePage() {
   return (

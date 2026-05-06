@@ -2,12 +2,13 @@ import { API_ENDPOINTS } from '@/constants/api-endpoints';
 import { ApiError } from './api-error';
 import { TokenStorage } from './token-storage';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_API_BASE_URL;
 
 function getApiBaseUrl(): string {
   if (!API_BASE_URL) {
     throw new Error(
-      'NEXT_PUBLIC_API_BASE_URL is not configured. Copy .env.example to .env.local and set the API base URL.',
+      'NEXT_PUBLIC_API_URL is not configured. Copy .env.example to .env.local and set the API base URL.',
     );
   }
 

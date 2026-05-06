@@ -1,8 +1,29 @@
+import { Metadata } from 'next';
 import { PAGE_STYLES, TEXT_STYLES } from '@/constants/styles';
 import { FaqTabs } from '@/components/faq/faq-tabs';
 import { Breadcrumb } from '@/components/ui/breadcrumb';
 import { ROUTES } from '@/constants/routes';
+import { DEFAULT_OG_IMAGE, SITE_NAME, absoluteUrl } from '@/constants/seo';
 
+export const metadata: Metadata = {
+  title: 'FAQ',
+  description: 'Dúvidas frequentes sobre a fitematch.',
+  alternates: {
+    canonical: absoluteUrl('/faq'),
+  },
+  openGraph: {
+    title: `FAQ | ${SITE_NAME}`,
+    description: 'Dúvidas frequentes sobre a fitematch.',
+    url: absoluteUrl('/faq'),
+    images: [{ url: absoluteUrl(DEFAULT_OG_IMAGE) }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: `FAQ | ${SITE_NAME}`,
+    description: 'Dúvidas frequentes sobre a fitematch.',
+    images: [absoluteUrl(DEFAULT_OG_IMAGE)],
+  },
+};
 
 export default function FaqPage() {
   return (

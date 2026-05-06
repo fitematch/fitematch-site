@@ -1,7 +1,14 @@
-
-
+import { Metadata } from 'next';
 import { THEME } from '@/constants/theme';
 import { SignInForm } from '@/components/auth/sign-in-form';
+
+export const metadata: Metadata = {
+  title: 'Login',
+  robots: {
+    index: false,
+    follow: false,
+  },
+};
 
 export default function SignInPage() {
   return (

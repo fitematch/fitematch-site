@@ -1,7 +1,16 @@
+import { Metadata } from 'next';
 import { RecruiterCompanyForm } from '@/components/recruiter/company/recruiter-company-form';
 import { RecruiterPageHeader } from '@/components/recruiter/recruiter-page-header';
 import { ROUTES } from '@/constants/routes';
 import { PAGE_STYLES } from '@/constants/styles';
+
+export const metadata: Metadata = {
+  title: 'Minha empresa',
+  robots: {
+    index: false,
+    follow: false,
+  },
+};
 
 export default function RecruiterCompanyPage() {
   return (

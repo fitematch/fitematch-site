@@ -1,3 +1,4 @@
+import { Metadata } from 'next';
 import Link from 'next/link';
 import { FaPlus } from 'react-icons/fa';
 import { Button } from '@/components/ui/button';
@@ -5,6 +6,14 @@ import { ROUTES } from '@/constants/routes';
 import { PAGE_STYLES } from '@/constants/styles';
 import { RecruiterPageHeader } from '@/components/recruiter/recruiter-page-header';
 import { RecruiterJobsList } from '@/components/recruiter/jobs/recruiter-jobs-list';
+
+export const metadata: Metadata = {
+  title: 'Minhas vagas',
+  robots: {
+    index: false,
+    follow: false,
+  },
+};
 
 export default function RecruiterJobsPage() {
   return (

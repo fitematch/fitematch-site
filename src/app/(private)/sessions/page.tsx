@@ -1,8 +1,17 @@
+import { Metadata } from 'next';
 import { PrivateRoute } from '@/components/auth/private-route';
 import { SessionList } from '@/components/sessions/session-list';
 import { Breadcrumb } from '@/components/ui/breadcrumb';
 import { ROUTES } from '@/constants/routes';
 import { TEXT_STYLES } from '@/constants/styles';
+
+export const metadata: Metadata = {
+  title: 'Sessões',
+  robots: {
+    index: false,
+    follow: false,
+  },
+};
 
 export default function SessionsPage() {
   return (

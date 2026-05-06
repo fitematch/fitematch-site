@@ -1,8 +1,17 @@
+import { Metadata } from 'next';
 import { ApplicationList } from '@/components/applications/application-list';
 import { Breadcrumb } from '@/components/ui/breadcrumb';
 import { ROUTES } from '@/constants/routes';
 import { TEXT_STYLES } from '@/constants/styles';
 import { THEME } from '@/constants/theme';
+
+export const metadata: Metadata = {
+  title: 'Minhas candidaturas',
+  robots: {
+    index: false,
+    follow: false,
+  },
+};
 
 export default function ApplicationsPage() {
   return (

@@ -1,5 +1,14 @@
+import { Metadata } from 'next';
 import { THEME } from '@/constants/theme';
 import { ActivateAccountForm } from '@/components/auth/activate-account-form';
+
+export const metadata: Metadata = {
+  title: 'Ativar conta',
+  robots: {
+    index: false,
+    follow: false,
+  },
+};
 
 export default function ActivateAccountPage() {
   return (

@@ -1,6 +1,5 @@
 'use client';
 
-import NextImage from 'next/image';
 import { ChangeEvent, useEffect, useMemo, useState } from 'react';
 import { FaCheck, FaEye, FaTimes } from 'react-icons/fa';
 import { FaFilePdf, FaImage } from 'react-icons/fa';
@@ -67,23 +66,12 @@ export function FileUpload({
 }: FileUploadProps) {
   const { showError } = useFlashMessage();
   const [isUploading, setIsUploading] = useState(false);
-  const [fileName, setFileName] = useState('');
   const [localPreviewUrl, setLocalPreviewUrl] = useState<string | null>(null);
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [pendingFile, setPendingFile] = useState<File | null>(null);
   const [pendingPreviewUrl, setPendingPreviewUrl] = useState<string | null>(null);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
-
-  useEffect(() => {
-    if (!uploadedFile && value) {
-      setFileName(getFileNameFromUrl(value));
-    }
-
-    if (!value && !uploadedFile) {
-      setFileName('');
-    }
-  }, [uploadedFile, value]);
 
   useEffect(() => {
     return () => {
@@ -98,6 +86,7 @@ export function FileUpload({
   }, [localPreviewUrl, pendingPreviewUrl]);
 
   const previewUrl = localPreviewUrl || value;
+  const fileName = uploadedFile?.name || getFileNameFromUrl(value);
   const resolvedPreviewUrl = resolveFileUrl(previewUrl);
   const hasImagePreview = isImageFile(uploadedFile, previewUrl);
   const hasPdfPreview = isPdfFile(uploadedFile, previewUrl);
@@ -130,7 +119,6 @@ export function FileUpload({
 
     setLocalPreviewUrl(objectUrl);
     setUploadedFile(file);
-    setFileName(file.name);
     setIsUploading(true);
 
     try {
@@ -140,7 +128,6 @@ export function FileUpload({
       URL.revokeObjectURL(objectUrl);
       setLocalPreviewUrl(null);
       setUploadedFile(null);
-      setFileName(value ? getFileNameFromUrl(value) : '');
     } finally {
       setIsUploading(false);
     }

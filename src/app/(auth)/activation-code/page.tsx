@@ -1,5 +1,14 @@
+import { Metadata } from 'next';
 import { THEME } from '@/constants/theme';
 import { ActivationCodeForm } from '@/components/auth/activation-code-form';
+
+export const metadata: Metadata = {
+  title: 'Código de ativação',
+  robots: {
+    index: false,
+    follow: false,
+  },
+};
 
 export default function ActivationCodePage() {
   return (
