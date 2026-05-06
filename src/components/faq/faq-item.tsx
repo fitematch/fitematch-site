@@ -7,7 +7,11 @@ interface FaqItemProps {
 
 export function FaqItem({ question, answer }: FaqItemProps) {
   return (
-    <div className={FAQ_STYLES.box}>
+    <div
+      className={`${FAQ_STYLES.box} overflow-hidden rounded-2xl shadow-[0_18px_48px_rgba(0,0,0,0.32)] transition`}
+    >
+      <div className="mb-4 h-px w-full bg-gradient-to-r from-transparent via-white/12 to-transparent" />
+
       <h3 className={FAQ_STYLES.boxTitle}>
         {question}
       </h3>

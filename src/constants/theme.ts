@@ -111,10 +111,10 @@ export const THEME = {
       'border border-green-500 text-green-500 hover:border-green-500 hover:bg-green-800 hover:text-green-100',
     buttonRecruiter:
       'border border-blue-500 text-blue-500 hover:border-blue-500 hover:bg-blue-800 hover:text-blue-100',
-    boxBorder: 'border-gray-100',
-    boxBackground: 'bg-gray-100',
-    boxTitle: 'text-gray-700 hover:text-gray-500',
-    boxText: 'text-gray-500 hover:text-gray-700',
+    boxBorder: 'border-slate-800/80 hover:border-slate-700',
+    boxBackground: 'bg-gradient-to-br from-slate-950 via-black to-slate-900/90',
+    boxTitle: 'text-gray-100',
+    boxText: 'text-gray-400',
   },
   sectionProfile: {
     profileCard: 'rounded-xl border border-gray-200 bg-white p-6 mb-6',

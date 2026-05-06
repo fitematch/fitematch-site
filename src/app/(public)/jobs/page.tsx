@@ -4,7 +4,6 @@ import { useState } from 'react';
 import { Breadcrumb } from '@/components/ui/breadcrumb';
 import { JobSearchInput } from '@/components/jobs/job-search-input';
 import { THEME } from '@/constants/theme';
-import { TEXT_STYLES } from '@/constants/styles';
 import { JobGrid } from '@/components/jobs/job-grid';
 
 export default function JobsPage() {
@@ -19,9 +18,6 @@ export default function JobsPage() {
             { label: 'Vagas' },
           ]}
         />
-        <h1 className={`${TEXT_STYLES.pageTitle} mt-8`}>
-          Vagas
-        </h1>
         <div className="mt-8">
           <JobSearchInput value={search} onChange={setSearch} />
         </div>

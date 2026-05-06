@@ -7,6 +7,7 @@ type ApplyApiEntity = Partial<ApplyEntity> & {
   _id?: string;
   jobId?: ApplyIdentifier;
   userId?: ApplyIdentifier;
+  user?: ApplyEntity['user'];
   details?: ApplyEntity['details'];
 };
 

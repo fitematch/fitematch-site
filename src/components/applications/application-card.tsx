@@ -6,7 +6,7 @@ import { FaTrash } from 'react-icons/fa';
 import { MdBusiness } from 'react-icons/md';
 import { Button } from '@/components/ui/button';
 import { ApplyService } from '@/services/apply/apply.service';
-import ApplyEntity from '@/types/entities/apply.entity';
+import ApplyEntity, { ApplicationStatusEnum } from '@/types/entities/apply.entity';
 import { useFlashMessage } from '@/contexts/flash-message-context';
 import { CARD_STYLES } from '@/constants/styles';
 import { resolveFileUrl } from '@/utils/file-url';
@@ -16,12 +16,20 @@ interface Props {
   onDeleted?: () => void;
 }
 
+function getApplicationStatusLabel(status: ApplicationStatusEnum) {
+  return {
+    [ApplicationStatusEnum.APPLIED]: 'Aplicado',
+    [ApplicationStatusEnum.SHORTLISTED]: 'Pré-selecionado',
+    [ApplicationStatusEnum.REJECTED]: 'Rejeitado',
+    [ApplicationStatusEnum.HIRED]: 'Contratado',
+  }[status];
+}
+
 export function ApplicationCard({ application, onDeleted }: Props) {
   const { showSuccess, showError } = useFlashMessage();
   const [isDeleting, setIsDeleting] = useState(false);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
-  const statusLabel =
-    application.status === 'applied' ? 'Aplicado' : application.status;
+  const statusLabel = getApplicationStatusLabel(application.status);
   const details = (application as ApplyEntity & {
     details?: {
       jobTitle?: string;

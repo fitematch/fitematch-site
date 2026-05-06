@@ -11,11 +11,18 @@ export interface ApplicationDetails {
   logoUrl?: string;
 }
 
+export interface ApplicationUserSummary {
+  name?: string;
+  birthday?: string;
+  resumeUrl?: string;
+}
+
 export default interface ApplyEntity {
   _id: string;
   id?: string;
   jobId: string;
   userId: string;
+  user?: ApplicationUserSummary;
   status: ApplicationStatusEnum;
   details?: ApplicationDetails;
   createdAt?: Date;

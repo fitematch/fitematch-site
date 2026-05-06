@@ -617,7 +617,41 @@ export function RecruiterJobForm({
           </div>
 
           <div className="grid gap-4 md:grid-cols-2">
-            <div className="md:col-span-2">
+            <div>
+              <FileUpload
+                label="Imagem da vaga"
+                accept="image/*"
+                value={coverUrlValue}
+                cropAspectRatio={20 / 7}
+                onUpload={async (file) => {
+                  const response = await UploadService.uploadJobCover(file);
+
+                  setValue('coverUrl', response.url, {
+                    shouldDirty: true,
+                    shouldTouch: true,
+                    shouldValidate: true,
+                  });
+
+                  return response.url;
+                }}
+              />
+              <input
+                type="hidden"
+                {...register('coverUrl', {
+                  required: 'Informe a imagem da vaga.',
+                })}
+              />
+              {errors.coverUrl && (
+                <p className="mt-1 text-sm text-red-100">
+                  {errors.coverUrl.message}
+                </p>
+              )}
+            </div>
+            <div className="hidden md:block" />
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-2">
+            <div>
               <label className="text-sm text-gray-300">Título</label>
               <input
                 className={fieldClassName}
@@ -632,7 +666,7 @@ export function RecruiterJobForm({
           </div>
 
           <div className="grid gap-4 md:grid-cols-2">
-            <div className="md:col-span-2">
+            <div>
               <label className="text-sm text-gray-300">Slug</label>
               <div
                 className={`${disabledFieldClassName} flex min-h-[50px] items-center overflow-hidden break-all ${errors.slug ? 'border-red-100 text-red-100' : ''}`}
@@ -680,40 +714,6 @@ export function RecruiterJobForm({
                 </p>
               )}
             </div>
-          </div>
-
-          <div className="grid gap-4 md:grid-cols-2">
-            <div>
-              <FileUpload
-                label="Imagem da vaga"
-                accept="image/*"
-                value={coverUrlValue}
-                cropAspectRatio={20 / 7}
-                onUpload={async (file) => {
-                  const response = await UploadService.uploadJobCover(file);
-
-                  setValue('coverUrl', response.url, {
-                    shouldDirty: true,
-                    shouldTouch: true,
-                    shouldValidate: true,
-                  });
-
-                  return response.url;
-                }}
-              />
-              <input
-                type="hidden"
-                {...register('coverUrl', {
-                  required: 'Informe a imagem da vaga.',
-                })}
-              />
-              {errors.coverUrl && (
-                <p className="mt-1 text-sm text-red-100">
-                  {errors.coverUrl.message}
-                </p>
-              )}
-            </div>
-            <div className="hidden md:block" />
           </div>
 
           <div className="grid gap-4 md:grid-cols-2">

@@ -252,11 +252,6 @@ export function RecruiterCompanyForm() {
         shouldTouch: true,
         shouldValidate: true,
       });
-      setValue('complement', result.complement, {
-        shouldDirty: true,
-        shouldTouch: true,
-        shouldValidate: true,
-      });
       setValue('neighborhood', result.neighborhood, {
         shouldDirty: true,
         shouldTouch: true,
@@ -293,287 +288,311 @@ export function RecruiterCompanyForm() {
       </div>
 
       <div className="space-y-4">
-        <div className="grid gap-4 md:grid-cols-2">
-          <div>
-            <FileUpload
-              label="Logo da empresa"
-              accept="image/*"
-              value={logoUrlValue}
-              onUpload={async (file) => {
-                const response = await UploadService.uploadCompanyLogo(file);
+        <fieldset className="rounded-2xl border border-gray-500 p-5">
+          <legend className="px-2 text-sm font-semibold uppercase text-gray-100">
+            Empresa
+          </legend>
 
-                setValue('logoUrl', response.url, {
-                  shouldDirty: true,
-                  shouldTouch: true,
-                  shouldValidate: true,
-                });
+          <div className="grid gap-4">
+            <div className="grid gap-4 md:grid-cols-2">
+              <div>
+                <FileUpload
+                  label="Logo da empresa"
+                  accept="image/*"
+                  value={logoUrlValue}
+                  onUpload={async (file) => {
+                    const response = await UploadService.uploadCompanyLogo(file);
 
-                return response.url;
-              }}
-            />
-          </div>
-          <div className="hidden md:block" />
-        </div>
-        <input
-          type="hidden"
-          {...register('logoUrl')}
-        />
+                    setValue('logoUrl', response.url, {
+                      shouldDirty: true,
+                      shouldTouch: true,
+                      shouldValidate: true,
+                    });
 
-        <div className="grid gap-4 md:grid-cols-2">
-          <div>
-            <Input
-              label="CNPJ"
-              labelClassName={labelClassName}
-              className={fieldClassName}
-              placeholder="00.000.000/0000-00"
-              error={errors.cnpj?.message}
-              {...cnpjField}
-              onChange={(event) => {
-                clearCnpjError();
-                const formattedValue = formatCnpj(event.target.value);
-
-                setValue('cnpj', formattedValue, {
-                  shouldDirty: true,
-                  shouldTouch: true,
-                  shouldValidate: true,
-                });
-              }}
-              onBlur={(event) => {
-                cnpjField.onBlur(event);
-                void handleCnpjLookup(event.target.value);
-              }}
-            />
-          </div>
-          <div />
-        </div>
-
-        {isCnpjLoading && (
-          <p className="text-sm text-gray-300">Consultando CNPJ...</p>
-        )}
-
-        {cnpjError && (
-          <p className="text-sm text-red-100">{cnpjError}</p>
-        )}
-
-        <div className="grid gap-4 md:grid-cols-2">
-          <div>
-            <Input
-              label="Nome fantasia"
-              labelClassName={labelClassName}
-              className={fieldClassName}
-              error={errors.tradeName?.message}
-              {...register('tradeName', {
-                required: 'Informe o nome fantasia.',
-                validate: (value) =>
-                  value.trim().length > 0 || 'Informe o nome fantasia.',
-              })}
-            />
-          </div>
-
-          <div>
-            <Input
-              label="Razão social"
-              labelClassName={labelClassName}
-              className={fieldClassName}
-              error={errors.legalName?.message}
-              {...register('legalName', {
-                required: 'Informe a razão social.',
-                validate: (value) =>
-                  value.trim().length > 0 || 'Informe a razão social.',
-              })}
-            />
-          </div>
-        </div>
-
-        <div className="grid gap-4 md:grid-cols-2">
-          <div>
-            <Input
-              label="E-mail"
-              labelClassName={labelClassName}
-              type="email"
-              className={fieldClassName}
-              error={errors.email?.message}
-              {...register('email', {
-                required: 'Informe o e-mail.',
-                pattern: {
-                  value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                  message: 'Informe um e-mail válido.',
-                },
-              })}
-            />
-          </div>
-
-          <div>
-            <Input
-              label="Website"
-              labelClassName={labelClassName}
-              className={fieldClassName}
-              {...register('website')}
-            />
-          </div>
-        </div>
-
-        <div className="grid gap-4 md:grid-cols-2">
-          <div>
+                    return response.url;
+                  }}
+                />
+              </div>
+              <div className="hidden md:block" />
+            </div>
             <input
               type="hidden"
-              {...register('phoneCountry')}
+              {...register('logoUrl')}
             />
-            <input
-              type="hidden"
-              {...register('phoneNumber', {
-                required: 'Informe o telefone.',
-                validate: (value) =>
-                  value.replace(/\D/g, '').length >= 8 || 'Informe o telefone.',
-              })}
-            />
-            <PhoneInput
-              label="Telefone"
-              labelClassName={labelClassName}
-              countryValue={phoneCountryValue || '+55'}
-              numberValue={phoneNumberValue || ''}
-              onCountryChange={(value) =>
-                setValue('phoneCountry', value, {
-                  shouldDirty: true,
-                  shouldTouch: true,
-                  shouldValidate: true,
-                })
-              }
-              onNumberChange={(value) =>
-                setValue('phoneNumber', value, {
-                  shouldDirty: true,
-                  shouldTouch: true,
-                  shouldValidate: true,
-                })
-              }
-              error={errors.phoneNumber?.message}
-            />
-          </div>
-          <div />
-        </div>
 
-        <div className="grid gap-4 md:grid-cols-2">
-          <div>
-            <Input
-              label="CEP"
-              labelClassName={labelClassName}
-              className={fieldClassName}
-              placeholder="01310-100"
-              error={errors.zipCode?.message}
-              {...zipCodeField}
-              onChange={(event) => {
-                clearZipCodeError();
-                const formattedValue = formatZipCode(event.target.value);
+            <div className="grid gap-4 md:grid-cols-2">
+              <div>
+                <Input
+                  label="CNPJ"
+                  labelClassName={labelClassName}
+                  className={fieldClassName}
+                  placeholder="00.000.000/0000-00"
+                  error={errors.cnpj?.message}
+                  {...cnpjField}
+                  onChange={(event) => {
+                    clearCnpjError();
+                    const formattedValue = formatCnpj(event.target.value);
 
-                setValue('zipCode', formattedValue, {
-                  shouldDirty: true,
-                  shouldTouch: true,
-                  shouldValidate: true,
-                });
-              }}
-              onBlur={(event) => {
-                zipCodeField.onBlur(event);
-                void handleZipCodeLookup(event.target.value);
-              }}
-            />
-          </div>
-          <div />
-        </div>
-
-        {isZipCodeLoading && (
-          <p className="text-sm text-gray-300">Consultando CEP...</p>
-        )}
-
-        {zipCodeError && (
-          <p className="text-sm text-red-100">{zipCodeError}</p>
-        )}
-
-        <div className="grid gap-4 md:grid-cols-2">
-          <div>
-            <Input
-              label="Rua"
-              labelClassName={labelClassName}
-              className={fieldClassName}
-              error={errors.street?.message}
-              {...register('street', {
-                required: 'Informe a rua.',
-                validate: (value) =>
-                  value.trim().length > 0 || 'Informe a rua.',
-              })}
-            />
-          </div>
-
-          <div className="grid gap-4 md:grid-cols-2">
-            <div>
-              <Input
-                label="Número"
-                labelClassName={labelClassName}
-                className={fieldClassName}
-                error={errors.number?.message}
-                {...register('number', {
-                  required: 'Informe o número.',
-                  validate: (value) =>
-                    value.trim().length > 0 || 'Informe o número.',
-                })}
-              />
+                    setValue('cnpj', formattedValue, {
+                      shouldDirty: true,
+                      shouldTouch: true,
+                      shouldValidate: true,
+                    });
+                  }}
+                  onBlur={(event) => {
+                    cnpjField.onBlur(event);
+                    void handleCnpjLookup(event.target.value);
+                  }}
+                />
+              </div>
+              <div />
             </div>
 
-            <div>
-              <Input
-                label="Complemento"
-                labelClassName={labelClassName}
-                className={fieldClassName}
-                {...register('complement')}
-              />
+            {isCnpjLoading && (
+              <p className="text-sm text-gray-300">Consultando CNPJ...</p>
+            )}
+
+            {cnpjError && (
+              <p className="text-sm text-red-100">{cnpjError}</p>
+            )}
+
+            <div className="grid gap-4 md:grid-cols-2">
+              <div>
+                <Input
+                  label="Nome fantasia"
+                  labelClassName={labelClassName}
+                  className={fieldClassName}
+                  error={errors.tradeName?.message}
+                  {...register('tradeName', {
+                    required: 'Informe o nome fantasia.',
+                    validate: (value) =>
+                      value.trim().length > 0 || 'Informe o nome fantasia.',
+                  })}
+                />
+              </div>
+
+              <div>
+                <Input
+                  label="Razão social"
+                  labelClassName={labelClassName}
+                  className={fieldClassName}
+                  error={errors.legalName?.message}
+                  {...register('legalName', {
+                    required: 'Informe a razão social.',
+                    validate: (value) =>
+                      value.trim().length > 0 || 'Informe a razão social.',
+                  })}
+                />
+              </div>
             </div>
           </div>
-        </div>
+        </fieldset>
 
-        <div className="grid gap-4 md:grid-cols-2">
-          <div>
-            <Input
-              label="Bairro"
-              labelClassName={labelClassName}
-              className={fieldClassName}
-              error={errors.neighborhood?.message}
-              {...register('neighborhood', {
-                required: 'Informe o bairro.',
-                validate: (value) =>
-                  value.trim().length > 0 || 'Informe o bairro.',
-              })}
-            />
-          </div>
+        <fieldset className="rounded-2xl border border-gray-500 p-5">
+          <legend className="px-2 text-sm font-semibold uppercase text-gray-100">
+            Contato
+          </legend>
 
-          <div className="grid gap-4 md:grid-cols-2">
-            <div>
-              <Input
-                label="Cidade"
-                labelClassName={labelClassName}
-                className={fieldClassName}
-                error={errors.city?.message}
-                {...register('city', {
-                  required: 'Informe a cidade.',
-                  validate: (value) =>
-                    value.trim().length > 0 || 'Informe a cidade.',
-                })}
-              />
+          <div className="grid gap-4">
+            <div className="grid gap-4 md:grid-cols-2">
+              <div>
+                <input
+                  type="hidden"
+                  {...register('phoneCountry')}
+                />
+                <input
+                  type="hidden"
+                  {...register('phoneNumber', {
+                    required: 'Informe o telefone.',
+                    validate: (value) =>
+                      value.replace(/\D/g, '').length >= 8 || 'Informe o telefone.',
+                  })}
+                />
+                <PhoneInput
+                  label="Telefone"
+                  labelClassName={labelClassName}
+                  countryValue={phoneCountryValue || '+55'}
+                  numberValue={phoneNumberValue || ''}
+                  onCountryChange={(value) =>
+                    setValue('phoneCountry', value, {
+                      shouldDirty: true,
+                      shouldTouch: true,
+                      shouldValidate: true,
+                    })
+                  }
+                  onNumberChange={(value) =>
+                    setValue('phoneNumber', value, {
+                      shouldDirty: true,
+                      shouldTouch: true,
+                      shouldValidate: true,
+                    })
+                  }
+                  error={errors.phoneNumber?.message}
+                />
+              </div>
+              <div />
             </div>
 
-            <div>
-              <Input
-                label="Estado"
-                labelClassName={labelClassName}
-                className={fieldClassName}
-                error={errors.state?.message}
-                {...register('state', {
-                  required: 'Informe o estado.',
-                  validate: (value) =>
-                    value.trim().length > 0 || 'Informe o estado.',
-                })}
-              />
+            <div className="grid gap-4 md:grid-cols-2">
+              <div>
+                <Input
+                  label="E-mail"
+                  labelClassName={labelClassName}
+                  type="email"
+                  className={fieldClassName}
+                  error={errors.email?.message}
+                  {...register('email', {
+                    required: 'Informe o e-mail.',
+                    pattern: {
+                      value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                      message: 'Informe um e-mail válido.',
+                    },
+                  })}
+                />
+              </div>
+
+              <div>
+                <Input
+                  label="Website"
+                  labelClassName={labelClassName}
+                  className={fieldClassName}
+                  {...register('website')}
+                />
+              </div>
             </div>
           </div>
-        </div>
+        </fieldset>
+
+        <fieldset className="rounded-2xl border border-gray-500 p-5">
+          <legend className="px-2 text-sm font-semibold uppercase text-gray-100">
+            Endereço
+          </legend>
+
+          <div className="grid gap-4">
+            <div className="grid gap-4 md:grid-cols-2">
+              <div>
+                <Input
+                  label="CEP"
+                  labelClassName={labelClassName}
+                  className={fieldClassName}
+                  placeholder="01310-100"
+                  error={errors.zipCode?.message}
+                  {...zipCodeField}
+                  onChange={(event) => {
+                    clearZipCodeError();
+                    const formattedValue = formatZipCode(event.target.value);
+
+                    setValue('zipCode', formattedValue, {
+                      shouldDirty: true,
+                      shouldTouch: true,
+                      shouldValidate: true,
+                    });
+                  }}
+                  onBlur={(event) => {
+                    zipCodeField.onBlur(event);
+                    void handleZipCodeLookup(event.target.value);
+                  }}
+                />
+              </div>
+              <div />
+            </div>
+
+            {isZipCodeLoading && (
+              <p className="text-sm text-gray-300">Consultando CEP...</p>
+            )}
+
+            {zipCodeError && (
+              <p className="text-sm text-red-100">{zipCodeError}</p>
+            )}
+
+            <div className="grid gap-4 md:grid-cols-2">
+              <div>
+                <Input
+                  label="Rua"
+                  labelClassName={labelClassName}
+                  className={fieldClassName}
+                  error={errors.street?.message}
+                  {...register('street', {
+                    required: 'Informe a rua.',
+                    validate: (value) =>
+                      value.trim().length > 0 || 'Informe a rua.',
+                  })}
+                />
+              </div>
+
+              <div className="grid gap-4 md:grid-cols-2">
+                <div>
+                  <Input
+                    label="Número"
+                    labelClassName={labelClassName}
+                    className={fieldClassName}
+                    error={errors.number?.message}
+                    {...register('number', {
+                      required: 'Informe o número.',
+                      validate: (value) =>
+                        value.trim().length > 0 || 'Informe o número.',
+                    })}
+                  />
+                </div>
+
+                <div>
+                  <Input
+                    label="Complemento"
+                    labelClassName={labelClassName}
+                    className={fieldClassName}
+                    {...register('complement')}
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="grid gap-4 md:grid-cols-2">
+              <div>
+                <Input
+                  label="Bairro"
+                  labelClassName={labelClassName}
+                  className={fieldClassName}
+                  error={errors.neighborhood?.message}
+                  {...register('neighborhood', {
+                    required: 'Informe o bairro.',
+                    validate: (value) =>
+                      value.trim().length > 0 || 'Informe o bairro.',
+                  })}
+                />
+              </div>
+
+              <div className="grid gap-4 md:grid-cols-2">
+                <div>
+                  <Input
+                    label="Cidade"
+                    labelClassName={labelClassName}
+                    className={fieldClassName}
+                    error={errors.city?.message}
+                    {...register('city', {
+                      required: 'Informe a cidade.',
+                      validate: (value) =>
+                        value.trim().length > 0 || 'Informe a cidade.',
+                    })}
+                  />
+                </div>
+
+                <div>
+                  <Input
+                    label="Estado"
+                    labelClassName={labelClassName}
+                    className={fieldClassName}
+                    error={errors.state?.message}
+                    {...register('state', {
+                      required: 'Informe o estado.',
+                      validate: (value) =>
+                        value.trim().length > 0 || 'Informe o estado.',
+                    })}
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </fieldset>
 
       </div>
 
