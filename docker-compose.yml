@@ -1,0 +1,20 @@
+services:
+  fitematch-site:
+    container_name: fitematch-site
+    image: fitematch-site:development
+    build:
+      context: .
+      target: deps
+    working_dir: /app
+    command: npm run dev
+    ports:
+      - '3001:3000'
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/.next
+    env_file:
+      - .env.local
+    environment:
+      NEXT_TELEMETRY_DISABLED: '1'
+      WATCHPACK_POLLING: 'true'
