@@ -1,0 +1,26 @@
+#!/usr/bin/env sh
+
+echo "🧪 Running project checks before push..."
+
+npm run lint
+
+if [ $? -ne 0 ]; then
+  echo "❌ Lint failed."
+  exit 1
+fi
+
+npm run type-check
+
+if [ $? -ne 0 ]; then
+  echo "❌ Type check failed."
+  exit 1
+fi
+
+npm run test
+
+if [ $? -ne 0 ]; then
+  echo "❌ Tests failed."
+  exit 1
+fi
+
+echo "✅ Pre-push passed."
