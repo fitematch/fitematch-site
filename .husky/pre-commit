@@ -1,5 +1,12 @@
 #!/usr/bin/env sh
 
+STAGED_FILES=$(git diff --cached --name-only)
+
+if [ -z "$STAGED_FILES" ]; then
+  echo "⚠️ No staged files found."
+  exit 0
+fi
+
 echo "🔍 Running lint-staged..."
 
 npx lint-staged
