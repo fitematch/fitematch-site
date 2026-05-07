@@ -1,6 +1,7 @@
 'use client';
 
 import { ChangeEvent, useEffect, useMemo, useState } from 'react';
+import Image from 'next/image';
 import { FaCheck, FaEye, FaTimes } from 'react-icons/fa';
 import { FaFilePdf, FaImage } from 'react-icons/fa';
 import { IoCloudUploadOutline } from 'react-icons/io5';
@@ -243,9 +244,12 @@ export function FileUpload({
             <div
               className="relative w-full overflow-hidden rounded-2xl border border-gray-500 bg-white"
             >
-              <img
+              <Image
                 src={pendingPreviewUrl}
                 alt="Preview para confirmacao"
+                width={1600}
+                height={1600}
+                unoptimized
                 className="mx-auto block max-h-[80vh] w-full rounded-2xl object-contain"
               />
             </div>
@@ -294,9 +298,12 @@ export function FileUpload({
 
           {hasImagePreview && (
             <div className="relative w-full overflow-hidden rounded-2xl border border-gray-500 bg-white">
-              <img
+              <Image
                 src={resolvedPreviewUrl}
                 alt={fileName || 'Preview do arquivo'}
+                width={1600}
+                height={1600}
+                unoptimized
                 className="mx-auto block max-h-[80vh] w-full rounded-2xl object-contain"
               />
             </div>

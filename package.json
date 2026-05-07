@@ -7,7 +7,25 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "type-check": "tsc --noEmit"
+    "lint:fix": "eslint --fix",
+    "type-check": "tsc --noEmit",
+    "test": "cross-env TZ=America/Sao_Paulo jest --verbose",
+    "test:watch": "cross-env TZ=America/Sao_Paulo jest --watch",
+    "test:cov": "cross-env TZ=America/Sao_Paulo jest --coverage",
+    "test:staged": "cross-env TZ=America/Sao_Paulo jest --findRelatedTests --passWithNoTests",
+    "check": "npm run lint && npm run type-check && npm run test",
+    "precommit:staged": "lint-staged",
+    "prepare": "husky"
+  },
+  "lint-staged": {
+    "*.{ts,tsx,js,jsx}": [
+      "eslint --fix",
+      "prettier --write",
+      "npm run test:staged --"
+    ],
+    "*.{json,md,yml,yaml,css,mjs,ts}": [
+      "prettier --write"
+    ]
   },
   "dependencies": {
     "leaflet": "^1.9.4",
@@ -19,12 +37,27 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
+    "@testing-library/dom": "^10.4.1",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.0",
+    "@testing-library/user-event": "^14.6.1",
+    "@types/jest": "^30.0.0",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "cross-env": "^10.1.0",
     "eslint": "^9",
     "eslint-config-next": "16.2.4",
+    "husky": "^9.1.7",
+    "identity-obj-proxy": "^3.0.0",
+    "jest": "^30.3.0",
+    "jest-environment-jsdom": "^30.3.0",
+    "lint-staged": "^16.4.0",
+    "msw": "^2.12.4",
+    "prettier": "^3.8.3",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "ts-jest": "^29.4.9",
+    "typescript": "^5",
+    "whatwg-fetch": "^3.6.20"
   }
 }

@@ -284,10 +284,6 @@ export function RecruiterJobForm({
     control,
     name: 'title',
   });
-  const contractTypeValue = useWatch({
-    control,
-    name: 'contractType',
-  });
   const slotsValue = useWatch({
     control,
     name: 'slots',

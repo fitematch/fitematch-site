@@ -17,11 +17,44 @@ export function useJobs() {
     error: null,
   });
 
+  async function loadJobs() {
+    const jobs = await JobService.list();
+    return jobs.filter((job) => job.status === JobStatusEnum.ACTIVE);
+  }
+
+  async function fetchJobs() {
+    setState((current) => ({
+      ...current,
+      isLoading: true,
+    }));
+
+    try {
+      const activeJobs = await loadJobs();
+
+      setState({
+        jobs: activeJobs,
+        isLoading: false,
+        error: null,
+      });
+    } catch {
+      setState({
+        jobs: [],
+        isLoading: false,
+        error: 'Não foi possível carregar as vagas.',
+      });
+    }
+  }
+
   useEffect(() => {
-    async function fetchJobs() {
+    let isMounted = true;
+
+    async function initializeJobs() {
       try {
-        const jobs = await JobService.list();
-        const activeJobs = jobs.filter((job) => job.status === JobStatusEnum.ACTIVE);
+        const activeJobs = await loadJobs();
+
+        if (!isMounted) {
+          return;
+        }
 
         setState({
           jobs: activeJobs,
@@ -29,6 +62,10 @@ export function useJobs() {
           error: null,
         });
       } catch {
+        if (!isMounted) {
+          return;
+        }
+
         setState({
           jobs: [],
           isLoading: false,
@@ -37,8 +74,15 @@ export function useJobs() {
       }
     }
 
-    fetchJobs();
+    void initializeJobs();
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
-  return state;
+  return {
+    ...state,
+    refetch: fetchJobs,
+  };
 }
