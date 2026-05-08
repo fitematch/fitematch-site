@@ -1,10 +1,5 @@
 import Link from 'next/link';
-import {
-  FaFacebook,
-  FaInstagram,
-  FaLinkedin,
-  FaYoutube,
-} from 'react-icons/fa';
+import { FaFacebook, FaInstagram, FaLinkedin, FaYoutube } from 'react-icons/fa';
 import { FaXTwitter } from 'react-icons/fa6';
 import { ROUTES } from '@/constants/routes';
 import { FOOTER_STYLES, PAGE_STYLES } from '@/constants/styles';
@@ -16,12 +11,11 @@ export function Footer() {
       <div className={`${PAGE_STYLES.container} grid gap-10 py-12 md:grid-cols-2`}>
         <div>
           <h2 className={FOOTER_STYLES.brand}>
-            fitematch
+            <span className="text-white">fite</span>
+            <span className="text-lime-400">match</span>
           </h2>
 
-          <p className={`mt-4 ${FOOTER_STYLES.text}`}>
-            Você pode nos encontrar em alguns canais:
-          </p>
+          <p className={`mt-4 ${FOOTER_STYLES.text}`}>Você pode nos encontrar em alguns canais:</p>
 
           <div className="mt-4 flex items-center gap-4">
             <FaFacebook className={FOOTER_STYLES.socialFacebook} />
@@ -33,9 +27,7 @@ export function Footer() {
         </div>
 
         <div className="md:text-right">
-          <h3 className={FOOTER_STYLES.title}>
-            Suporte & Ajuda
-          </h3>
+          <h3 className={FOOTER_STYLES.title}>Suporte & Ajuda</h3>
 
           <div className={`mt-4 flex flex-col gap-2 text-sm md:items-end ${THEME.footer.text}`}>
             <Link href={ROUTES.PRIVACY_POLICY} className={FOOTER_STYLES.link}>
@@ -51,7 +43,9 @@ export function Footer() {
         </div>
       </div>
 
-      <div className={`border-t ${THEME.layout.border} px-4 py-6 text-center ${FOOTER_STYLES.text}`}>
+      <div
+        className={`border-t ${THEME.layout.border} px-4 py-6 text-center ${FOOTER_STYLES.text}`}
+      >
         <p>© 2026 fitematch - Todos os direitos reservados</p>
         <p className="mt-1">Desenvolvido por drowper</p>
       </div>
