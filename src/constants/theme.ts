@@ -15,7 +15,7 @@ export const THEME = {
     breadcrumbIcon: 'text-gray-700',
     breadcrumbActive: 'text-gray-100',
     menuLanguageDropdown:
-      'border border-gray-500 text-gray-300 hover:border-gray-500 hover:bg-gray-800 hover:text-gray-100',
+      'border border-zinc-700 bg-zinc-900/80 text-zinc-100 hover:border-zinc-600 hover:bg-zinc-900 hover:text-white',
   },
   pages: {
     title: 'text-2xl font-bold text-gray-300 hover:text-gray-100',

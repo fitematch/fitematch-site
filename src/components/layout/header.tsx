@@ -2,338 +2,225 @@
 
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { FaSignInAlt, FaSignOutAlt, FaUserCircle, FaUserPlus } from 'react-icons/fa';
-import { FiMenu, FiX } from 'react-icons/fi';
-import { useState } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
+import { ArrowRight, LogIn, LogOut, Menu, UserRound, UserRoundPlus, X } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { ROUTES } from '@/constants/routes';
-import { THEME } from '@/constants/theme';
-import { useAuth } from '@/hooks/use-auth';
 import { useFlashMessage } from '@/contexts/flash-message-context';
+import { useAuth } from '@/hooks/use-auth';
 import { ProductRoleEnum } from '@/types/entities/user.entity';
 import { LanguageDropdown } from './language-dropdown';
+
+const NAV_LINK_BASE =
+  'rounded-full px-3 py-2 text-sm text-zinc-100 transition-colors duration-200 hover:text-white';
+const NAV_LINK_ACTIVE = 'text-lime-400';
 
 export function Header() {
   const pathname = usePathname();
   const router = useRouter();
+  const { showError, showSuccess } = useFlashMessage();
   const { user, isAuthenticated, isLoading, signOut } = useAuth();
-  const { showSuccess, showError } = useFlashMessage();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
 
   const isRecruiter = user?.productRole === ProductRoleEnum.RECRUITER;
   const isCandidate = user?.productRole === ProductRoleEnum.CANDIDATE;
 
-  function closeMenu() {
-    setMenuOpen(false);
-  }
+  useEffect(() => {
+    function handleScroll() {
+      setIsScrolled(window.scrollY > 12);
+    }
+
+    handleScroll();
+    window.addEventListener('scroll', handleScroll, { passive: true });
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
+
+  const navItems = [
+    { href: ROUTES.JOBS, label: 'Vagas', show: true },
+    { href: ROUTES.APPLICATIONS, label: 'Aplicações', show: isCandidate },
+    { href: ROUTES.RECRUITER_COMPANY, label: 'Minha Empresa', show: isRecruiter },
+    { href: ROUTES.RECRUITER_JOBS, label: 'Minhas Vagas', show: isRecruiter },
+    { href: ROUTES.SESSIONS, label: 'Sessões', show: isAuthenticated },
+    { href: ROUTES.FAQ, label: 'FAQ', show: true },
+  ].filter((item) => item.show);
 
   async function handleSignOut() {
     try {
       await signOut();
-
       showSuccess('Logout realizado com sucesso.');
+      setMenuOpen(false);
       router.push(ROUTES.HOME);
     } catch {
       showError('Não foi possível sair da conta.');
     }
   }
 
-  function renderDesktopAuthActions() {
-    if (isLoading) {
-      return null;
-    }
-
-    if (isAuthenticated) {
-      return (
-        <>
-          <Link
-            href={ROUTES.PROFILE}
-            className="flex items-center justify-center gap-2 rounded border border-gray-500 bg-black px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700"
-          >
-            <FaUserCircle className="text-base" />
-            Perfil
-          </Link>
-
-          <button
-            type="button"
-            onClick={() => {
-              void handleSignOut();
-            }}
-            className="flex items-center justify-center gap-2 rounded bg-red-700 px-3 py-2 text-sm font-medium text-red-100 hover:bg-red-500"
-          >
-            <FaSignOutAlt className="text-base" />
-            Sair
-          </button>
-        </>
-      );
-    }
-
-    return (
-      <>
-        <Link
-          href={ROUTES.SIGN_UP}
-          className="flex items-center justify-center gap-2 rounded border border-blue-100 bg-blue-800 px-3 py-2 text-sm font-medium text-blue-100 hover:bg-blue-600"
-        >
-          <FaUserPlus className="text-base" />
-          Cadastro
-        </Link>
-
-        <Link
-          href={ROUTES.SIGN_IN}
-          className="flex items-center justify-center gap-2 rounded border border-green-100 bg-green-800 px-3 py-2 text-sm font-medium text-green-100 hover:bg-green-600"
-        >
-          <FaSignInAlt className="text-base" />
-          Login
-        </Link>
-      </>
-    );
-  }
-
-  function renderMobileAuthActions() {
-    if (isLoading) {
-      return null;
-    }
-
-    if (isAuthenticated) {
-      return (
-        <>
-          <Link
-            href={ROUTES.PROFILE}
-            className="flex w-full items-center justify-center gap-2 rounded border border-gray-500 bg-black px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700"
-            onClick={closeMenu}
-          >
-            <FaUserCircle className="text-base" />
-            Perfil
-          </Link>
-
-          <button
-            type="button"
-            onClick={() => {
-              closeMenu();
-              void handleSignOut();
-            }}
-            className="flex w-full items-center justify-center gap-2 rounded bg-red-700 px-3 py-2 text-sm font-medium text-red-100 hover:bg-red-500"
-          >
-            <FaSignOutAlt className="text-base" />
-            Sair
-          </button>
-        </>
-      );
-    }
-
-    return (
-      <>
-        <Link
-          href={ROUTES.SIGN_UP}
-          className="flex w-full items-center justify-center gap-2 rounded border border-blue-100 bg-blue-800 px-3 py-2 text-sm font-medium text-blue-100 hover:bg-blue-600"
-          onClick={closeMenu}
-        >
-          <FaUserPlus className="text-base" />
-          Cadastro
-        </Link>
-
-        <Link
-          href={ROUTES.SIGN_IN}
-          className="flex w-full items-center justify-center gap-2 rounded border border-green-100 bg-green-800 px-3 py-2 text-sm font-medium text-green-100 hover:bg-green-600"
-          onClick={closeMenu}
-        >
-          <FaSignInAlt className="text-base" />
-          Login
-        </Link>
-      </>
-    );
+  function getNavClass(href: string) {
+    const isActive = pathname.startsWith(href) && href !== ROUTES.HOME;
+    return `${NAV_LINK_BASE} ${isActive ? NAV_LINK_ACTIVE : ''}`;
   }
 
   return (
-    <header className="sticky top-0 z-40 border-b border-gray-800 bg-black px-0 py-4 md:px-0">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between gap-4">
-          <div className="flex min-w-0 items-center gap-6">
-            <Link
-              href={ROUTES.HOME}
-              className="flex-shrink-0 rounded-sm leading-none transition duration-200 hover:opacity-90 hover:brightness-110"
-            >
-              <div className="font-sans text-[1.35rem] font-extrabold lowercase tracking-[-0.04em] text-white sm:text-[1.5rem]">
-                <span className="text-white">fite</span>
-                <span className="text-lime-400">match</span>
-              </div>
-            </Link>
+    <header
+      className={`sticky top-0 z-50 transition-all duration-300 ${
+        isScrolled
+          ? 'border-b border-white/8 bg-black/55 backdrop-blur-xl'
+          : 'border-b border-white/8 bg-zinc-950/70 backdrop-blur-md'
+      }`}
+    >
+      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
+        <div className="flex items-center gap-8">
+          <Link
+            href={ROUTES.HOME}
+            className="text-lg font-semibold lowercase tracking-[-0.05em] text-zinc-50 transition-opacity hover:opacity-80"
+          >
+            <span className="text-zinc-50">fite</span>
+            <span className="text-lime-400">match</span>
+          </Link>
 
-            <nav className="hidden items-center gap-6 text-sm font-medium text-gray-300 md:flex">
-              <Link
-                href={ROUTES.JOBS}
-                className={`transition-colors duration-200 ${
-                  pathname.startsWith(ROUTES.JOBS)
-                    ? THEME.navigation.linkActive
-                    : THEME.navigation.link
-                }`}
-              >
-                Vagas
+          <nav className="hidden items-center gap-1 lg:flex">
+            {navItems.map((item) => (
+              <Link key={item.href} href={item.href} className={getNavClass(item.href)}>
+                {item.label}
               </Link>
-
-              {isCandidate && (
-                <Link
-                  href={ROUTES.APPLICATIONS}
-                  className={`transition-colors duration-200 ${
-                    pathname.startsWith(ROUTES.APPLICATIONS)
-                      ? THEME.navigation.linkActive
-                      : THEME.navigation.link
-                  }`}
-                >
-                  Aplicações
-                </Link>
-              )}
-
-              {isRecruiter && (
-                <Link
-                  href={ROUTES.RECRUITER_COMPANY}
-                  className={`transition-colors duration-200 ${
-                    pathname.startsWith(ROUTES.RECRUITER_COMPANY)
-                      ? THEME.navigation.linkActive
-                      : THEME.navigation.link
-                  }`}
-                >
-                  Minha Empresa
-                </Link>
-              )}
-
-              {isRecruiter && (
-                <Link
-                  href={ROUTES.RECRUITER_JOBS}
-                  className={`transition-colors duration-200 ${
-                    pathname.startsWith(ROUTES.RECRUITER_JOBS)
-                      ? THEME.navigation.linkActive
-                      : THEME.navigation.link
-                  }`}
-                >
-                  Minha(s) Vaga(s)
-                </Link>
-              )}
-
-              {isAuthenticated && (
-                <Link
-                  href={ROUTES.SESSIONS}
-                  className={`transition-colors duration-200 ${
-                    pathname.startsWith(ROUTES.SESSIONS)
-                      ? THEME.navigation.linkActive
-                      : THEME.navigation.link
-                  }`}
-                >
-                  Sessions
-                </Link>
-              )}
-
-              <Link
-                href={ROUTES.FAQ}
-                className={`transition-colors duration-200 ${
-                  pathname.startsWith(ROUTES.FAQ)
-                    ? THEME.navigation.linkActive
-                    : THEME.navigation.link
-                }`}
-              >
-                FAQ
-              </Link>
-            </nav>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <div className="hidden md:block">
-              <LanguageDropdown />
-            </div>
-
-            <div className="hidden items-center gap-2 md:flex">{renderDesktopAuthActions()}</div>
-
-            <button
-              type="button"
-              onClick={() => setMenuOpen((current) => !current)}
-              className="ml-2 flex h-10 w-10 items-center justify-center rounded border border-gray-700 text-gray-300 md:hidden"
-              aria-label={menuOpen ? 'Fechar menu' : 'Abrir menu'}
-              aria-expanded={menuOpen}
-            >
-              {menuOpen ? <FiX className="text-xl" /> : <FiMenu className="text-xl" />}
-            </button>
-          </div>
+            ))}
+          </nav>
         </div>
+
+        <div className="hidden items-center gap-3 lg:flex">
+          <LanguageDropdown />
+
+          {!isLoading && !isAuthenticated && (
+            <>
+              <Link
+                href={ROUTES.SIGN_IN}
+                className="inline-flex items-center gap-2 rounded-full border border-zinc-700 bg-zinc-900/80 px-4 py-2 text-sm text-zinc-100 transition-all duration-300 hover:border-zinc-600 hover:bg-zinc-900"
+              >
+                <LogIn className="h-4 w-4" />
+                Entrar
+              </Link>
+              <Link
+                href={ROUTES.SIGN_UP}
+                className="inline-flex items-center gap-2 rounded-full bg-zinc-50 px-4 py-2 text-sm font-medium text-black transition-all duration-300 hover:bg-white"
+              >
+                Criar conta
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+            </>
+          )}
+
+          {!isLoading && isAuthenticated && (
+            <>
+              <Link
+                href={ROUTES.PROFILE}
+                className="inline-flex items-center gap-2 rounded-full border border-zinc-700 bg-zinc-900/80 px-4 py-2 text-sm text-zinc-100 transition-all duration-300 hover:border-zinc-600 hover:bg-zinc-900"
+              >
+                <UserRound className="h-4 w-4" />
+                Perfil
+              </Link>
+              <button
+                type="button"
+                onClick={() => {
+                  void handleSignOut();
+                }}
+                className="inline-flex items-center gap-2 rounded-full border border-zinc-700 bg-zinc-900/80 px-4 py-2 text-sm text-zinc-100 transition-all duration-300 hover:border-zinc-600 hover:bg-zinc-900"
+              >
+                <LogOut className="h-4 w-4" />
+                Sair
+              </button>
+            </>
+          )}
+        </div>
+
+        <button
+          type="button"
+          onClick={() => setMenuOpen((current) => !current)}
+          className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/[0.03] text-zinc-100 transition-all duration-300 hover:border-white/15 hover:bg-white/[0.05] lg:hidden"
+          aria-label={menuOpen ? 'Fechar menu' : 'Abrir menu'}
+          aria-expanded={menuOpen}
+        >
+          {menuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+        </button>
       </div>
 
-      {menuOpen && (
-        <div className="mt-4 space-y-3 border-t border-gray-800 pt-4 md:hidden">
-          <nav className="flex flex-col gap-3">
-            <div className="w-full">
-              <LanguageDropdown isFullWidth />
+      <AnimatePresence>
+        {menuOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.18, ease: 'easeOut' }}
+            className="border-t border-white/8 bg-black/80 backdrop-blur-xl lg:hidden"
+          >
+            <div className="mx-auto flex max-w-7xl flex-col gap-3 px-4 py-4 sm:px-6">
+              <div className="flex justify-end">
+                <LanguageDropdown />
+              </div>
+
+              <nav className="flex flex-col gap-1">
+                {navItems.map((item) => (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    onClick={() => setMenuOpen(false)}
+                    className="rounded-2xl px-4 py-3 text-sm text-zinc-200 transition-colors hover:bg-white/[0.04] hover:text-zinc-50"
+                  >
+                    {item.label}
+                  </Link>
+                ))}
+              </nav>
+
+              {!isLoading && !isAuthenticated && (
+                <div className="grid gap-2 pt-2">
+                  <Link
+                    href={ROUTES.SIGN_IN}
+                    onClick={() => setMenuOpen(false)}
+                    className="inline-flex items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm text-zinc-100"
+                  >
+                    <LogIn className="h-4 w-4" />
+                    Entrar
+                  </Link>
+                  <Link
+                    href={ROUTES.SIGN_UP}
+                    onClick={() => setMenuOpen(false)}
+                    className="inline-flex items-center justify-center gap-2 rounded-2xl bg-zinc-50 px-4 py-3 text-sm font-medium text-black"
+                  >
+                    <UserRoundPlus className="h-4 w-4" />
+                    Criar conta
+                  </Link>
+                </div>
+              )}
+
+              {!isLoading && isAuthenticated && (
+                <div className="grid gap-2 pt-2">
+                  <Link
+                    href={ROUTES.PROFILE}
+                    onClick={() => setMenuOpen(false)}
+                    className="inline-flex items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm text-zinc-100"
+                  >
+                    <UserRound className="h-4 w-4" />
+                    Perfil
+                  </Link>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      void handleSignOut();
+                    }}
+                    className="inline-flex items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm text-zinc-100"
+                  >
+                    <LogOut className="h-4 w-4" />
+                    Sair
+                  </button>
+                </div>
+              )}
             </div>
-
-            <Link
-              href={ROUTES.JOBS}
-              className={`flex w-full items-center justify-center rounded border border-gray-700 bg-black px-3 py-2 text-sm font-medium text-gray-300 transition-colors hover:bg-gray-700 hover:text-white ${
-                pathname.startsWith(ROUTES.JOBS) ? 'font-bold' : ''
-              }`}
-              onClick={closeMenu}
-            >
-              Vagas
-            </Link>
-
-            {isCandidate && (
-              <Link
-                href={ROUTES.APPLICATIONS}
-                className={`flex w-full items-center justify-center rounded border border-gray-700 bg-black px-3 py-2 text-sm font-medium text-gray-300 transition-colors hover:bg-gray-700 hover:text-white ${
-                  pathname.startsWith(ROUTES.APPLICATIONS) ? 'font-bold' : ''
-                }`}
-                onClick={closeMenu}
-              >
-                Aplicações
-              </Link>
-            )}
-
-            {isRecruiter && (
-              <Link
-                href={ROUTES.RECRUITER_COMPANY}
-                className={`flex w-full items-center justify-center rounded border border-gray-700 bg-black px-3 py-2 text-sm font-medium text-gray-300 transition-colors hover:bg-gray-700 hover:text-white ${
-                  pathname.startsWith(ROUTES.RECRUITER_COMPANY) ? 'font-bold' : ''
-                }`}
-                onClick={closeMenu}
-              >
-                Minha Empresa
-              </Link>
-            )}
-
-            {isRecruiter && (
-              <Link
-                href={ROUTES.RECRUITER_JOBS}
-                className={`flex w-full items-center justify-center rounded border border-gray-700 bg-black px-3 py-2 text-sm font-medium text-gray-300 transition-colors hover:bg-gray-700 hover:text-white ${
-                  pathname.startsWith(ROUTES.RECRUITER_JOBS) ? 'font-bold' : ''
-                }`}
-                onClick={closeMenu}
-              >
-                Minha(s) Vaga(s)
-              </Link>
-            )}
-
-            {isAuthenticated && (
-              <Link
-                href={ROUTES.SESSIONS}
-                className={`flex w-full items-center justify-center rounded border border-gray-700 bg-black px-3 py-2 text-sm font-medium text-gray-300 transition-colors hover:bg-gray-700 hover:text-white ${
-                  pathname.startsWith(ROUTES.SESSIONS) ? 'font-bold' : ''
-                }`}
-                onClick={closeMenu}
-              >
-                Sessions
-              </Link>
-            )}
-
-            <Link
-              href={ROUTES.FAQ}
-              className={`flex w-full items-center justify-center rounded border border-gray-700 bg-black px-3 py-2 text-sm font-medium text-gray-300 transition-colors hover:bg-gray-700 hover:text-white ${
-                pathname.startsWith(ROUTES.FAQ) ? 'font-bold' : ''
-              }`}
-              onClick={closeMenu}
-            >
-              FAQ
-            </Link>
-          </nav>
-
-          <div className="flex flex-col gap-3">{renderMobileAuthActions()}</div>
-        </div>
-      )}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </header>
   );
 }

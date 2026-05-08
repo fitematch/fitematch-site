@@ -1,8 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { FaBuilding, FaUser } from 'react-icons/fa';
-import { Button } from '@/components/ui/button';
+import { Building2, UserRound } from 'lucide-react';
 import { FaqItem } from './faq-item';
 
 const candidateFaq = [
@@ -31,8 +30,7 @@ const candidateFaq = [
 const recruiterFaq = [
   {
     question: 'Como criar uma conta de recrutador?',
-    answer:
-      'No cadastro, selecione o perfil de recrutador e preencha seus dados básicos.',
+    answer: 'No cadastro, selecione o perfil de recrutador e preencha seus dados básicos.',
   },
   {
     question: 'Como cadastrar minha empresa?',
@@ -52,40 +50,47 @@ const recruiterFaq = [
 ];
 
 export function FaqTabs() {
-  const [activeTab, setActiveTab] = useState<'candidate' | 'recruiter'>(
-    'candidate',
-  );
+  const [activeTab, setActiveTab] = useState<'candidate' | 'recruiter'>('candidate');
 
   const items = activeTab === 'candidate' ? candidateFaq : recruiterFaq;
 
   return (
     <div>
-      <div className="mb-8 flex gap-3">
-        <Button
+      <div className="mb-8 inline-flex rounded-2xl border border-zinc-800 bg-zinc-950/90 p-1 backdrop-blur">
+        <button
           type="button"
-          color={activeTab === 'candidate' ? 'faqCandidate' : 'ghost'}
-          icon={<FaUser />}
           onClick={() => setActiveTab('candidate')}
+          className={`inline-flex items-center gap-2 rounded-xl px-4 py-3 text-sm font-medium transition-all duration-300 ${
+            activeTab === 'candidate'
+              ? 'bg-lime-500/10 text-lime-300'
+              : 'text-zinc-400 hover:text-zinc-100'
+          }`}
         >
+          <UserRound className="h-4 w-4" />
           Candidatos
-        </Button>
+        </button>
 
-        <Button
+        <button
           type="button"
-          color={activeTab === 'recruiter' ? 'faqRecruiter' : 'ghost'}
-          icon={<FaBuilding />}
           onClick={() => setActiveTab('recruiter')}
+          className={`inline-flex items-center gap-2 rounded-xl px-4 py-3 text-sm font-medium transition-all duration-300 ${
+            activeTab === 'recruiter'
+              ? 'bg-lime-500/10 text-lime-300'
+              : 'text-zinc-400 hover:text-zinc-100'
+          }`}
         >
+          <Building2 className="h-4 w-4" />
           Recrutadores
-        </Button>
+        </button>
       </div>
 
       <div className="space-y-4">
-        {items.map((item) => (
+        {items.map((item, index) => (
           <FaqItem
             key={item.question}
             question={item.question}
             answer={item.answer}
+            index={index}
           />
         ))}
       </div>

@@ -84,7 +84,7 @@ export function RecruiterCompanyForm() {
   } = useAddressByZipCode();
   const labelClassName = 'text-gray-300';
   const fieldClassName =
-    'rounded-xl border border-gray-500 bg-black text-gray-300 placeholder:text-gray-500';
+    'rounded-xl border border-zinc-800 bg-zinc-950 text-zinc-200 placeholder:text-zinc-500';
 
   const {
     register,
@@ -136,7 +136,7 @@ export function RecruiterCompanyForm() {
         }
       }
     },
-    [reset, showError]
+    [reset, showError],
   );
 
   useEffect(() => {
@@ -199,7 +199,7 @@ export function RecruiterCompanyForm() {
       showError(
         hasCompany
           ? 'Não foi possível atualizar a empresa.'
-          : 'Não foi possível cadastrar a empresa.'
+          : 'Não foi possível cadastrar a empresa.',
       );
     }
   }
@@ -212,13 +212,11 @@ export function RecruiterCompanyForm() {
 
   const zipCodeField = register('zipCode', {
     required: 'Informe o CEP.',
-    validate: (value) =>
-      value.replace(/\D/g, '').length === 8 || 'Informe um CEP válido.',
+    validate: (value) => value.replace(/\D/g, '').length === 8 || 'Informe um CEP válido.',
   });
   const cnpjField = register('cnpj', {
     required: 'Informe o CNPJ.',
-    validate: (value) =>
-      value.replace(/\D/g, '').length === 14 || 'Informe um CNPJ válido.',
+    validate: (value) => value.replace(/\D/g, '').length === 14 || 'Informe um CNPJ válido.',
   });
 
   async function handleCnpjLookup(cnpj?: string) {
@@ -228,16 +226,16 @@ export function RecruiterCompanyForm() {
       return;
     }
 
-      setValue('legalName', result.legalName, {
-        shouldDirty: true,
-        shouldTouch: true,
-        shouldValidate: true,
-      });
-      setValue('tradeName', result.tradeName, {
-        shouldDirty: true,
-        shouldTouch: true,
-        shouldValidate: true,
-      });
+    setValue('legalName', result.legalName, {
+      shouldDirty: true,
+      shouldTouch: true,
+      shouldValidate: true,
+    });
+    setValue('tradeName', result.tradeName, {
+      shouldDirty: true,
+      shouldTouch: true,
+      shouldValidate: true,
+    });
   }
 
   async function handleZipCodeLookup(zipCode?: string) {
@@ -247,31 +245,31 @@ export function RecruiterCompanyForm() {
       return;
     }
 
-      setValue('street', result.street, {
-        shouldDirty: true,
-        shouldTouch: true,
-        shouldValidate: true,
-      });
-      setValue('neighborhood', result.neighborhood, {
-        shouldDirty: true,
-        shouldTouch: true,
-        shouldValidate: true,
-      });
-      setValue('city', result.city, {
-        shouldDirty: true,
-        shouldTouch: true,
-        shouldValidate: true,
-      });
-      setValue('state', result.state, {
-        shouldDirty: true,
-        shouldTouch: true,
-        shouldValidate: true,
-      });
+    setValue('street', result.street, {
+      shouldDirty: true,
+      shouldTouch: true,
+      shouldValidate: true,
+    });
+    setValue('neighborhood', result.neighborhood, {
+      shouldDirty: true,
+      shouldTouch: true,
+      shouldValidate: true,
+    });
+    setValue('city', result.city, {
+      shouldDirty: true,
+      shouldTouch: true,
+      shouldValidate: true,
+    });
+    setValue('state', result.state, {
+      shouldDirty: true,
+      shouldTouch: true,
+      shouldValidate: true,
+    });
   }
 
   if (isLoadingCompany) {
     return (
-      <div className="rounded-2xl border border-gray-500 bg-black p-6 text-gray-300">
+      <div className="rounded-2xl border border-zinc-800 bg-zinc-950/90 p-6 text-zinc-400 backdrop-blur">
         Carregando dados da empresa...
       </div>
     );
@@ -280,18 +278,16 @@ export function RecruiterCompanyForm() {
   return (
     <form
       onSubmit={handleSubmit(onSubmit, onInvalidSubmit)}
-      className="rounded-2xl border border-gray-500 bg-black p-6"
+      className="rounded-2xl border border-zinc-800 bg-zinc-950/90 p-6 shadow-[0_18px_60px_rgba(0,0,0,0.28)] backdrop-blur"
     >
-      <div className="mb-6 flex items-center gap-3 text-gray-100">
+      <div className="mb-6 flex items-center gap-3 text-zinc-100">
         <FaBuilding />
         <h2 className="text-xl font-semibold uppercase">Dados da empresa</h2>
       </div>
 
       <div className="space-y-4">
-        <fieldset className="rounded-2xl border border-gray-500 p-5">
-          <legend className="px-2 text-sm font-semibold uppercase text-gray-100">
-            Empresa
-          </legend>
+        <fieldset className="rounded-2xl border border-zinc-800 bg-black/30 p-5">
+          <legend className="px-2 text-sm font-semibold uppercase text-zinc-100">Empresa</legend>
 
           <div className="grid gap-4">
             <div className="grid gap-4 md:grid-cols-2">
@@ -315,10 +311,7 @@ export function RecruiterCompanyForm() {
               </div>
               <div className="hidden md:block" />
             </div>
-            <input
-              type="hidden"
-              {...register('logoUrl')}
-            />
+            <input type="hidden" {...register('logoUrl')} />
 
             <div className="grid gap-4 md:grid-cols-2">
               <div>
@@ -348,13 +341,9 @@ export function RecruiterCompanyForm() {
               <div />
             </div>
 
-            {isCnpjLoading && (
-              <p className="text-sm text-gray-300">Consultando CNPJ...</p>
-            )}
+            {isCnpjLoading && <p className="text-sm text-zinc-400">Consultando CNPJ...</p>}
 
-            {cnpjError && (
-              <p className="text-sm text-red-100">{cnpjError}</p>
-            )}
+            {cnpjError && <p className="text-sm text-red-100">{cnpjError}</p>}
 
             <div className="grid gap-4 md:grid-cols-2">
               <div>
@@ -365,8 +354,7 @@ export function RecruiterCompanyForm() {
                   error={errors.tradeName?.message}
                   {...register('tradeName', {
                     required: 'Informe o nome fantasia.',
-                    validate: (value) =>
-                      value.trim().length > 0 || 'Informe o nome fantasia.',
+                    validate: (value) => value.trim().length > 0 || 'Informe o nome fantasia.',
                   })}
                 />
               </div>
@@ -379,8 +367,7 @@ export function RecruiterCompanyForm() {
                   error={errors.legalName?.message}
                   {...register('legalName', {
                     required: 'Informe a razão social.',
-                    validate: (value) =>
-                      value.trim().length > 0 || 'Informe a razão social.',
+                    validate: (value) => value.trim().length > 0 || 'Informe a razão social.',
                   })}
                 />
               </div>
@@ -388,18 +375,13 @@ export function RecruiterCompanyForm() {
           </div>
         </fieldset>
 
-        <fieldset className="rounded-2xl border border-gray-500 p-5">
-          <legend className="px-2 text-sm font-semibold uppercase text-gray-100">
-            Contato
-          </legend>
+        <fieldset className="rounded-2xl border border-zinc-800 bg-black/30 p-5">
+          <legend className="px-2 text-sm font-semibold uppercase text-zinc-100">Contato</legend>
 
           <div className="grid gap-4">
             <div className="grid gap-4 md:grid-cols-2">
               <div>
-                <input
-                  type="hidden"
-                  {...register('phoneCountry')}
-                />
+                <input type="hidden" {...register('phoneCountry')} />
                 <input
                   type="hidden"
                   {...register('phoneNumber', {
@@ -463,10 +445,8 @@ export function RecruiterCompanyForm() {
           </div>
         </fieldset>
 
-        <fieldset className="rounded-2xl border border-gray-500 p-5">
-          <legend className="px-2 text-sm font-semibold uppercase text-gray-100">
-            Endereço
-          </legend>
+        <fieldset className="rounded-2xl border border-zinc-800 bg-black/30 p-5">
+          <legend className="px-2 text-sm font-semibold uppercase text-zinc-100">Endereço</legend>
 
           <div className="grid gap-4">
             <div className="grid gap-4 md:grid-cols-2">
@@ -497,13 +477,9 @@ export function RecruiterCompanyForm() {
               <div />
             </div>
 
-            {isZipCodeLoading && (
-              <p className="text-sm text-gray-300">Consultando CEP...</p>
-            )}
+            {isZipCodeLoading && <p className="text-sm text-zinc-400">Consultando CEP...</p>}
 
-            {zipCodeError && (
-              <p className="text-sm text-red-100">{zipCodeError}</p>
-            )}
+            {zipCodeError && <p className="text-sm text-red-100">{zipCodeError}</p>}
 
             <div className="grid gap-4 md:grid-cols-2">
               <div>
@@ -514,8 +490,7 @@ export function RecruiterCompanyForm() {
                   error={errors.street?.message}
                   {...register('street', {
                     required: 'Informe a rua.',
-                    validate: (value) =>
-                      value.trim().length > 0 || 'Informe a rua.',
+                    validate: (value) => value.trim().length > 0 || 'Informe a rua.',
                   })}
                 />
               </div>
@@ -529,8 +504,7 @@ export function RecruiterCompanyForm() {
                     error={errors.number?.message}
                     {...register('number', {
                       required: 'Informe o número.',
-                      validate: (value) =>
-                        value.trim().length > 0 || 'Informe o número.',
+                      validate: (value) => value.trim().length > 0 || 'Informe o número.',
                     })}
                   />
                 </div>
@@ -555,8 +529,7 @@ export function RecruiterCompanyForm() {
                   error={errors.neighborhood?.message}
                   {...register('neighborhood', {
                     required: 'Informe o bairro.',
-                    validate: (value) =>
-                      value.trim().length > 0 || 'Informe o bairro.',
+                    validate: (value) => value.trim().length > 0 || 'Informe o bairro.',
                   })}
                 />
               </div>
@@ -570,8 +543,7 @@ export function RecruiterCompanyForm() {
                     error={errors.city?.message}
                     {...register('city', {
                       required: 'Informe a cidade.',
-                      validate: (value) =>
-                        value.trim().length > 0 || 'Informe a cidade.',
+                      validate: (value) => value.trim().length > 0 || 'Informe a cidade.',
                     })}
                   />
                 </div>
@@ -584,8 +556,7 @@ export function RecruiterCompanyForm() {
                     error={errors.state?.message}
                     {...register('state', {
                       required: 'Informe o estado.',
-                      validate: (value) =>
-                        value.trim().length > 0 || 'Informe o estado.',
+                      validate: (value) => value.trim().length > 0 || 'Informe o estado.',
                     })}
                   />
                 </div>
@@ -593,16 +564,10 @@ export function RecruiterCompanyForm() {
             </div>
           </div>
         </fieldset>
-
       </div>
 
       <div className="mt-6 flex justify-end">
-        <Button
-          type="submit"
-          variant="positive"
-          icon={<FaSave />}
-          disabled={isSubmitting}
-        >
+        <Button type="submit" variant="positive" icon={<FaSave />} disabled={isSubmitting}>
           {hasCompany ? 'Atualizar empresa' : 'Salvar empresa'}
         </Button>
       </div>

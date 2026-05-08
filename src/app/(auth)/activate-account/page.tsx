@@ -1,5 +1,4 @@
 import { Metadata } from 'next';
-import { THEME } from '@/constants/theme';
 import { ActivateAccountForm } from '@/components/auth/activate-account-form';
 
 export const metadata: Metadata = {
@@ -12,21 +11,16 @@ export const metadata: Metadata = {
 
 export default function ActivateAccountPage() {
   return (
-    <section
-      className={`flex min-h-screen items-center justify-center ${THEME.layout.background} px-4 py-20`}
-    >
-      <div className="w-full max-w-md">
-        <h1 className={`text-center text-3xl font-bold ${THEME.text.title}`}>
-          Ativar conta
-        </h1>
-
-        <p className={`mt-3 text-center text-sm ${THEME.text.subtitle}`}>
-          Informe seu e-mail e o código recebido para ativar sua conta.
-        </p>
-
-        <div className="mt-8">
-          <ActivateAccountForm />
+    <section className="relative flex min-h-screen items-center justify-center overflow-hidden bg-black px-4 py-20">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(34,197,94,0.12),transparent_28%),radial-gradient(circle_at_80%_20%,rgba(255,255,255,0.05),transparent_24%)]" />
+      <div className="relative w-full max-w-5xl">
+        <div className="mb-10 text-center">
+          <p className="text-sm font-medium uppercase tracking-[0.3em] text-lime-400">
+            Verificação
+          </p>
         </div>
+
+        <ActivateAccountForm />
       </div>
     </section>
   );

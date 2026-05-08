@@ -1,5 +1,4 @@
 import { Metadata } from 'next';
-import { THEME } from '@/constants/theme';
 import { SignInForm } from '@/components/auth/sign-in-form';
 
 export const metadata: Metadata = {
@@ -12,12 +11,12 @@ export const metadata: Metadata = {
 
 export default function SignInPage() {
   return (
-    <section className={`flex min-h-screen items-center justify-center ${THEME.layout.background} px-4`}>
-      <div className="w-full">
-        <h1 className={`mb-8 text-center text-3xl font-bold ${THEME.text.title}`}>
-          fitematch | LOGIN
-        </h1>
-
+    <section className="relative flex min-h-screen items-center justify-center overflow-hidden bg-black px-4 py-20">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(34,197,94,0.12),transparent_28%),radial-gradient(circle_at_80%_20%,rgba(255,255,255,0.05),transparent_24%)]" />
+      <div className="relative w-full max-w-5xl">
+        <div className="mb-10 text-center">
+          <p className="text-sm font-medium uppercase tracking-[0.3em] text-lime-400">login</p>
+        </div>
         <SignInForm />
       </div>
     </section>

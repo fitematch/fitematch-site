@@ -21,22 +21,16 @@ export function RecruiterPageHeader({
   breadcrumbs,
 }: RecruiterPageHeaderProps) {
   return (
-    <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+    <div className="mb-8 flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
       <div>
-        {breadcrumbs && breadcrumbs.length > 0 && (
-          <Breadcrumb items={breadcrumbs} />
-        )}
+        {breadcrumbs && breadcrumbs.length > 0 && <Breadcrumb items={breadcrumbs} />}
 
         <h1 className={TEXT_STYLES.pageTitle}>{title}</h1>
 
-        {description && (
-          <p className={`${TEXT_STYLES.pageSubtitle} max-w-2xl`}>
-            {description}
-          </p>
-        )}
+        {description && <p className={`${TEXT_STYLES.pageSubtitle} max-w-2xl`}>{description}</p>}
       </div>
 
-      {action && <div>{action}</div>}
+      {action && <div className="shrink-0">{action}</div>}
     </div>
   );
 }

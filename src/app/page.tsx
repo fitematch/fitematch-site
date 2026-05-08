@@ -1,15 +1,10 @@
 import { Metadata } from 'next';
-import { HeroSection } from '@/components/home/hero-section';
-import { FeaturesSection } from '@/components/home/features-section';
-import { CompaniesSection } from '@/components/home/companies-section';
-import { FeaturedJobsSection } from '@/components/home/featured-jobs-section';
 import { OrganizationJsonLd } from '@/components/seo/organization-json-ld';
-import {
-  DEFAULT_DESCRIPTION,
-  DEFAULT_OG_IMAGE,
-  DEFAULT_TITLE,
-  absoluteUrl,
-} from '@/constants/seo';
+import { DEFAULT_DESCRIPTION, DEFAULT_OG_IMAGE, DEFAULT_TITLE, absoluteUrl } from '@/constants/seo';
+import { HomeFeatures } from '@/features/home/components/features';
+import { FeaturedJobs } from '@/features/home/components/featured-jobs';
+import { HomeHero } from '@/features/home/components/hero';
+import { PartnerCompanies } from '@/features/home/components/partner-companies';
 
 export const metadata: Metadata = {
   title: {
@@ -37,10 +32,10 @@ export default function HomePage() {
   return (
     <>
       <OrganizationJsonLd />
-      <HeroSection />
-      <FeaturesSection />
-      <CompaniesSection />
-      <FeaturedJobsSection />
+      <HomeHero />
+      <HomeFeatures />
+      <PartnerCompanies />
+      <FeaturedJobs />
     </>
   );
 }

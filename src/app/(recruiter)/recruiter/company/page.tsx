@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import { RecruiterCompanyForm } from '@/components/recruiter/company/recruiter-company-form';
 import { RecruiterPageHeader } from '@/components/recruiter/recruiter-page-header';
 import { ROUTES } from '@/constants/routes';
-import { PAGE_STYLES } from '@/constants/styles';
+import { DashboardShell } from '@/features/recruiter-dashboard/components/dashboard-shell';
 
 export const metadata: Metadata = {
   title: 'Minha empresa',
@@ -14,19 +14,16 @@ export const metadata: Metadata = {
 
 export default function RecruiterCompanyPage() {
   return (
-    <section className={`${PAGE_STYLES.body} py-20`}>
-      <div className={PAGE_STYLES.container}>
+    <DashboardShell title="Minha empresa" subtitle="Configure os dados institucionais da operação">
+      <div className="mx-auto w-full max-w-7xl">
         <RecruiterPageHeader
-          breadcrumbs={[
-            { label: 'Home', href: ROUTES.HOME },
-            { label: 'Minha empresa' },
-          ]}
+          breadcrumbs={[{ label: 'Home', href: ROUTES.HOME }, { label: 'Minha empresa' }]}
           title="Minha empresa"
           description="Cadastre ou atualize a empresa responsável pelas vagas que você vai publicar na plataforma."
         />
 
         <RecruiterCompanyForm />
       </div>
-    </section>
+    </DashboardShell>
   );
 }
