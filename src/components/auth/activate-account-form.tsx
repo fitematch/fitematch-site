@@ -82,7 +82,7 @@ export function ActivateAccountForm() {
         variant="positive"
         icon={<FaCheckCircle />}
         disabled={isSubmitting}
-        className="mt-6 w-full rounded-2xl border border-zinc-800 bg-lime-500 py-3 text-white transition-all duration-300 hover:bg-lime-400"
+        className="mt-6 w-full rounded-2xl border border-lime-500/30 bg-lime-500/10 py-3 text-lime-300 transition-all duration-300 hover:border-lime-400/40 hover:bg-lime-500/14 hover:text-lime-200"
       >
         Ativar conta
       </Button>
