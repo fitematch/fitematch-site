@@ -26,7 +26,7 @@ export function HeroSection() {
           }
 
           50% {
-            transform: translateY(-26px);
+            transform: translateY(-16px);
           }
         }
       `}</style>
@@ -59,7 +59,7 @@ export function HeroSection() {
           </div>
         </div>
         <div className="hidden items-center justify-center lg:flex">
-          <div className="flex h-[420px] w-[420px] items-center justify-center rounded-full border border-gray-800 bg-gray-900/70 shadow-2xl shadow-gray-950/80">
+          <div className="flex h-[420px] w-[420px] items-center justify-center rounded-full border border-lime-300/20 bg-lime-950/20 shadow-2xl shadow-lime-950/20">
             <svg viewBox="0 0 420 420" className="h-[360px] w-[360px]" aria-hidden="true">
               <defs>
                 <radialGradient id="heroCircleGlow" cx="50%" cy="45%" r="65%">
@@ -139,20 +139,20 @@ export function HeroSection() {
                 cy="210"
                 r="148"
                 fill="none"
-                stroke="#A3E635"
-                strokeOpacity="0.16"
-                strokeWidth="20"
+                stroke="#F7FEE7"
+                strokeOpacity="0.56"
+                strokeWidth="14"
                 filter="url(#heroLimeGlow)"
               />
 
-              <g transform="translate(210 210)">
+              <g transform="translate(215 226)">
                 <path
                   d="M0 84c-10-8-18-15-25-21-42-36-69-58-69-96 0-28 21-49 48-49 16 0 32 8 46 23 14-15 30-23 46-23 27 0 48 21 48 49 0 38-27 60-69 96-7 6-15 13-25 21Z"
                   fill="url(#heroHeartFill)"
                   stroke="#C7F51D"
                   strokeWidth="4"
                   filter="url(#heroHeartGlow)"
-                  transform="translate(-52 -66) scale(1.03)"
+                  transform="translate(-5 -10) scale(1.03)"
                 />
 
                 <path
@@ -161,55 +161,105 @@ export function HeroSection() {
                   stroke="url(#heroHeartInnerStroke)"
                   strokeWidth="1.6"
                   strokeOpacity="0.9"
-                  transform="translate(-52 -66) scale(0.93)"
+                  transform="translate(-5 -10) scale(0.93)"
                 />
 
-                <g className="hero-dumbbell-bench" transform="rotate(-28)">
-                  <rect
-                    x="-86"
-                    y="-9"
-                    width="172"
-                    height="18"
-                    rx="9"
-                    fill="url(#heroDumbbellBar)"
-                    stroke="#84CC16"
-                    strokeOpacity="0.65"
-                    strokeWidth="1.5"
-                  />
-                  <rect
-                    x="-118"
-                    y="-26"
-                    width="18"
-                    height="52"
-                    rx="6"
-                    fill="url(#heroDumbbellPlate)"
-                  />
-                  <rect x="-96" y="-34" width="12" height="68" rx="5" fill="#84CC16" />
-                  <rect
-                    x="-74"
-                    y="-26"
-                    width="18"
-                    height="52"
-                    rx="6"
-                    fill="url(#heroDumbbellPlate)"
-                  />
-                  <rect
-                    x="56"
-                    y="-26"
-                    width="18"
-                    height="52"
-                    rx="6"
-                    fill="url(#heroDumbbellPlate)"
-                  />
-                  <rect x="84" y="-34" width="12" height="68" rx="5" fill="#84CC16" />
-                  <rect
-                    x="100"
-                    y="-26"
-                    width="18"
-                    height="52"
-                    rx="6"
-                    fill="url(#heroDumbbellPlate)"
-                  />
+                <g className="hero-dumbbell-bench" transform="translate(0 12)">
+                  <g transform="translate(-78 34) rotate(-28)">
+                    <rect
+                      x="-43"
+                      y="-6"
+                      width="86"
+                      height="12"
+                      rx="6"
+                      fill="url(#heroDumbbellBar)"
+                      stroke="#84CC16"
+                      strokeOpacity="0.65"
+                      strokeWidth="1.25"
+                    />
+                    <rect
+                      x="-60"
+                      y="-18"
+                      width="12"
+                      height="36"
+                      rx="4"
+                      fill="url(#heroDumbbellPlate)"
+                    />
+                    <rect x="-46" y="-24" width="8" height="48" rx="4" fill="#84CC16" />
+                    <rect
+                      x="-34"
+                      y="-18"
+                      width="12"
+                      height="36"
+                      rx="4"
+                      fill="url(#heroDumbbellPlate)"
+                    />
+                    <rect
+                      x="22"
+                      y="-18"
+                      width="12"
+                      height="36"
+                      rx="4"
+                      fill="url(#heroDumbbellPlate)"
+                    />
+                    <rect x="38" y="-24" width="8" height="48" rx="4" fill="#84CC16" />
+                    <rect
+                      x="48"
+                      y="-18"
+                      width="12"
+                      height="36"
+                      rx="4"
+                      fill="url(#heroDumbbellPlate)"
+                    />
+                  </g>
+
+                  <g transform="translate(78 34) rotate(28)">
+                    <rect
+                      x="-43"
+                      y="-6"
+                      width="86"
+                      height="12"
+                      rx="6"
+                      fill="url(#heroDumbbellBar)"
+                      stroke="#84CC16"
+                      strokeOpacity="0.65"
+                      strokeWidth="1.25"
+                    />
+                    <rect
+                      x="-60"
+                      y="-18"
+                      width="12"
+                      height="36"
+                      rx="4"
+                      fill="url(#heroDumbbellPlate)"
+                    />
+                    <rect x="-46" y="-24" width="8" height="48" rx="4" fill="#84CC16" />
+                    <rect
+                      x="-34"
+                      y="-18"
+                      width="12"
+                      height="36"
+                      rx="4"
+                      fill="url(#heroDumbbellPlate)"
+                    />
+                    <rect
+                      x="22"
+                      y="-18"
+                      width="12"
+                      height="36"
+                      rx="4"
+                      fill="url(#heroDumbbellPlate)"
+                    />
+                    <rect x="38" y="-24" width="8" height="48" rx="4" fill="#84CC16" />
+                    <rect
+                      x="48"
+                      y="-18"
+                      width="12"
+                      height="36"
+                      rx="4"
+                      fill="url(#heroDumbbellPlate)"
+                    />
+                  </g>
                 </g>
               </g>
             </svg>
