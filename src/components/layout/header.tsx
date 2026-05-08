@@ -2,12 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import {
-  FaSignInAlt,
-  FaSignOutAlt,
-  FaUserCircle,
-  FaUserPlus,
-} from 'react-icons/fa';
+import { FaSignInAlt, FaSignOutAlt, FaUserCircle, FaUserPlus } from 'react-icons/fa';
 import { FiMenu, FiX } from 'react-icons/fi';
 import { useState } from 'react';
 import { ROUTES } from '@/constants/routes';
@@ -155,15 +150,18 @@ export function Header() {
           <div className="flex min-w-0 items-center gap-6">
             <Link
               href={ROUTES.HOME}
-              className={`flex-shrink-0 text-2xl font-bold lowercase ${THEME.layout.header.logo}`}
+              className="flex-shrink-0 rounded-sm leading-none transition duration-200 hover:opacity-90 hover:brightness-110"
             >
-              fitematch
+              <div className="font-sans text-[1.35rem] font-extrabold lowercase tracking-[-0.04em] text-white sm:text-[1.5rem]">
+                <span className="text-white">fite</span>
+                <span className="text-lime-400">match</span>
+              </div>
             </Link>
 
             <nav className="hidden items-center gap-6 text-sm font-medium text-gray-300 md:flex">
               <Link
                 href={ROUTES.JOBS}
-                className={`transition-colors hover:text-white ${
+                className={`transition-colors duration-200 ${
                   pathname.startsWith(ROUTES.JOBS)
                     ? THEME.navigation.linkActive
                     : THEME.navigation.link
@@ -175,7 +173,7 @@ export function Header() {
               {isCandidate && (
                 <Link
                   href={ROUTES.APPLICATIONS}
-                  className={`transition-colors hover:text-white ${
+                  className={`transition-colors duration-200 ${
                     pathname.startsWith(ROUTES.APPLICATIONS)
                       ? THEME.navigation.linkActive
                       : THEME.navigation.link
@@ -188,7 +186,7 @@ export function Header() {
               {isRecruiter && (
                 <Link
                   href={ROUTES.RECRUITER_COMPANY}
-                  className={`transition-colors hover:text-white ${
+                  className={`transition-colors duration-200 ${
                     pathname.startsWith(ROUTES.RECRUITER_COMPANY)
                       ? THEME.navigation.linkActive
                       : THEME.navigation.link
@@ -201,7 +199,7 @@ export function Header() {
               {isRecruiter && (
                 <Link
                   href={ROUTES.RECRUITER_JOBS}
-                  className={`transition-colors hover:text-white ${
+                  className={`transition-colors duration-200 ${
                     pathname.startsWith(ROUTES.RECRUITER_JOBS)
                       ? THEME.navigation.linkActive
                       : THEME.navigation.link
@@ -214,7 +212,7 @@ export function Header() {
               {isAuthenticated && (
                 <Link
                   href={ROUTES.SESSIONS}
-                  className={`transition-colors hover:text-white ${
+                  className={`transition-colors duration-200 ${
                     pathname.startsWith(ROUTES.SESSIONS)
                       ? THEME.navigation.linkActive
                       : THEME.navigation.link
@@ -226,7 +224,7 @@ export function Header() {
 
               <Link
                 href={ROUTES.FAQ}
-                className={`transition-colors hover:text-white ${
+                className={`transition-colors duration-200 ${
                   pathname.startsWith(ROUTES.FAQ)
                     ? THEME.navigation.linkActive
                     : THEME.navigation.link
@@ -242,9 +240,7 @@ export function Header() {
               <LanguageDropdown />
             </div>
 
-            <div className="hidden items-center gap-2 md:flex">
-              {renderDesktopAuthActions()}
-            </div>
+            <div className="hidden items-center gap-2 md:flex">{renderDesktopAuthActions()}</div>
 
             <button
               type="button"
@@ -253,11 +249,7 @@ export function Header() {
               aria-label={menuOpen ? 'Fechar menu' : 'Abrir menu'}
               aria-expanded={menuOpen}
             >
-              {menuOpen ? (
-                <FiX className="text-xl" />
-              ) : (
-                <FiMenu className="text-xl" />
-              )}
+              {menuOpen ? <FiX className="text-xl" /> : <FiMenu className="text-xl" />}
             </button>
           </div>
         </div>
@@ -296,9 +288,7 @@ export function Header() {
               <Link
                 href={ROUTES.RECRUITER_COMPANY}
                 className={`flex w-full items-center justify-center rounded border border-gray-700 bg-black px-3 py-2 text-sm font-medium text-gray-300 transition-colors hover:bg-gray-700 hover:text-white ${
-                  pathname.startsWith(ROUTES.RECRUITER_COMPANY)
-                    ? 'font-bold'
-                    : ''
+                  pathname.startsWith(ROUTES.RECRUITER_COMPANY) ? 'font-bold' : ''
                 }`}
                 onClick={closeMenu}
               >
@@ -310,9 +300,7 @@ export function Header() {
               <Link
                 href={ROUTES.RECRUITER_JOBS}
                 className={`flex w-full items-center justify-center rounded border border-gray-700 bg-black px-3 py-2 text-sm font-medium text-gray-300 transition-colors hover:bg-gray-700 hover:text-white ${
-                  pathname.startsWith(ROUTES.RECRUITER_JOBS)
-                    ? 'font-bold'
-                    : ''
+                  pathname.startsWith(ROUTES.RECRUITER_JOBS) ? 'font-bold' : ''
                 }`}
                 onClick={closeMenu}
               >
@@ -343,9 +331,7 @@ export function Header() {
             </Link>
           </nav>
 
-          <div className="flex flex-col gap-3">
-            {renderMobileAuthActions()}
-          </div>
+          <div className="flex flex-col gap-3">{renderMobileAuthActions()}</div>
         </div>
       )}
     </header>

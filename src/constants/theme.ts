@@ -9,8 +9,8 @@ export const THEME = {
     },
   },
   navigation: {
-    link: 'text-gray-100 hover:text-gray-300',
-    linkActive: 'text-gray-500 hover:text-gray-300',
+    link: 'text-zinc-100 hover:text-sky-300',
+    linkActive: 'text-lime-400 hover:text-sky-300',
     breadcrumb: 'text-gray-500 hover:text-gray-300',
     breadcrumbIcon: 'text-gray-700',
     breadcrumbActive: 'text-gray-100',
@@ -23,8 +23,7 @@ export const THEME = {
   },
 
   form: {
-    input:
-      'border-gray-700 bg-black text-white placeholder:text-gray-300, page',
+    input: 'border-gray-700 bg-black text-white placeholder:text-gray-300, page',
     error: 'text-red-100',
   },
 
@@ -47,22 +46,16 @@ export const THEME = {
   },
 
   flash: {
-    success:
-      'border border-green-100 bg-green-900 text-green-100',
-    error:
-      'border border-red-100 bg-red-900 text-red-100',
+    success: 'border border-green-100 bg-green-900 text-green-100',
+    error: 'border border-red-100 bg-red-900 text-red-100',
   },
   button: {
     green:
       'border border-green-500 text-green-500 hover:border-green-500 hover:bg-green-800 hover:text-green-100',
-    red:
-      'border border-red-500 text-red-500 hover:border-red-500 hover:bg-red-800 hover:text-red-100',
-    blue:
-      'border border-blue-500 text-blue-500 hover:border-blue-500 hover:bg-blue-800 hover:text-blue-100',
-    gray:
-      'border border-gray-500 text-gray-500 hover:border-gray-500 hover:bg-gray-800 hover:text-gray-100',
-    ghost:
-      'text-gray-700 hover:text-gray-500',
+    red: 'border border-red-500 text-red-500 hover:border-red-500 hover:bg-red-800 hover:text-red-100',
+    blue: 'border border-blue-500 text-blue-500 hover:border-blue-500 hover:bg-blue-800 hover:text-blue-100',
+    gray: 'border border-gray-500 text-gray-500 hover:border-gray-500 hover:bg-gray-800 hover:text-gray-100',
+    ghost: 'text-gray-700 hover:text-gray-500',
   },
   card: {
     featureBox: 'rounded-xl border p-6 bg-gray-100',
@@ -76,14 +69,14 @@ export const THEME = {
     jobBorder: 'border-gray-100',
     jobTitle: 'text-gray-700 hover:text-gray-500',
     jobText: 'text-gray-500 hover:text-gray-700',
-    jobBackground: 'bg-gray-100', 
+    jobBackground: 'bg-gray-100',
 
     jobDetailBox: 'rounded-xl border p-6 bg-gray-100',
     jobDetailBorder: 'border-gray-100',
     jobDetailTitle: 'text-gray-700',
     jobDetailText: 'text-gray-500',
     jobDetailBackground: 'bg-gray-100',
-  
+
     profileCard: 'rounded-xl p-6 bg-black',
     profileCardBorder: 'border border-gray-100',
     profileCardTitle: 'text-gray-100 hover:text-gray-500',
@@ -102,7 +95,7 @@ export const THEME = {
       card: 'rounded-xl p-6 bg-black',
       border: 'border border-gray-100',
       background: 'bg-gray-100',
-    }
+    },
   },
   faq: {
     sectionTitle: 'text-gray-200',
@@ -121,7 +114,8 @@ export const THEME = {
     profileCardTitle: 'text-2xl font-bold text-red-900 uppercase',
     profileCardText: 'text-gray-700 mb-4',
     profileCardFormLabel: 'block text-sm font-medium text-gray-700 mb-1',
-    profileCardFormInput: 'border border-gray-300 rounded-md px-3 py-2 w-full text-gray-900 bg-white focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50',
+    profileCardFormInput:
+      'border border-gray-300 rounded-md px-3 py-2 w-full text-gray-900 bg-white focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50',
   },
   footer: {
     title: 'text-gray-100',
