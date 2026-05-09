@@ -20,7 +20,6 @@ export function JobGrid({ search }: JobGridProps) {
 
   const [page, setPage] = useState(1);
 
-  // Responsividade
   let itemsPerPage = 6;
   let gridCols = 'md:grid-cols-2 lg:grid-cols-3';
 
@@ -75,7 +74,6 @@ export function JobGrid({ search }: JobGridProps) {
     });
   }, [jobs, search]);
 
-  // Paginação segura (sem setState no render/effect)
   const totalPages = Math.ceil(filteredJobs.length / itemsPerPage);
   const safePage = totalPages > 0 ? Math.min(page, totalPages) : 1;
 
@@ -87,24 +85,25 @@ export function JobGrid({ search }: JobGridProps) {
     setPage(nextPage);
   }
 
-  if (isLoading) {
-    return (
-      <div className={`grid gap-6 ${gridCols}`}>
-        {Array.from({ length: itemsPerPage }).map((_, index) => (
-          <Skeleton key={index} className="h-48" />
-        ))}
-      </div>
-    );
-  }
-
   if (error) {
     return <Alert type="error" message={error} />;
   }
 
   return (
-    <>
-      {filteredJobs.length === 0 ? (
-        <EmptyState message="Nenhuma vaga encontrada." />
+    <div className="space-y-6">
+      {isLoading ? (
+        <div className={`grid gap-6 ${gridCols}`}>
+          {Array.from({ length: itemsPerPage }).map((_, index) => (
+            <Skeleton
+              key={index}
+              className="h-[32rem] rounded-2xl border border-zinc-800 bg-zinc-950/80"
+            />
+          ))}
+        </div>
+      ) : filteredJobs.length === 0 ? (
+        <div className="rounded-2xl border border-zinc-800 bg-zinc-950/80 p-6 backdrop-blur">
+          <EmptyState message="Nenhuma vaga encontrada." />
+        </div>
       ) : (
         <>
           <div className={`grid gap-6 ${gridCols}`}>
@@ -120,6 +119,6 @@ export function JobGrid({ search }: JobGridProps) {
           />
         </>
       )}
-    </>
+    </div>
   );
 }

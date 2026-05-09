@@ -22,14 +22,14 @@ describe('RecruiterJobsList', () => {
       <>
         <RecruiterJobsList />
         <FlashMessageProbe />
-      </>
+      </>,
     );
   }
 
   it('loading', () => {
-    renderList();
+    const { container } = renderList();
 
-    expect(screen.getByText('Carregando vagas...')).toBeInTheDocument();
+    expect(container.querySelector('.animate-pulse')).toBeInTheDocument();
   });
 
   it('erro', async () => {
@@ -37,20 +37,21 @@ describe('RecruiterJobsList', () => {
 
     renderList();
 
-    expect(
-      await screen.findByText('Não foi possível carregar suas vagas.')
-    ).toBeInTheDocument();
+    expect(await screen.findByText('Não foi possível carregar suas vagas.')).toBeInTheDocument();
   });
 
   it('GET /job/me e lista vagas', async () => {
-    renderList();
+    const { container } = renderList();
 
-    expect(await screen.findByText('Personal Trainer')).toBeInTheDocument();
-    expect(screen.getByText('Atendimento de alunos e prescrição de treinos.')).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /Editar/i })).toHaveAttribute(
-      'href',
-      '/recruiter/jobs/job-1/edit'
+    expect(await screen.findAllByText('Personal Trainer')).not.toHaveLength(0);
+    expect(screen.getAllByText('Atendimento de alunos e prescrição de treinos.')).not.toHaveLength(
+      0,
     );
+    expect(screen.getAllByRole('link', { name: /Editar/i })[0]).toHaveAttribute(
+      'href',
+      '/recruiter/jobs/job-1/edit',
+    );
+    expect(container.querySelector('article')).toBeInTheDocument();
   });
 
   it('delete vaga', async () => {
@@ -58,12 +59,12 @@ describe('RecruiterJobsList', () => {
 
     renderList();
 
-    const articleTitle = await screen.findByText('Personal Trainer');
-    const article = articleTitle.closest('article');
+    await screen.findAllByText('Personal Trainer');
+    const article = document.querySelector('article');
 
-    await user.click(
-      within(article as HTMLElement).getByRole('button', { name: /Remover/i })
-    );
+    expect(article).not.toBeNull();
+
+    await user.click(within(article as HTMLElement).getByRole('button', { name: /Remover/i }));
     await user.click(screen.getByRole('button', { name: /Apagar Vaga/i }));
 
     await waitFor(() => {
@@ -71,8 +72,6 @@ describe('RecruiterJobsList', () => {
     });
 
     expect(await screen.findByText('Vaga removida com sucesso.')).toBeInTheDocument();
-    expect(
-      screen.getByText('Você ainda não publicou nenhuma vaga.')
-    ).toBeInTheDocument();
+    expect(screen.getByText('Você ainda não publicou nenhuma vaga.')).toBeInTheDocument();
   });
 });

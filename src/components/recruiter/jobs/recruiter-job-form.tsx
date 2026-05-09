@@ -3,14 +3,26 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { FieldErrors, useForm, useWatch } from 'react-hook-form';
-import { FaBus, FaPlus, FaSave, FaTrash } from 'react-icons/fa';
-import { CiCircleMinus, CiCirclePlus } from 'react-icons/ci';
-import { GiHealthNormal } from 'react-icons/gi';
-import { FaRegSquare, FaRegSquareCheck } from 'react-icons/fa6';
-import { LuSalad } from 'react-icons/lu';
-import { MdHealthAndSafety, MdKeyboardDoubleArrowDown } from 'react-icons/md';
+import { motion } from 'framer-motion';
+import {
+  BriefcaseBusiness,
+  Bus,
+  CheckSquare,
+  ChevronDown,
+  HeartPulse,
+  Languages,
+  MinusCircle,
+  Plus,
+  PlusCircle,
+  Save,
+  ShieldPlus,
+  Soup,
+  Square,
+  Trash2,
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { FileUpload } from '@/components/ui/file-upload';
+import { Skeleton } from '@/components/ui/skeleton';
 import { ROUTES } from '@/constants/routes';
 import { useAuth } from '@/hooks/use-auth';
 import { useFlashMessage } from '@/contexts/flash-message-context';
@@ -106,15 +118,11 @@ const languageLevelOptions = [
 ];
 
 function getLanguageLabel(value: LanguagesEnum) {
-  return (
-    languageOptions.find((option) => option.value === value)?.label || value
-  );
+  return languageOptions.find((option) => option.value === value)?.label || value;
 }
 
 function getLanguageLevelLabel(value: LanguagesLevelEnum) {
-  return (
-    languageLevelOptions.find((option) => option.value === value)?.label || value
-  );
+  return languageLevelOptions.find((option) => option.value === value)?.label || value;
 }
 
 function formatCurrencyInput(value?: number) {
@@ -153,15 +161,15 @@ function NumberStepper({
 }) {
   return (
     <div>
-      <label className="text-sm text-gray-300">{label}</label>
+      <label className="text-sm text-zinc-300">{label}</label>
       <div className="relative mt-2">
         <button
           type="button"
           onClick={() => onChange(Math.max(min, (value ?? min) - 1))}
-          className="absolute left-2 top-1/2 inline-flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-md bg-gray-100 text-black transition hover:bg-gray-300"
+          className="absolute left-2 top-1/2 inline-flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-xl border border-zinc-800 bg-zinc-950 text-zinc-300 transition-all duration-300 hover:border-lime-500/20 hover:bg-white/[0.03]"
           aria-label={`Diminuir ${label}`}
         >
-          <CiCircleMinus className="h-6 w-6" />
+          <MinusCircle className="h-4 w-4" />
         </button>
         <input
           type="text"
@@ -171,15 +179,15 @@ function NumberStepper({
             const nextValue = Number(event.target.value.replace(/\D/g, ''));
             onChange(Number.isNaN(nextValue) ? min : Math.max(min, nextValue));
           }}
-          className="mt-0 h-[50px] w-full rounded-xl border border-gray-300 bg-black px-12 py-3 text-center text-gray-300 outline-none placeholder:text-gray-300"
+          className="mt-0 h-[50px] w-full rounded-xl border border-zinc-800 bg-zinc-950 px-12 py-3 text-center text-zinc-200 outline-none placeholder:text-zinc-500"
         />
         <button
           type="button"
           onClick={() => onChange((value ?? min) + 1)}
-          className="absolute right-2 top-1/2 inline-flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-md bg-gray-100 text-black transition hover:bg-gray-300"
+          className="absolute right-2 top-1/2 inline-flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-xl border border-zinc-800 bg-zinc-950 text-zinc-300 transition-all duration-300 hover:border-lime-500/20 hover:bg-white/[0.03]"
           aria-label={`Aumentar ${label}`}
         >
-          <CiCirclePlus className="h-6 w-6" />
+          <PlusCircle className="h-4 w-4" />
         </button>
       </div>
       {error && <p className="mt-1 text-sm text-red-100">{error}</p>}
@@ -201,7 +209,7 @@ function BenefitCheckbox({
   onChange: (checked: boolean) => void;
 }) {
   return (
-    <label className="flex cursor-pointer items-center gap-4 rounded-2xl border border-gray-500 bg-black/60 px-4 py-4 text-gray-300 transition hover:border-gray-300 hover:bg-white/5">
+    <label className="flex cursor-pointer items-center gap-4 rounded-2xl border border-zinc-800 bg-zinc-950/80 px-4 py-4 text-zinc-300 backdrop-blur transition-all duration-300 hover:border-lime-500/20 hover:bg-zinc-950/90">
       <input
         type="checkbox"
         className="sr-only"
@@ -209,39 +217,31 @@ function BenefitCheckbox({
         onChange={(event) => onChange(event.target.checked)}
       />
       <div
-        className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border bg-gray-100 text-black transition ${
+        className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border transition-all duration-300 ${
           checked
-            ? 'border-green-500 bg-green-800 text-green-100'
-            : 'border-gray-500'
+            ? 'border-lime-500/20 bg-lime-500/10 text-lime-300'
+            : 'border-zinc-800 bg-black/40 text-zinc-400'
         }`}
       >
         {icon}
       </div>
       <div className="min-w-0 flex-1">
-        <p className="text-sm font-semibold text-gray-100">{label}</p>
-        <p className="mt-1 text-xs text-gray-400">{description}</p>
+        <p className="text-sm font-semibold text-zinc-100">{label}</p>
+        <p className="mt-1 text-xs text-zinc-500">{description}</p>
       </div>
-      <div className={`shrink-0 transition ${checked ? 'text-green-400' : 'text-gray-400'}`}>
-        {checked ? (
-          <FaRegSquareCheck className="h-5 w-5" />
-        ) : (
-          <FaRegSquare className="h-5 w-5" />
-        )}
+      <div className={`shrink-0 transition ${checked ? 'text-lime-400' : 'text-zinc-500'}`}>
+        {checked ? <CheckSquare className="h-5 w-5" /> : <Square className="h-5 w-5" />}
       </div>
     </label>
   );
 }
 
-export function RecruiterJobForm({
-  mode,
-  jobId,
-  initialValues,
-}: RecruiterJobFormProps) {
+export function RecruiterJobForm({ mode, jobId, initialValues }: RecruiterJobFormProps) {
   const router = useRouter();
   const { user } = useAuth();
   const { showSuccess, showError } = useFlashMessage();
   const [currentMode, setCurrentMode] = useState<'create' | 'edit'>(
-    jobId || initialValues ? 'edit' : mode
+    jobId || initialValues ? 'edit' : mode,
   );
   const [currentJobId, setCurrentJobId] = useState<string | undefined>(jobId);
   const [isLanguageModalOpen, setIsLanguageModalOpen] = useState(false);
@@ -255,18 +255,15 @@ export function RecruiterJobForm({
   });
   const [languagesError, setLanguagesError] = useState<string | null>(null);
   const [languages, setLanguages] = useState<LanguageRequirement[]>(
-    initialValues?.requirements?.languages || []
+    initialValues?.requirements?.languages || [],
   );
   const fieldClassName =
-    'mt-2 w-full rounded-xl border border-gray-300 bg-black px-4 py-3 text-gray-300 outline-none placeholder:text-gray-300';
-  const disabledFieldClassName =
-    `${fieldClassName} disabled:cursor-not-allowed disabled:opacity-100`;
+    'mt-2 w-full rounded-xl border border-zinc-800 bg-zinc-950 px-4 py-3 text-zinc-200 outline-none placeholder:text-zinc-500';
+  const disabledFieldClassName = `${fieldClassName} disabled:cursor-not-allowed disabled:opacity-100`;
   const hasCompany = Boolean(user?.recruiterProfile?.companyId);
   const companyId = user?.recruiterProfile?.companyId || '';
   const companyName =
-    user?.recruiterProfile?.tradeName ||
-    user?.recruiterProfile?.company?.tradeName ||
-    '';
+    user?.recruiterProfile?.tradeName || user?.recruiterProfile?.company?.tradeName || '';
 
   const {
     register,
@@ -287,6 +284,10 @@ export function RecruiterJobForm({
   const slotsValue = useWatch({
     control,
     name: 'slots',
+  });
+  const contractTypeValue = useWatch({
+    control,
+    name: 'contractType',
   });
   const minExperienceYearsValue = useWatch({
     control,
@@ -351,10 +352,9 @@ export function RecruiterJobForm({
     previousTitleRef.current = titleValue;
   }, [clearErrors, errors.slug?.type, titleValue]);
 
-  const slugValue =
-    !titleValue?.trim()
-      ? ''
-      : initialValues?.slug && currentMode === 'edit' && !titleValue
+  const slugValue = !titleValue?.trim()
+    ? ''
+    : initialValues?.slug && currentMode === 'edit' && !titleValue
       ? initialValues.slug
       : buildJobSlug([
           companyDetails?.tradeName || companyName,
@@ -381,7 +381,7 @@ export function RecruiterJobForm({
       setCurrentJobId(job._id);
       setCurrentMode('edit');
     },
-    [reset]
+    [reset],
   );
 
   const resetToCreateState = useCallback(() => {
@@ -392,17 +392,12 @@ export function RecruiterJobForm({
     setCurrentMode('create');
   }, [reset]);
 
-  const refreshJobFromMine = useCallback(
-    async (targetJobId?: string) => {
-      const jobs = await JobService.listMine();
-      const selectedJob = targetJobId
-        ? jobs.find((item) => item._id === targetJobId)
-        : undefined;
+  const refreshJobFromMine = useCallback(async (targetJobId?: string) => {
+    const jobs = await JobService.listMine();
+    const selectedJob = targetJobId ? jobs.find((item) => item._id === targetJobId) : undefined;
 
-      return selectedJob || jobs[0];
-    },
-    []
-  );
+    return selectedJob || jobs[0];
+  }, []);
 
   async function onSubmit(data: RecruiterJobFormValues) {
     if (!hasCompany) {
@@ -426,22 +421,18 @@ export function RecruiterJobForm({
       requirements: {
         educationLevel: data.educationLevel || undefined,
         minExperienceYears:
-          data.minExperienceYears !== undefined &&
-          !Number.isNaN(data.minExperienceYears)
+          data.minExperienceYears !== undefined && !Number.isNaN(data.minExperienceYears)
             ? Number(data.minExperienceYears)
             : undefined,
         maxExperienceYears:
-          data.maxExperienceYears !== undefined &&
-          !Number.isNaN(data.maxExperienceYears)
+          data.maxExperienceYears !== undefined && !Number.isNaN(data.maxExperienceYears)
             ? Number(data.maxExperienceYears)
             : undefined,
         languages: languages.length > 0 ? languages : undefined,
       },
       benefits: {
         salary:
-          data.salary !== undefined && !Number.isNaN(data.salary)
-            ? Number(data.salary)
-            : undefined,
+          data.salary !== undefined && !Number.isNaN(data.salary) ? Number(data.salary) : undefined,
         healthInsurance: data.healthInsurance,
         dentalInsurance: data.dentalInsurance,
         alimentationVoucher: data.alimentationVoucher,
@@ -460,8 +451,7 @@ export function RecruiterJobForm({
 
         if (refreshedJob) {
           hydrateFromJob(refreshedJob);
-          const refreshedJobId =
-            refreshedJob._id || (refreshedJob as { id?: string }).id;
+          const refreshedJobId = refreshedJob._id || (refreshedJob as { id?: string }).id;
 
           if (refreshedJobId) {
             router.push(ROUTES.RECRUITER_EDIT_JOB(refreshedJobId));
@@ -495,7 +485,7 @@ export function RecruiterJobForm({
       showError(
         currentMode === 'create'
           ? 'Não foi possível criar a vaga.'
-          : 'Não foi possível atualizar a vaga.'
+          : 'Não foi possível atualizar a vaga.',
       );
     }
   }
@@ -562,626 +552,716 @@ export function RecruiterJobForm({
     setLanguages((current) => current.filter((_, itemIndex) => itemIndex !== index));
   }
 
+  const summaryCards = [
+    {
+      label: 'Empresa',
+      value: companyDetails?.tradeName || companyName || 'Sem empresa',
+      helper: 'Publicação vinculada à operação ativa',
+      icon: <BriefcaseBusiness className="h-4 w-4" />,
+    },
+    {
+      label: 'Contrato',
+      value:
+        contractTypeOptions.find((option) => option.value === contractTypeValue)?.label ||
+        'Não definido',
+      helper: 'Modelo principal da contratação',
+      icon: <ShieldPlus className="h-4 w-4" />,
+    },
+    {
+      label: 'Vagas',
+      value: String(slotsValue || 1),
+      helper: 'Quantidade de posições abertas',
+      icon: <Plus className="h-4 w-4" />,
+    },
+    {
+      label: 'Idiomas',
+      value: `${languages.length}`,
+      helper: 'Requisitos linguísticos cadastrados',
+      icon: <Languages className="h-4 w-4" />,
+    },
+  ];
+
   return (
     <>
-      <form
-        onSubmit={handleSubmit(onSubmit, onInvalidSubmit)}
-        className="rounded-2xl border border-gray-500 bg-black p-6"
-      >
-        {!canPublishJob && !isLoadingCompanyDetails ? (
-          <div className="rounded-xl border border-red-100 bg-red-900 p-4 text-sm text-red-100">
-            Você precisa cadastrar sua empresa e esperar que ela seja aprovada pela plataforma antes de publicar vagas.
-          </div>
-        ) : (
-          <>
-
-        <div className="grid gap-4">
-          <div className="grid gap-4 md:grid-cols-2">
-            <div>
-              <label className="text-sm text-gray-300">Empresa</label>
-              <input
-                value={companyName}
-                disabled
-                className={disabledFieldClassName}
-              />
+      <div className="space-y-6">
+        {isLoadingCompanyDetails && (
+          <div className="space-y-6">
+            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+              {Array.from({ length: 4 }).map((_, index) => (
+                <Skeleton
+                  key={index}
+                  className="h-40 rounded-2xl border border-zinc-800 bg-zinc-950/80"
+                />
+              ))}
             </div>
-            <div>
-              <label className="text-sm text-gray-300">Tipo de contrato</label>
-              <div className="relative">
-                <select
-                  className={`${fieldClassName} appearance-none pr-12`}
-                  {...register('contractType', {
-                    required: 'Informe o tipo de contrato.',
-                  })}
-                >
-                  {contractTypeOptions.map((option) => (
-                    <option key={option.value} value={option.value}>
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
-                <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-gray-300">
-                  <MdKeyboardDoubleArrowDown className="h-5 w-5" />
-                </span>
+            <div className="rounded-2xl border border-zinc-800 bg-zinc-950/80 p-6 backdrop-blur">
+              <div className="space-y-5">
+                <Skeleton className="h-8 w-64 rounded-xl bg-black/50" />
+                <Skeleton className="h-28 rounded-2xl bg-black/50" />
+                <Skeleton className="h-28 rounded-2xl bg-black/50" />
+                <Skeleton className="h-28 rounded-2xl bg-black/50" />
               </div>
-              {errors.contractType && (
-                <p className="mt-1 text-sm text-red-100">
-                  {errors.contractType.message}
-                </p>
-              )}
             </div>
           </div>
+        )}
 
-          <div className="grid gap-4 md:grid-cols-2">
-            <div>
-              <FileUpload
-                label="Imagem da vaga"
-                accept="image/*"
-                value={coverUrlValue}
-                cropAspectRatio={20 / 7}
-                onUpload={async (file) => {
-                  const response = await UploadService.uploadJobCover(file);
-
-                  setValue('coverUrl', response.url, {
-                    shouldDirty: true,
-                    shouldTouch: true,
-                    shouldValidate: true,
-                  });
-
-                  return response.url;
-                }}
-              />
-              <input
-                type="hidden"
-                {...register('coverUrl', {
-                  required: 'Informe a imagem da vaga.',
-                })}
-              />
-              {errors.coverUrl && (
-                <p className="mt-1 text-sm text-red-100">
-                  {errors.coverUrl.message}
-                </p>
-              )}
-            </div>
-            <div className="hidden md:block" />
-          </div>
-
-          <div className="grid gap-4 md:grid-cols-2">
-            <div>
-              <label className="text-sm text-gray-300">Título</label>
-              <input
-                className={fieldClassName}
-                {...register('title', {
-                  required: 'Informe o título da vaga.',
-                })}
-              />
-              {errors.title && (
-                <p className="mt-1 text-sm text-red-100">{errors.title.message}</p>
-              )}
-            </div>
-          </div>
-
-          <div className="grid gap-4 md:grid-cols-2">
-            <div>
-              <label className="text-sm text-gray-300">Slug</label>
-              <div
-                className={`${disabledFieldClassName} flex min-h-[50px] items-center overflow-hidden break-all ${errors.slug ? 'border-red-100 text-red-100' : ''}`}
+        {!isLoadingCompanyDetails && (
+          <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+            {summaryCards.map((item, index) => (
+              <motion.div
+                key={item.label}
+                initial={{ opacity: 0, y: 18 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.32, delay: index * 0.04 }}
+                className="rounded-2xl border border-zinc-800 bg-zinc-950/80 p-6 backdrop-blur transition-all duration-300 hover:border-lime-500/20 hover:shadow-[0_0_0_1px_rgba(34,197,94,0.05),0_18px_60px_rgba(0,0,0,0.28)]"
               >
-                {slugPrefixPart ? (
-                  <>
-                    <span className={errors.slug ? 'text-red-100' : 'text-gray-300'}>
-                      {slugPrefixPart}
-                    </span>
-                    {slugTitlePart ? (
-                      <span className={errors.slug ? 'text-red-100' : 'text-green-400'}>
-                        {`-${slugTitlePart}`}
-                      </span>
-                    ) : null}
-                  </>
-                ) : (
-                  <span className="text-gray-500">Slug será gerado ao preencher o título</span>
-                )}
-              </div>
-              <input
-                type="hidden"
-                {...register('slug', {
-                  required: 'Slug não gerado.',
-                })}
-              />
-              {errors.slug && (
-                <p className="mt-1 text-sm text-red-100">{errors.slug.message}</p>
-              )}
-            </div>
-          </div>
-
-          <div className="grid gap-4 md:grid-cols-2">
-            <div className="md:col-span-2">
-              <label className="text-sm text-gray-300">Descrição</label>
-              <textarea
-                rows={5}
-                className={fieldClassName}
-                {...register('description', {
-                  required: 'Informe a descrição da vaga.',
-                })}
-              />
-              {errors.description && (
-                <p className="mt-1 text-sm text-red-100">
-                  {errors.description.message}
+                <div className="flex items-center justify-between">
+                  <div className="flex h-11 w-11 items-center justify-center rounded-2xl border border-lime-500/20 bg-lime-500/10 text-lime-400">
+                    {item.icon}
+                  </div>
+                  <span className="text-xs uppercase tracking-[0.22em] text-zinc-600">
+                    {item.label}
+                  </span>
+                </div>
+                <p className="mt-6 truncate text-2xl font-semibold tracking-[-0.04em] text-zinc-50">
+                  {item.value}
                 </p>
-              )}
+                <p className="mt-2 text-sm text-zinc-500">{item.helper}</p>
+              </motion.div>
+            ))}
+          </section>
+        )}
+
+        <form
+          onSubmit={handleSubmit(onSubmit, onInvalidSubmit)}
+          className="rounded-2xl border border-zinc-800 bg-zinc-950/80 p-6 shadow-[0_18px_60px_rgba(0,0,0,0.28)] backdrop-blur"
+        >
+          {!canPublishJob && !isLoadingCompanyDetails ? (
+            <div className="rounded-2xl border border-red-500/20 bg-red-500/10 p-5 text-sm text-red-200">
+              Você precisa cadastrar sua empresa e esperar que ela seja aprovada pela plataforma
+              antes de publicar vagas.
             </div>
-          </div>
+          ) : (
+            <>
+              <div className="mb-6 flex flex-col gap-4 border-b border-zinc-800 pb-6 md:flex-row md:items-end md:justify-between">
+                <div>
+                  <div className="flex items-center gap-3 text-zinc-100">
+                    <span className="flex h-11 w-11 items-center justify-center rounded-2xl border border-lime-500/20 bg-lime-500/10 text-lime-400">
+                      <BriefcaseBusiness className="h-4 w-4" />
+                    </span>
+                    <div>
+                      <h2 className="text-xl font-semibold text-zinc-50">
+                        {currentMode === 'create' ? 'Configuração da vaga' : 'Edição da vaga'}
+                      </h2>
+                      <p className="mt-1 text-sm text-zinc-500">
+                        Estruture os detalhes da publicação, requisitos e benefícios com o padrão do
+                        dashboard.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
 
-          <div className="grid gap-4 md:grid-cols-2">
-            <div>
-              <input
-                type="hidden"
-                {...register('slots', {
-                  required: 'Informe a quantidade de vagas.',
-                  valueAsNumber: true,
-                  min: {
-                    value: 1,
-                    message: 'Informe pelo menos uma vaga.',
-                  },
-                })}
-              />
-              <NumberStepper
-                label="Quantidade de vagas"
-                value={slotsValue}
-                min={1}
-                onChange={(value) =>
-                  setValue('slots', value, {
-                    shouldDirty: true,
-                    shouldTouch: true,
-                    shouldValidate: true,
-                  })
-                }
-                error={errors.slots?.message}
-              />
-            </div>
-            <div className="hidden md:block" />
-          </div>
+              <div className="grid gap-4">
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div>
+                    <label className="text-sm text-zinc-300">Empresa</label>
+                    <input value={companyName} disabled className={disabledFieldClassName} />
+                  </div>
+                  <div>
+                    <label className="text-sm text-zinc-300">Tipo de contrato</label>
+                    <div className="relative">
+                      <select
+                        className={`${fieldClassName} appearance-none pr-12`}
+                        {...register('contractType', {
+                          required: 'Informe o tipo de contrato.',
+                        })}
+                      >
+                        {contractTypeOptions.map((option) => (
+                          <option key={option.value} value={option.value}>
+                            {option.label}
+                          </option>
+                        ))}
+                      </select>
+                      <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500">
+                        <ChevronDown className="h-5 w-5" />
+                      </span>
+                    </div>
+                    {errors.contractType && (
+                      <p className="mt-1 text-sm text-red-100">{errors.contractType.message}</p>
+                    )}
+                  </div>
+                </div>
 
-          <fieldset className="rounded-2xl border border-gray-500 p-5">
-            <legend className="px-2 text-sm font-semibold uppercase text-gray-100">
-              Requisitos
-            </legend>
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div>
+                    <FileUpload
+                      label="Imagem da vaga"
+                      accept="image/*"
+                      value={coverUrlValue}
+                      cropAspectRatio={20 / 7}
+                      onUpload={async (file) => {
+                        const response = await UploadService.uploadJobCover(file);
 
-            <div className="grid gap-4">
+                        setValue('coverUrl', response.url, {
+                          shouldDirty: true,
+                          shouldTouch: true,
+                          shouldValidate: true,
+                        });
+
+                        return response.url;
+                      }}
+                    />
+                    <input
+                      type="hidden"
+                      {...register('coverUrl', {
+                        required: 'Informe a imagem da vaga.',
+                      })}
+                    />
+                    {errors.coverUrl && (
+                      <p className="mt-1 text-sm text-red-100">{errors.coverUrl.message}</p>
+                    )}
+                  </div>
+                  <div className="hidden md:block" />
+                </div>
+
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div>
+                    <label className="text-sm text-zinc-300">Título</label>
+                    <input
+                      className={fieldClassName}
+                      {...register('title', {
+                        required: 'Informe o título da vaga.',
+                      })}
+                    />
+                    {errors.title && (
+                      <p className="mt-1 text-sm text-red-100">{errors.title.message}</p>
+                    )}
+                  </div>
+                </div>
+
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div>
+                    <label className="text-sm text-zinc-300">Slug</label>
+                    <div
+                      className={`${disabledFieldClassName} flex min-h-[50px] items-center overflow-hidden break-all ${errors.slug ? 'border-red-500/30 text-red-200' : ''}`}
+                    >
+                      {slugPrefixPart ? (
+                        <>
+                          <span className={errors.slug ? 'text-red-200' : 'text-zinc-300'}>
+                            {slugPrefixPart}
+                          </span>
+                          {slugTitlePart ? (
+                            <span className={errors.slug ? 'text-red-200' : 'text-lime-400'}>
+                              {`-${slugTitlePart}`}
+                            </span>
+                          ) : null}
+                        </>
+                      ) : (
+                        <span className="text-zinc-500">
+                          Slug será gerado ao preencher o título
+                        </span>
+                      )}
+                    </div>
+                    <input
+                      type="hidden"
+                      {...register('slug', {
+                        required: 'Slug não gerado.',
+                      })}
+                    />
+                    {errors.slug && (
+                      <p className="mt-1 text-sm text-red-100">{errors.slug.message}</p>
+                    )}
+                  </div>
+                </div>
+
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div className="md:col-span-2">
+                    <label className="text-sm text-zinc-300">Descrição</label>
+                    <textarea
+                      rows={5}
+                      className={fieldClassName}
+                      {...register('description', {
+                        required: 'Informe a descrição da vaga.',
+                      })}
+                    />
+                    {errors.description && (
+                      <p className="mt-1 text-sm text-red-100">{errors.description.message}</p>
+                    )}
+                  </div>
+                </div>
+
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div>
+                    <input
+                      type="hidden"
+                      {...register('slots', {
+                        required: 'Informe a quantidade de vagas.',
+                        valueAsNumber: true,
+                        min: {
+                          value: 1,
+                          message: 'Informe pelo menos uma vaga.',
+                        },
+                      })}
+                    />
+                    <NumberStepper
+                      label="Quantidade de vagas"
+                      value={slotsValue}
+                      min={1}
+                      onChange={(value) =>
+                        setValue('slots', value, {
+                          shouldDirty: true,
+                          shouldTouch: true,
+                          shouldValidate: true,
+                        })
+                      }
+                      error={errors.slots?.message}
+                    />
+                  </div>
+                  <div className="hidden md:block" />
+                </div>
+
+                <fieldset className="rounded-2xl border border-zinc-800 bg-black/30 p-5">
+                  <legend className="px-2 text-sm font-semibold uppercase text-zinc-100">
+                    Requisitos
+                  </legend>
+
+                  <div className="grid gap-4">
+                    <div className="grid gap-4 md:grid-cols-2">
+                      <div>
+                        <label className="text-sm text-zinc-300">Escolaridade</label>
+                        <div className="relative">
+                          <select
+                            className={`${fieldClassName} appearance-none pr-12`}
+                            {...register('educationLevel', {
+                              required: 'Informe a escolaridade.',
+                            })}
+                          >
+                            <option value="">Selecione</option>
+                            {educationLevelOptions.map((option) => (
+                              <option key={option.value} value={option.value}>
+                                {option.label}
+                              </option>
+                            ))}
+                          </select>
+                          <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500">
+                            <ChevronDown className="h-5 w-5" />
+                          </span>
+                        </div>
+                        {errors.educationLevel && (
+                          <p className="mt-1 text-sm text-red-100">
+                            {errors.educationLevel.message}
+                          </p>
+                        )}
+                      </div>
+                      <div className="hidden md:block" />
+                    </div>
+
+                    <div className="grid gap-4 md:grid-cols-2">
+                      <div>
+                        <input
+                          type="hidden"
+                          {...register('minExperienceYears', {
+                            required: 'Informe a experiência mínima.',
+                            valueAsNumber: true,
+                            min: {
+                              value: 0,
+                              message: 'Informe um valor válido.',
+                            },
+                          })}
+                        />
+                        <NumberStepper
+                          label="Experiência mínima"
+                          value={minExperienceYearsValue}
+                          min={0}
+                          onChange={(value) =>
+                            setValue('minExperienceYears', value, {
+                              shouldDirty: true,
+                              shouldTouch: true,
+                              shouldValidate: true,
+                            })
+                          }
+                          error={errors.minExperienceYears?.message}
+                        />
+                      </div>
+
+                      <div>
+                        <input
+                          type="hidden"
+                          {...register('maxExperienceYears', {
+                            required: 'Informe a experiência máxima.',
+                            valueAsNumber: true,
+                            min: {
+                              value: 0,
+                              message: 'Informe um valor válido.',
+                            },
+                          })}
+                        />
+                        <NumberStepper
+                          label="Experiência máxima"
+                          value={maxExperienceYearsValue}
+                          min={0}
+                          onChange={(value) =>
+                            setValue('maxExperienceYears', value, {
+                              shouldDirty: true,
+                              shouldTouch: true,
+                              shouldValidate: true,
+                            })
+                          }
+                          error={errors.maxExperienceYears?.message}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </fieldset>
+
+                <fieldset className="rounded-2xl border border-zinc-800 bg-black/30 p-5">
+                  <legend className="px-2 text-sm font-semibold uppercase text-zinc-100">
+                    Idiomas
+                  </legend>
+
+                  <div className="grid gap-4">
+                    <div className="grid gap-4 md:grid-cols-2">
+                      <div>
+                        <Button
+                          type="button"
+                          variant="profile"
+                          icon={<Plus className="h-4 w-4" />}
+                          onClick={handleOpenLanguageModal}
+                          className="rounded-xl border-zinc-800 bg-black/40 text-zinc-200 hover:bg-white/[0.03]"
+                        >
+                          Adicionar língua
+                        </Button>
+                      </div>
+                      <div className="hidden md:block" />
+                    </div>
+
+                    {languages.length > 0 && (
+                      <div className="grid gap-3">
+                        {languages.map((language, index) => (
+                          <article
+                            key={`${language.name}-${language.level}-${index}`}
+                            className="rounded-2xl border border-zinc-800 bg-zinc-950/80 p-4 backdrop-blur"
+                          >
+                            <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                              <div>
+                                <p className="text-sm font-semibold text-zinc-100">
+                                  {getLanguageLabel(language.name)}
+                                </p>
+                                <p className="mt-1 text-sm text-zinc-500">
+                                  {getLanguageLevelLabel(language.level)}
+                                </p>
+                              </div>
+
+                              <Button
+                                type="button"
+                                variant="danger"
+                                icon={<Trash2 className="h-4 w-4" />}
+                                onClick={() => handleRemoveLanguage(index)}
+                                className="rounded-xl border-red-500/20 bg-red-500/10 text-red-200 hover:bg-red-500/15"
+                              >
+                                Deletar
+                              </Button>
+                            </div>
+                          </article>
+                        ))}
+                      </div>
+                    )}
+
+                    {languagesError && <p className="text-sm text-red-100">{languagesError}</p>}
+                  </div>
+                </fieldset>
+
+                <fieldset className="rounded-2xl border border-zinc-800 bg-black/30 p-5">
+                  <legend className="px-2 text-sm font-semibold uppercase text-zinc-100">
+                    Benefits
+                  </legend>
+
+                  <div className="grid gap-4">
+                    <div className="grid gap-4 md:grid-cols-2">
+                      <div>
+                        <label className="text-sm text-zinc-300">Salário</label>
+                        <input
+                          type="hidden"
+                          {...register('salary', {
+                            required: 'Informe o salário.',
+                            valueAsNumber: true,
+                          })}
+                        />
+                        <input
+                          type="text"
+                          inputMode="numeric"
+                          className={fieldClassName}
+                          value={formatCurrencyInput(salaryValue)}
+                          onChange={(event) => {
+                            setValue('salary', parseCurrencyInput(event.target.value), {
+                              shouldDirty: true,
+                              shouldTouch: true,
+                              shouldValidate: true,
+                            });
+                          }}
+                        />
+                        {errors.salary && (
+                          <p className="mt-1 text-sm text-red-100">{errors.salary.message}</p>
+                        )}
+                      </div>
+                      <div className="hidden md:block" />
+                    </div>
+
+                    <div className="grid gap-4 md:grid-cols-2">
+                      <BenefitCheckbox
+                        label="Plano de saúde"
+                        description="Cobertura médica para os colaboradores."
+                        icon={<HeartPulse className="h-6 w-6" />}
+                        checked={Boolean(healthInsuranceValue)}
+                        onChange={(checked) =>
+                          setValue('healthInsurance', checked, {
+                            shouldDirty: true,
+                            shouldTouch: true,
+                            shouldValidate: true,
+                          })
+                        }
+                      />
+                      <BenefitCheckbox
+                        label="Plano odontológico"
+                        description="Assistência odontológica como benefício."
+                        icon={<ShieldPlus className="h-6 w-6" />}
+                        checked={Boolean(dentalInsuranceValue)}
+                        onChange={(checked) =>
+                          setValue('dentalInsurance', checked, {
+                            shouldDirty: true,
+                            shouldTouch: true,
+                            shouldValidate: true,
+                          })
+                        }
+                      />
+                      <BenefitCheckbox
+                        label="Vale alimentação"
+                        description="Apoio no custo de alimentação do dia a dia."
+                        icon={<Soup className="h-6 w-6" />}
+                        checked={Boolean(alimentationVoucherValue)}
+                        onChange={(checked) =>
+                          setValue('alimentationVoucher', checked, {
+                            shouldDirty: true,
+                            shouldTouch: true,
+                            shouldValidate: true,
+                          })
+                        }
+                      />
+                      <BenefitCheckbox
+                        label="Vale transporte"
+                        description="Auxílio de deslocamento para o trabalho."
+                        icon={<Bus className="h-5 w-5" />}
+                        checked={Boolean(transportationVoucherValue)}
+                        onChange={(checked) =>
+                          setValue('transportationVoucher', checked, {
+                            shouldDirty: true,
+                            shouldTouch: true,
+                            shouldValidate: true,
+                          })
+                        }
+                      />
+                    </div>
+                  </div>
+                </fieldset>
+              </div>
+
+              <div className="mt-6 flex justify-end gap-3">
+                {currentJobId && (
+                  <Button
+                    type="button"
+                    variant="danger"
+                    icon={<Trash2 className="h-4 w-4" />}
+                    onClick={() => {
+                      setHasConfirmedDelete(false);
+                      setIsDeleteModalOpen(true);
+                    }}
+                    className="rounded-xl border-red-500/20 bg-red-500/10 text-red-200 hover:bg-red-500/15"
+                  >
+                    Deletar vaga
+                  </Button>
+                )}
+                <Button
+                  type="submit"
+                  variant="positive"
+                  icon={<Save className="h-4 w-4" />}
+                  disabled={isSubmitting || !canPublishJob}
+                  className="rounded-xl border-lime-500/20 bg-lime-500/10 text-lime-300 hover:bg-lime-500/15"
+                >
+                  {currentMode === 'create' ? 'Criar' : 'Atualizar'}
+                </Button>
+              </div>
+            </>
+          )}
+        </form>
+
+        {isLanguageModalOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 px-4">
+            <div className="w-full max-w-3xl rounded-2xl border border-zinc-800 bg-zinc-950/95 p-6 shadow-[0_24px_80px_rgba(0,0,0,0.45)] backdrop-blur">
+              <div className="mb-6 flex items-start justify-between gap-4">
+                <div className="flex items-center gap-3 text-xl font-semibold uppercase text-zinc-100">
+                  <Plus className="h-5 w-5 shrink-0 text-lime-400" />
+                  <h2>Adicionar língua</h2>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setIsLanguageModalOpen(false)}
+                  className="text-2xl leading-none text-zinc-400 transition-colors hover:text-zinc-100"
+                  aria-label="Fechar modal"
+                >
+                  ×
+                </button>
+              </div>
+
               <div className="grid gap-4 md:grid-cols-2">
                 <div>
-                  <label className="text-sm text-gray-300">Escolaridade</label>
+                  <label className="text-sm text-zinc-300">Idioma</label>
                   <div className="relative">
                     <select
+                      value={languageDraft.name}
+                      onChange={(event) =>
+                        setLanguageDraft((current) => ({
+                          ...current,
+                          name: event.target.value as LanguagesEnum | '',
+                        }))
+                      }
                       className={`${fieldClassName} appearance-none pr-12`}
-                      {...register('educationLevel', {
-                        required: 'Informe a escolaridade.',
-                      })}
                     >
                       <option value="">Selecione</option>
-                      {educationLevelOptions.map((option) => (
+                      {languageOptions.map((option) => (
                         <option key={option.value} value={option.value}>
                           {option.label}
                         </option>
                       ))}
                     </select>
-                    <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-gray-300">
-                      <MdKeyboardDoubleArrowDown className="h-5 w-5" />
+                    <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500">
+                      <ChevronDown className="h-5 w-5" />
                     </span>
                   </div>
-                  {errors.educationLevel && (
-                    <p className="mt-1 text-sm text-red-100">
-                      {errors.educationLevel.message}
-                    </p>
-                  )}
-                </div>
-                <div className="hidden md:block" />
-              </div>
-
-              <div className="grid gap-4 md:grid-cols-2">
-                <div>
-                  <input
-                    type="hidden"
-                    {...register('minExperienceYears', {
-                      required: 'Informe a experiência mínima.',
-                      valueAsNumber: true,
-                      min: {
-                        value: 0,
-                        message: 'Informe um valor válido.',
-                      },
-                    })}
-                  />
-                  <NumberStepper
-                    label="Experiência mínima"
-                    value={minExperienceYearsValue}
-                    min={0}
-                    onChange={(value) =>
-                      setValue('minExperienceYears', value, {
-                        shouldDirty: true,
-                        shouldTouch: true,
-                        shouldValidate: true,
-                      })
-                    }
-                    error={errors.minExperienceYears?.message}
-                  />
                 </div>
 
                 <div>
-                  <input
-                    type="hidden"
-                    {...register('maxExperienceYears', {
-                      required: 'Informe a experiência máxima.',
-                      valueAsNumber: true,
-                      min: {
-                        value: 0,
-                        message: 'Informe um valor válido.',
-                      },
-                    })}
-                  />
-                  <NumberStepper
-                    label="Experiência máxima"
-                    value={maxExperienceYearsValue}
-                    min={0}
-                    onChange={(value) =>
-                      setValue('maxExperienceYears', value, {
-                        shouldDirty: true,
-                        shouldTouch: true,
-                        shouldValidate: true,
-                      })
-                    }
-                    error={errors.maxExperienceYears?.message}
-                  />
+                  <label className="text-sm text-zinc-300">Nível</label>
+                  <div className="relative">
+                    <select
+                      value={languageDraft.level}
+                      onChange={(event) =>
+                        setLanguageDraft((current) => ({
+                          ...current,
+                          level: event.target.value as LanguagesLevelEnum | '',
+                        }))
+                      }
+                      className={`${fieldClassName} appearance-none pr-12`}
+                    >
+                      <option value="">Selecione</option>
+                      {languageLevelOptions.map((option) => (
+                        <option key={option.value} value={option.value}>
+                          {option.label}
+                        </option>
+                      ))}
+                    </select>
+                    <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500">
+                      <ChevronDown className="h-5 w-5" />
+                    </span>
+                  </div>
                 </div>
-              </div>
 
-            </div>
-          </fieldset>
-
-          <fieldset className="rounded-2xl border border-gray-500 p-5">
-            <legend className="px-2 text-sm font-semibold uppercase text-gray-100">
-              Idiomas
-            </legend>
-
-            <div className="grid gap-4">
-              <div className="grid gap-4 md:grid-cols-2">
-                <div>
+                <div className="flex justify-end md:col-span-2">
                   <Button
                     type="button"
-                    variant="profile"
-                    icon={<FaPlus />}
-                    onClick={handleOpenLanguageModal}
+                    variant="positive"
+                    icon={<Save className="h-4 w-4" />}
+                    onClick={handleSaveLanguage}
+                    className="rounded-xl border-lime-500/20 bg-lime-500/10 text-lime-300 hover:bg-lime-500/15"
                   >
-                    Adicionar língua
+                    Salvar
                   </Button>
                 </div>
-                <div className="hidden md:block" />
-              </div>
-
-              {languages.length > 0 && (
-                <div className="grid gap-3">
-                  {languages.map((language, index) => (
-                    <article
-                      key={`${language.name}-${language.level}-${index}`}
-                      className="rounded-2xl border border-gray-500 bg-black p-4"
-                    >
-                      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-                        <div>
-                          <p className="text-sm font-semibold text-gray-100">
-                            {getLanguageLabel(language.name)}
-                          </p>
-                          <p className="mt-1 text-sm text-gray-300">
-                            {getLanguageLevelLabel(language.level)}
-                          </p>
-                        </div>
-
-                        <Button
-                          type="button"
-                          variant="danger"
-                          icon={<FaTrash />}
-                          onClick={() => handleRemoveLanguage(index)}
-                        >
-                          Deletar
-                        </Button>
-                      </div>
-                    </article>
-                  ))}
-                </div>
-              )}
-
-              {languagesError && (
-                <p className="text-sm text-red-100">{languagesError}</p>
-              )}
-            </div>
-          </fieldset>
-
-          <fieldset className="rounded-2xl border border-gray-500 p-5">
-            <legend className="px-2 text-sm font-semibold uppercase text-gray-100">
-              Benefits
-            </legend>
-
-            <div className="grid gap-4">
-              <div className="grid gap-4 md:grid-cols-2">
-                <div>
-                  <label className="text-sm text-gray-300">Salário</label>
-                  <input
-                    type="hidden"
-                    {...register('salary', {
-                      required: 'Informe o salário.',
-                      valueAsNumber: true,
-                    })}
-                  />
-                  <input
-                    type="text"
-                    inputMode="numeric"
-                    className={fieldClassName}
-                    value={formatCurrencyInput(salaryValue)}
-                    onChange={(event) => {
-                      setValue('salary', parseCurrencyInput(event.target.value), {
-                        shouldDirty: true,
-                        shouldTouch: true,
-                        shouldValidate: true,
-                      });
-                    }}
-                  />
-                  {errors.salary && (
-                    <p className="mt-1 text-sm text-red-100">
-                      {errors.salary.message}
-                    </p>
-                  )}
-                </div>
-                <div className="hidden md:block" />
-              </div>
-
-              <div className="grid gap-4 md:grid-cols-2">
-                <BenefitCheckbox
-                  label="Plano de saúde"
-                  description="Cobertura médica para os colaboradores."
-                  icon={<MdHealthAndSafety className="h-6 w-6" />}
-                  checked={Boolean(healthInsuranceValue)}
-                  onChange={(checked) =>
-                    setValue('healthInsurance', checked, {
-                      shouldDirty: true,
-                      shouldTouch: true,
-                      shouldValidate: true,
-                    })
-                  }
-                />
-                <BenefitCheckbox
-                  label="Plano odontológico"
-                  description="Assistência odontológica como benefício."
-                  icon={<GiHealthNormal className="h-6 w-6" />}
-                  checked={Boolean(dentalInsuranceValue)}
-                  onChange={(checked) =>
-                    setValue('dentalInsurance', checked, {
-                      shouldDirty: true,
-                      shouldTouch: true,
-                      shouldValidate: true,
-                    })
-                  }
-                />
-                <BenefitCheckbox
-                  label="Vale alimentação"
-                  description="Apoio no custo de alimentação do dia a dia."
-                  icon={<LuSalad className="h-6 w-6" />}
-                  checked={Boolean(alimentationVoucherValue)}
-                  onChange={(checked) =>
-                    setValue('alimentationVoucher', checked, {
-                      shouldDirty: true,
-                      shouldTouch: true,
-                      shouldValidate: true,
-                    })
-                  }
-                />
-                <BenefitCheckbox
-                  label="Vale transporte"
-                  description="Auxílio de deslocamento para o trabalho."
-                  icon={<FaBus className="h-5 w-5" />}
-                  checked={Boolean(transportationVoucherValue)}
-                  onChange={(checked) =>
-                    setValue('transportationVoucher', checked, {
-                      shouldDirty: true,
-                      shouldTouch: true,
-                      shouldValidate: true,
-                    })
-                  }
-                />
-              </div>
-            </div>
-          </fieldset>
-
-        </div>
-
-        <div className="mt-6 flex justify-end gap-3">
-          {currentJobId && (
-            <Button
-              type="button"
-              variant="danger"
-              icon={<FaTrash />}
-              onClick={() => {
-                setHasConfirmedDelete(false);
-                setIsDeleteModalOpen(true);
-              }}
-            >
-              Deletar vaga
-            </Button>
-          )}
-          <Button
-            type="submit"
-            variant="login"
-            icon={<FaSave />}
-            disabled={isSubmitting || !canPublishJob}
-          >
-            {currentMode === 'create' ? 'Criar' : 'Atualizar'}
-          </Button>
-        </div>
-          </>
-        )}
-      </form>
-
-      {isLanguageModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 px-4">
-          <div className="w-full max-w-3xl rounded-2xl border border-gray-500 bg-black p-6">
-            <div className="mb-6 flex items-start justify-between gap-4">
-              <div className="flex items-center gap-3 text-xl font-semibold uppercase text-gray-100">
-                <FaPlus className="h-5 w-5 shrink-0" />
-                <h2>Adicionar língua</h2>
-              </div>
-              <button
-                type="button"
-                onClick={() => setIsLanguageModalOpen(false)}
-                className="text-2xl leading-none text-gray-300 transition-colors hover:text-gray-100"
-                aria-label="Fechar modal"
-              >
-                ×
-              </button>
-            </div>
-
-            <div className="grid gap-4 md:grid-cols-2">
-              <div>
-                <label className="text-sm text-gray-300">Idioma</label>
-                <div className="relative">
-                  <select
-                    value={languageDraft.name}
-                    onChange={(event) =>
-                      setLanguageDraft((current) => ({
-                        ...current,
-                        name: event.target.value as LanguagesEnum | '',
-                      }))
-                    }
-                    className={`${fieldClassName} appearance-none pr-12`}
-                  >
-                    <option value="">Selecione</option>
-                    {languageOptions.map((option) => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
-                  </select>
-                  <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-gray-300">
-                    <MdKeyboardDoubleArrowDown className="h-5 w-5" />
-                  </span>
-                </div>
-              </div>
-
-              <div>
-                <label className="text-sm text-gray-300">Nível</label>
-                <div className="relative">
-                  <select
-                    value={languageDraft.level}
-                    onChange={(event) =>
-                      setLanguageDraft((current) => ({
-                        ...current,
-                        level: event.target.value as LanguagesLevelEnum | '',
-                      }))
-                    }
-                    className={`${fieldClassName} appearance-none pr-12`}
-                  >
-                    <option value="">Selecione</option>
-                    {languageLevelOptions.map((option) => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
-                  </select>
-                  <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-gray-300">
-                    <MdKeyboardDoubleArrowDown className="h-5 w-5" />
-                  </span>
-                </div>
-              </div>
-
-              <div className="flex justify-end md:col-span-2">
-                <Button
-                  type="button"
-                  variant="positive"
-                  icon={<FaSave />}
-                  onClick={handleSaveLanguage}
-                >
-                  Salvar
-                </Button>
               </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {isDeleteModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 px-4">
-          <div className="w-full max-w-3xl rounded-2xl border border-gray-500 bg-black p-6">
-            <div className="mb-6 flex items-start justify-between gap-4">
-              <div className="flex items-center gap-3 text-xl font-semibold uppercase text-gray-100">
-                <FaTrash className="h-5 w-5 shrink-0" />
-                <h2>APAGAR VAGA</h2>
-              </div>
-              <button
-                type="button"
-                onClick={() => {
-                  setHasConfirmedDelete(false);
-                  setIsDeleteModalOpen(false);
-                }}
-                className="text-2xl leading-none text-gray-300 transition-colors hover:text-gray-100"
-                aria-label="Fechar modal"
-              >
-                ×
-              </button>
-            </div>
-
-            <div className="space-y-4">
-              <p className="text-gray-300">
-                {`Deseja realmente deletar a vaga ${titleValue || initialValues?.title || ''}?`}
-              </p>
-
-              <div className="rounded-2xl border border-red-900/60 bg-red-950/40 p-5">
-                <p className="text-sm text-red-100">
-                  Ao deletar a vaga, não será possível reativá-la posteriormente.
-                  Os dados dos candidatos aplicados também serão perdidos de forma definitiva.
-                </p>
-              </div>
-
-              <label className="flex items-center gap-3 rounded-xl border border-gray-500 px-4 py-3 text-sm text-gray-300">
-                <input
-                  type="checkbox"
-                  className="h-4 w-4 rounded border border-gray-400 bg-black accent-gray-300"
-                  checked={hasConfirmedDelete}
-                  onChange={(event) => setHasConfirmedDelete(event.target.checked)}
-                />
-                <span>Confirmo que desejo deletar esta vaga permanentemente.</span>
-              </label>
-
-              <div className="flex justify-end gap-3">
-                <Button
+        {isDeleteModalOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 px-4">
+            <div className="w-full max-w-3xl rounded-2xl border border-zinc-800 bg-zinc-950/95 p-6 shadow-[0_24px_80px_rgba(0,0,0,0.45)] backdrop-blur">
+              <div className="mb-6 flex items-start justify-between gap-4">
+                <div className="flex items-center gap-3 text-xl font-semibold uppercase text-zinc-100">
+                  <Trash2 className="h-5 w-5 shrink-0 text-red-300" />
+                  <h2>APAGAR VAGA</h2>
+                </div>
+                <button
                   type="button"
-                  variant="profile"
                   onClick={() => {
                     setHasConfirmedDelete(false);
                     setIsDeleteModalOpen(false);
                   }}
+                  className="text-2xl leading-none text-zinc-400 transition-colors hover:text-zinc-100"
+                  aria-label="Fechar modal"
                 >
-                  Cancelar
-                </Button>
-                <Button
-                  type="button"
-                  variant="danger"
-                  icon={<FaTrash />}
-                  disabled={isSubmitting || !hasConfirmedDelete}
-                  onClick={() => {
-                    void handleDeleteJob();
-                  }}
-                >
-                  Apagar Vaga
-                </Button>
+                  ×
+                </button>
+              </div>
+
+              <div className="space-y-4">
+                <p className="text-zinc-300">
+                  {`Deseja realmente deletar a vaga ${titleValue || initialValues?.title || ''}?`}
+                </p>
+
+                <div className="rounded-2xl border border-red-500/20 bg-red-500/10 p-5">
+                  <p className="text-sm text-red-200">
+                    Ao deletar a vaga, não será possível reativá-la posteriormente. Os dados dos
+                    candidatos aplicados também serão perdidos de forma definitiva.
+                  </p>
+                </div>
+
+                <label className="flex items-center gap-3 rounded-xl border border-zinc-800 bg-black/40 px-4 py-3 text-sm text-zinc-300">
+                  <input
+                    type="checkbox"
+                    className="h-4 w-4 rounded border border-zinc-700 bg-black accent-lime-400"
+                    checked={hasConfirmedDelete}
+                    onChange={(event) => setHasConfirmedDelete(event.target.checked)}
+                  />
+                  <span>Confirmo que desejo deletar esta vaga permanentemente.</span>
+                </label>
+
+                <div className="flex justify-end gap-3">
+                  <Button
+                    type="button"
+                    variant="profile"
+                    onClick={() => {
+                      setHasConfirmedDelete(false);
+                      setIsDeleteModalOpen(false);
+                    }}
+                    className="rounded-xl border-zinc-800 bg-black/40 text-zinc-200 hover:bg-white/[0.03]"
+                  >
+                    Cancelar
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="danger"
+                    icon={<Trash2 className="h-4 w-4" />}
+                    disabled={isSubmitting || !hasConfirmedDelete}
+                    onClick={() => {
+                      void handleDeleteJob();
+                    }}
+                    className="rounded-xl border-red-500/20 bg-red-500/10 text-red-200 hover:bg-red-500/15"
+                  >
+                    Apagar Vaga
+                  </Button>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </>
   );
 }
 
 function buildDefaultValues(job?: JobEntity): RecruiterJobFormValues {
   return {
-    contractType:
-      (job?.contractType as JobContractTypeEnum) || JobContractTypeEnum.FREELANCE,
+    contractType: (job?.contractType as JobContractTypeEnum) || JobContractTypeEnum.FREELANCE,
     slug: job?.slug || '',
     title: job?.title || '',
     description: job?.description || '',

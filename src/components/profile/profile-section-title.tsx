@@ -1,10 +1,8 @@
 'use client';
 
+import { ChevronDown, FileText } from 'lucide-react';
 import { type IconType } from 'react-icons';
 import { TiDocumentText } from 'react-icons/ti';
-import { MdKeyboardDoubleArrowDown } from 'react-icons/md';
-import { TEXT_STYLES } from '@/constants/styles';
-import { THEME } from '@/constants/theme';
 
 type ProfileSectionTitleProps = {
   title: string;
@@ -30,9 +28,15 @@ export function ProfileSectionTitle({
   icon: Icon = TiDocumentText,
 }: ProfileSectionTitleProps) {
   return (
-    <div className={`flex items-center justify-between gap-4 ${THEME.sectionProfile.profileCardTitle} ${containerClassName}`}>
-      <div className={`flex items-center gap-3 ${TEXT_STYLES.card.profile.title} ${titleClassName}`}>
-        <Icon className={`h-6 w-6 ${iconClassName}`} />
+    <div className={`flex items-center justify-between gap-4 ${containerClassName}`}>
+      <div
+        className={`flex items-center gap-3 text-xl font-semibold text-zinc-100 ${titleClassName}`}
+      >
+        {Icon === TiDocumentText ? (
+          <FileText className={`h-5 w-5 text-lime-400 ${iconClassName}`} />
+        ) : (
+          <Icon className={`h-6 w-6 ${iconClassName}`} />
+        )}
         <h2>{title}</h2>
       </div>
       {iconClickable ? (
@@ -40,14 +44,14 @@ export function ProfileSectionTitle({
           type="button"
           onClick={onIconClick}
           aria-label={expanded ? 'Esconder conteúdo' : 'Mostrar conteúdo'}
-          className="focus:outline-none"
+          className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-zinc-800 bg-black/40 text-zinc-400 transition-all duration-300 hover:border-lime-500/20 hover:text-zinc-100 focus:outline-none"
         >
-          <MdKeyboardDoubleArrowDown
-            className={`h-6 w-6 transition-transform duration-200 ${THEME.icon.default} ${toggleIconClassName} ${expanded ? 'rotate-180' : ''}`}
+          <ChevronDown
+            className={`h-5 w-5 transition-transform duration-200 ${toggleIconClassName} ${expanded ? 'rotate-180' : ''}`}
           />
         </button>
       ) : (
-        <MdKeyboardDoubleArrowDown className={`h-6 w-6 ${THEME.icon.default} ${toggleIconClassName}`} />
+        <ChevronDown className={`h-5 w-5 text-zinc-500 ${toggleIconClassName}`} />
       )}
     </div>
   );

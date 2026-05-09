@@ -3,7 +3,7 @@ import { PrivateRoute } from '@/components/auth/private-route';
 import { SessionList } from '@/components/sessions/session-list';
 import { Breadcrumb } from '@/components/ui/breadcrumb';
 import { ROUTES } from '@/constants/routes';
-import { TEXT_STYLES } from '@/constants/styles';
+import { PAGE_STYLES } from '@/constants/styles';
 
 export const metadata: Metadata = {
   title: 'Sessões',
@@ -16,23 +16,15 @@ export const metadata: Metadata = {
 export default function SessionsPage() {
   return (
     <PrivateRoute>
-      <section className="min-h-screen bg-black py-20">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <Breadcrumb
-            items={[
-              { label: 'Home', href: ROUTES.HOME },
-              { label: 'Sessões' },
-            ]}
-          />
-
-          <h1 className={TEXT_STYLES.pageTitle}>
+      <section className={`${PAGE_STYLES.body} py-20`}>
+        <div className={PAGE_STYLES.container}>
+          <Breadcrumb items={[{ label: 'Home', href: ROUTES.HOME }, { label: 'Sessões' }]} />
+          <p className="mt-8 text-sm font-medium uppercase tracking-[0.28em] text-lime-400">
             Sessões
-          </h1>
-
-          <p className={TEXT_STYLES.pageSubtitle}>
-            Veja os dispositivos conectados à sua conta.
           </p>
-
+          <p className="mt-5 max-w-2xl text-lg leading-8 text-zinc-400">
+            Gerencie os dispositivos conectados à sua conta e revogue acessos antigos com segurança.
+          </p>
           <div className="mt-10">
             <SessionList />
           </div>

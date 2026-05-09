@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
-import { FaPlus } from 'react-icons/fa';
+import { Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ROUTES } from '@/constants/routes';
 import { RecruiterPageHeader } from '@/components/recruiter/recruiter-page-header';
@@ -17,19 +17,20 @@ export const metadata: Metadata = {
 
 export default function RecruiterJobsPage() {
   return (
-    <DashboardShell
-      title="Minhas vagas"
-      subtitle="Gerencie publicações, status e fluxo de candidatos"
-    >
+    <DashboardShell title="" subtitle="">
       <div className="mx-auto w-full max-w-7xl">
         <RecruiterPageHeader
           breadcrumbs={[{ label: 'Home', href: ROUTES.HOME }, { label: 'Minhas vagas' }]}
-          title="Minhas vagas"
-          description="Gerencie as vagas publicadas pela sua empresa."
+          title=""
+          description=""
           action={
             <Link href={ROUTES.RECRUITER_NEW_JOB}>
-              <Button variant="positive" icon={<FaPlus />}>
-                Nova vaga
+              <Button
+                variant="positive"
+                icon={<Plus className="h-4 w-4" />}
+                className="rounded-xl border-lime-500/20 bg-lime-500/10 text-lime-300 hover:bg-lime-500/15"
+              >
+                Cadastrar Nova vaga
               </Button>
             </Link>
           }

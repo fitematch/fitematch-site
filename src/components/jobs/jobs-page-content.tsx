@@ -3,24 +3,21 @@
 import { useState } from 'react';
 import { Breadcrumb } from '@/components/ui/breadcrumb';
 import { JobSearchInput } from '@/components/jobs/job-search-input';
-import { THEME } from '@/constants/theme';
 import { JobGrid } from '@/components/jobs/job-grid';
+import { PAGE_STYLES } from '@/constants/styles';
 
 export function JobsPageContent() {
   const [search, setSearch] = useState('');
 
   return (
-    <section className={`min-h-screen ${THEME.layout.background} py-20`}>
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <Breadcrumb
-          items={[
-            { label: 'Home', href: '/' },
-            { label: 'Vagas' },
-          ]}
-        />
+    <section className={`${PAGE_STYLES.body} py-20`}>
+      <div className={PAGE_STYLES.container}>
+        <Breadcrumb items={[{ label: 'Home', href: '/' }, { label: 'Vagas' }]} />
+
         <div className="mt-8">
           <JobSearchInput value={search} onChange={setSearch} />
         </div>
+
         <div className="mt-12">
           <JobGrid search={search} />
         </div>

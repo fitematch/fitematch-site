@@ -1,19 +1,9 @@
 'use client';
 
-import {
-  ChangeEvent,
-  KeyboardEvent,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import { ChangeEvent, KeyboardEvent, useEffect, useMemo, useRef, useState } from 'react';
 import { FiCheck, FiChevronDown } from 'react-icons/fi';
 import { useCountryDialCodes } from '@/hooks/use-country-dial-codes';
-import {
-  formatPhoneWithDialCode,
-  removeDialCodeFromPhone,
-} from '@/utils/phone.utils';
+import { formatPhoneWithDialCode, removeDialCodeFromPhone } from '@/utils/phone.utils';
 
 interface PhoneInputProps {
   label?: string;
@@ -42,10 +32,7 @@ export function PhoneInput({
   const dropdownRef = useRef<HTMLDivElement | null>(null);
 
   const selectedCountry = useMemo(() => {
-    return (
-      countries.find((country) => country.dialCode === countryValue) ||
-      defaultCountry
-    );
+    return countries.find((country) => country.dialCode === countryValue) || defaultCountry;
   }, [countries, countryValue, defaultCountry]);
 
   const formattedPhone = formatPhoneWithDialCode(
@@ -75,10 +62,7 @@ export function PhoneInput({
   }, []);
 
   function handleNumberChange(event: ChangeEvent<HTMLInputElement>) {
-    const cleanNumber = removeDialCodeFromPhone(
-      event.target.value,
-      selectedCountry.dialCode,
-    );
+    const cleanNumber = removeDialCodeFromPhone(event.target.value, selectedCountry.dialCode);
 
     onNumberChange(cleanNumber);
   }
@@ -103,9 +87,7 @@ export function PhoneInput({
     <div className={`w-full ${className}`}>
       <div className="grid gap-3 md:grid-cols-2">
         <div>
-          <label className={`mb-1 block text-sm font-medium ${labelClassName}`}>
-            Código do País
-          </label>
+          <label className={`mb-1 block text-sm font-medium ${labelClassName}`}>País</label>
           <div className="relative" ref={dropdownRef}>
             <button
               type="button"
@@ -114,19 +96,19 @@ export function PhoneInput({
               disabled={disabled || isLoading}
               aria-haspopup="listbox"
               aria-expanded={isMenuOpen}
-              className="inline-flex h-[50px] w-full items-center justify-between gap-x-2 rounded-xl border border-gray-500 bg-black px-4 py-3 text-left text-sm font-semibold text-gray-100 outline-none transition hover:bg-white/5 disabled:cursor-not-allowed disabled:opacity-60"
+              className="inline-flex h-[50px] w-full items-center justify-between gap-x-2 rounded-xl border border-zinc-800 bg-zinc-950 px-4 py-3 text-left text-sm font-semibold text-zinc-100 outline-none transition-all duration-300 hover:border-zinc-700 hover:bg-zinc-900 disabled:cursor-not-allowed disabled:opacity-60"
             >
               <span className="min-w-0 truncate">
                 {selectedCountry.flag} {selectedCountry.name} {selectedCountry.dialCode}
               </span>
-              <FiChevronDown className="size-5 shrink-0 text-gray-400" />
+              <FiChevronDown className="size-5 shrink-0 text-zinc-400" />
             </button>
 
             {isMenuOpen && !(disabled || isLoading) ? (
               <div
                 role="listbox"
                 aria-label="Código do País"
-                className="absolute left-0 z-20 mt-2 max-h-80 w-full origin-top-right overflow-y-auto divide-y divide-white/10 rounded-xl bg-gray-900 outline-1 -outline-offset-1 outline-white/10 transition [--anchor-gap:--spacing(2)] [scrollbar-color:theme(colors.gray.500)_theme(colors.gray.950)] [scrollbar-width:thin] [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-track]:bg-gray-950 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-600 [&::-webkit-scrollbar-thumb]:border-2 [&::-webkit-scrollbar-thumb]:border-gray-900"
+                className="absolute left-0 z-20 mt-2 max-h-80 w-full origin-top-right overflow-y-auto rounded-2xl border border-zinc-800 bg-zinc-950/95 p-1 shadow-[0_18px_50px_rgba(0,0,0,0.35)] backdrop-blur-xl transition [scrollbar-color:theme(colors.lime.500)_theme(colors.zinc.950)] [scrollbar-width:thin] [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-track]:bg-zinc-950 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-zinc-700 [&::-webkit-scrollbar-thumb]:border-2 [&::-webkit-scrollbar-thumb]:border-zinc-950 [&::-webkit-scrollbar-thumb:hover]:bg-lime-500/70"
               >
                 {countries.map((country) => {
                   const isSelected = country.dialCode === selectedCountry.dialCode;
@@ -138,14 +120,16 @@ export function PhoneInput({
                       role="option"
                       aria-selected={isSelected}
                       onClick={() => handleCountrySelect(country.dialCode)}
-                      className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left text-sm text-gray-300 outline-none transition hover:bg-white/5 focus:bg-white/5 focus:text-white"
+                      className={`flex w-full items-center justify-between gap-3 rounded-xl px-3 py-2.5 text-left text-sm outline-none transition-all duration-200 ${
+                        isSelected
+                          ? 'bg-lime-500/10 text-lime-300'
+                          : 'text-zinc-300 hover:bg-white/[0.04] hover:text-zinc-100 focus:bg-white/[0.04] focus:text-zinc-100'
+                      }`}
                     >
                       <span className="min-w-0 truncate">
                         {country.flag} {country.name} {country.dialCode}
                       </span>
-                      {isSelected ? (
-                        <FiCheck className="size-4 shrink-0 text-white" />
-                      ) : null}
+                      {isSelected ? <FiCheck className="size-4 shrink-0 text-lime-300" /> : null}
                     </button>
                   );
                 })}
@@ -161,10 +145,7 @@ export function PhoneInput({
               className="pointer-events-none absolute inset-0 opacity-0"
             >
               {countries.map((country) => (
-                <option
-                  key={`${country.isoCode}-${country.dialCode}`}
-                  value={country.dialCode}
-                >
+                <option key={`${country.isoCode}-${country.dialCode}`} value={country.dialCode}>
                   {country.flag} {country.name} {country.dialCode}
                 </option>
               ))}
@@ -173,15 +154,13 @@ export function PhoneInput({
         </div>
 
         <div>
-          <label className={`mb-1 block text-sm font-medium ${labelClassName}`}>
-            Número de Telefone
-          </label>
+          <label className={`mb-1 block text-sm font-medium ${labelClassName}`}>Número</label>
           <input
             value={formattedPhone}
             onChange={handleNumberChange}
             disabled={disabled}
             placeholder={`${selectedCountry.dialCode} ${selectedCountry.mask}`}
-            className="h-[50px] w-full rounded-xl border border-gray-500 bg-black px-4 py-3 text-gray-100 outline-none placeholder:text-gray-500 disabled:cursor-not-allowed disabled:opacity-60"
+            className="h-[50px] w-full rounded-xl border border-zinc-800 bg-zinc-950 px-4 py-3 text-zinc-100 outline-none placeholder:text-zinc-500 disabled:cursor-not-allowed disabled:opacity-60"
           />
         </div>
       </div>

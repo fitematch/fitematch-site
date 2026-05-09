@@ -22,6 +22,8 @@ export type UpdateMyCompanyRequest = Partial<CreateMyCompanyRequest>;
 
 export type UpdateMyCompanyResponse = CompanyEntity;
 
+export type ListCompaniesResponse = CompanyEntity[];
+
 export interface PublicCompanyResponse {
   _id: string;
   slug: string;

@@ -3,24 +3,14 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { AnimatePresence, motion } from 'framer-motion';
-import {
-  BarChart3,
-  BriefcaseBusiness,
-  Building2,
-  ChevronLeft,
-  LayoutDashboard,
-  Menu,
-  Search,
-  Users,
-  X,
-} from 'lucide-react';
+import { BriefcaseBusiness, Building2, ChevronLeft, LayoutDashboard, Menu, X } from 'lucide-react';
 import { useState } from 'react';
 import { ROUTES } from '@/constants/routes';
 
 const NAV_ITEMS = [
   { href: ROUTES.RECRUITER_DASHBOARD, label: 'Dashboard', icon: LayoutDashboard },
-  { href: ROUTES.RECRUITER_JOBS, label: 'Vagas', icon: BriefcaseBusiness },
   { href: ROUTES.RECRUITER_COMPANY, label: 'Empresa', icon: Building2 },
+  { href: ROUTES.RECRUITER_JOBS, label: 'Vagas', icon: BriefcaseBusiness },
 ];
 
 function SidebarContent({
@@ -40,15 +30,7 @@ function SidebarContent({
           className="inline-flex items-center gap-3 lowercase"
           onClick={onNavigate}
         >
-          <span className="flex h-9 w-9 items-center justify-center rounded-2xl border border-lime-500/20 bg-lime-500/10 text-lime-400">
-            <BarChart3 className="h-4 w-4" />
-          </span>
-          {!collapsed && (
-            <span className="text-base font-semibold tracking-[-0.04em] text-zinc-50">
-              <span className="text-zinc-50">fite</span>
-              <span className="text-lime-400">match</span>
-            </span>
-          )}
+          <span className="text-base font-semibold tracking-[-0.04em] text-zinc-50"></span>
         </Link>
       </div>
 
@@ -180,16 +162,6 @@ export function DashboardShell({
                 <div>
                   <p className="text-sm text-zinc-500">{subtitle}</p>
                   <h1 className="text-lg font-semibold tracking-[-0.04em] text-zinc-50">{title}</h1>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-3">
-                <div className="hidden items-center gap-2 rounded-full border border-zinc-800 bg-zinc-950 px-4 py-2 text-sm text-zinc-500 md:flex">
-                  <Search className="h-4 w-4" />
-                  Buscar vaga, aplicação ou candidato
-                </div>
-                <div className="flex h-10 w-10 items-center justify-center rounded-full border border-zinc-800 bg-lime-500/10 text-lime-400">
-                  <Users className="h-4 w-4" />
                 </div>
               </div>
             </div>

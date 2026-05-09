@@ -5,6 +5,7 @@ import {
   CreateCompanyResponse,
   CreateMyCompanyRequest,
   CreateMyCompanyResponse,
+  ListCompaniesResponse,
   ListPublicCompaniesResponse,
   ReadMyCompanyResponse,
   UpdateMyCompanyRequest,
@@ -23,18 +24,14 @@ export const CompanyService = {
     return apiClient<ReadMyCompanyResponse>(API_ENDPOINTS.COMPANY_ME);
   },
 
-  createMine(
-    payload: CreateMyCompanyRequest,
-  ): Promise<CreateMyCompanyResponse> {
+  createMine(payload: CreateMyCompanyRequest): Promise<CreateMyCompanyResponse> {
     return apiClient<CreateMyCompanyResponse>(API_ENDPOINTS.COMPANY_ME, {
       method: 'POST',
       body: JSON.stringify(payload),
     });
   },
 
-  updateMine(
-    payload: UpdateMyCompanyRequest,
-  ): Promise<UpdateMyCompanyResponse> {
+  updateMine(payload: UpdateMyCompanyRequest): Promise<UpdateMyCompanyResponse> {
     return apiClient<UpdateMyCompanyResponse>(API_ENDPOINTS.COMPANY_ME, {
       method: 'PATCH',
       body: JSON.stringify(payload),
@@ -42,11 +39,14 @@ export const CompanyService = {
   },
 
   listPublic(): Promise<ListPublicCompaniesResponse> {
-    return apiClient<ListPublicCompaniesResponse>(
-      API_ENDPOINTS.COMPANY_PUBLIC,
-      {
-        auth: false,
-      },
-    );
+    return apiClient<ListPublicCompaniesResponse>(API_ENDPOINTS.COMPANY_PUBLIC, {
+      auth: false,
+    });
+  },
+
+  list(): Promise<ListCompaniesResponse> {
+    return apiClient<ListCompaniesResponse>(API_ENDPOINTS.COMPANY, {
+      auth: false,
+    });
   },
 };

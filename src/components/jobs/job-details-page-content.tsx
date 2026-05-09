@@ -2,24 +2,23 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { FaArrowLeft, FaWhatsapp, FaFacebook, FaInstagram, FaLinkedinIn } from 'react-icons/fa';
-import { SlGlobe } from 'react-icons/sl';
-import { CiShare2 } from 'react-icons/ci';
-import { FaXTwitter } from 'react-icons/fa6';
+import { motion } from 'framer-motion';
+import { ArrowLeft, Building2, Copy, Globe, MapPin, Share2 } from 'lucide-react';
+import { FaFacebookF, FaLinkedinIn, FaWhatsapp, FaXTwitter } from 'react-icons/fa6';
+import { useApplications } from '@/hooks/use-applications';
+import { useAuth } from '@/hooks/use-auth';
 import { useJob } from '@/hooks/use-job';
 import { usePublicCompanies } from '@/hooks/use-public-companies';
-import { useApplications } from '@/hooks/use-applications';
-import { Skeleton } from '@/components/ui/skeleton';
 import { Alert } from '@/components/ui/alert';
 import { ApplyJobButton } from '@/components/jobs/apply-job-button';
-import { THEME } from '@/constants/theme';
-import { JobCard } from '@/components/jobs/job-card';
-import { Button } from '@/components/ui/button';
-import { ROUTES } from '@/constants/routes';
 import { Breadcrumb } from '@/components/ui/breadcrumb';
-import { CARD_STYLES, TEXT_STYLES } from '@/constants/styles';
+import { JobCard } from '@/components/jobs/job-card';
 import { JobLocationMapTest } from '@/components/jobs/job-location-map-test';
-import { useAuth } from '@/hooks/use-auth';
+import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
+import { ROUTES } from '@/constants/routes';
+import { useFlashMessage } from '@/contexts/flash-message-context';
+import { PAGE_STYLES } from '@/constants/styles';
 import { ProductRoleEnum } from '@/types/entities/user.entity';
 import { resolveFileUrl } from '@/utils/file-url';
 
@@ -27,35 +26,65 @@ interface JobDetailsPageContentProps {
   jobId: string;
 }
 
+function ShareButton({
+  href,
+  icon,
+  className,
+}: {
+  href: string;
+  icon: React.ReactNode;
+  className: string;
+}) {
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      className={`inline-flex h-12 w-12 items-center justify-center rounded-xl border text-sm transition-all duration-300 ${className}`}
+    >
+      {icon}
+    </a>
+  );
+}
+
 export function JobDetailsPageContent({ jobId }: JobDetailsPageContentProps) {
   const { user, isAuthenticated } = useAuth();
-  const canLoadApplications =
-    isAuthenticated && user?.productRole === ProductRoleEnum.CANDIDATE;
+  const { showSuccess, showError } = useFlashMessage();
+  const canLoadApplications = isAuthenticated && user?.productRole === ProductRoleEnum.CANDIDATE;
 
   const { applications, refetch } = useApplications({
     enabled: canLoadApplications,
   });
 
   const hasAlreadyApplied = applications.some((app) => app.jobId === jobId);
-
   const { job, isLoading, error } = useJob(jobId);
-  const {
-    companies,
-    isLoading: isLoadingCompanies,
-    error: companiesError,
-  } = usePublicCompanies();
+  const { companies, isLoading: isLoadingCompanies, error: companiesError } = usePublicCompanies();
 
   const company = job?.company
     ? {
         ...job.company,
         _id: job.company._id || job.company._id,
       }
-    : (job && companies.find((item) => item._id === job.companyId))
-      ? companies.find((item) => item._id === job.companyId)
-      : undefined;
+    : (job && companies.find((item) => item._id === job.companyId)) || undefined;
 
   if (isLoading || isLoadingCompanies) {
-    return <Skeleton className="h-64" />;
+    return (
+      <section className={`${PAGE_STYLES.body} py-20`}>
+        <div className={PAGE_STYLES.container}>
+          <div className="space-y-6">
+            <Skeleton className="h-8 w-52 rounded-xl bg-zinc-950/80" />
+            <Skeleton className="h-20 rounded-2xl border border-zinc-800 bg-zinc-950/80" />
+            <div className="grid gap-8 lg:grid-cols-3">
+              <Skeleton className="h-[48rem] rounded-2xl border border-zinc-800 bg-zinc-950/80 lg:col-span-2" />
+              <div className="space-y-6">
+                <Skeleton className="h-56 rounded-2xl border border-zinc-800 bg-zinc-950/80" />
+                <Skeleton className="h-56 rounded-2xl border border-zinc-800 bg-zinc-950/80" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    );
   }
 
   if (error) {
@@ -70,9 +99,23 @@ export function JobDetailsPageContent({ jobId }: JobDetailsPageContentProps) {
     return null;
   }
 
+  const currentUrl = typeof window !== 'undefined' ? window.location.href : '';
+  const location = [company?.contacts?.address?.city, company?.contacts?.address?.state]
+    .filter(Boolean)
+    .join(', ');
+
+  async function handleCopyLink() {
+    try {
+      await navigator.clipboard.writeText(currentUrl);
+      showSuccess('Link da vaga copiado para a área de transferência.');
+    } catch {
+      showError('Não foi possível copiar o link da vaga.');
+    }
+  }
+
   return (
-    <section className={`min-h-screen ${THEME.layout.background} py-20`}>
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    <section className={`${PAGE_STYLES.body} py-20`}>
+      <div className={PAGE_STYLES.container}>
         <Breadcrumb
           items={[
             { label: 'Home', href: ROUTES.HOME },
@@ -80,33 +123,48 @@ export function JobDetailsPageContent({ jobId }: JobDetailsPageContentProps) {
             { label: job.title },
           ]}
         />
-        <h1 className={`${TEXT_STYLES.pageTitle} mt-8`}>
-          {company?.tradeName ? `${company.tradeName} - ${job.title}` : job.title}
-        </h1>
-        <div className={`${TEXT_STYLES.pageSubtitle} mt-2 mb-2 text-gray-400`}>
-          {job.createdAt &&
-            `Publicado: ${new Date(job.createdAt).toLocaleDateString('pt-BR', {
-              day: '2-digit',
-              month: '2-digit',
-              year: '2-digit',
-            })} às ${new Date(job.createdAt).toLocaleTimeString('pt-BR', {
-              hour: '2-digit',
-              minute: '2-digit',
-            })}`}
+
+        {company?.tradeName && (
+          <div className="mt-8 flex items-start gap-3">
+            <span className="mt-1 flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-lime-500/20 bg-lime-500/10 text-lime-400">
+              <Building2 className="h-4 w-4" />
+            </span>
+            <div className="min-w-0">
+              <h1 className="text-2xl font-bold tracking-[-0.04em] text-zinc-100">
+                {company.tradeName}
+              </h1>
+            </div>
+          </div>
+        )}
+
+        <div className="mt-8 flex flex-wrap justify-start gap-2 text-sm text-zinc-400">
+          {job.createdAt && (
+            <span className="rounded-full border border-zinc-800 bg-zinc-950/80 px-3 py-1.5 backdrop-blur">
+              Publicado em{' '}
+              {new Date(job.createdAt).toLocaleDateString('pt-BR', {
+                day: '2-digit',
+                month: '2-digit',
+                year: '2-digit',
+              })}
+            </span>
+          )}
         </div>
-        <div className="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-3">
+
+        <div className="mt-10 grid gap-8 lg:grid-cols-3">
           <div className="lg:col-span-2">
             <JobCard
               job={job}
               company={company}
-              showRequirements={true}
-              hideDetailsButton={true}
-              hideImageTitleAndLocation={true}
-              className="border-slate-600/70 bg-zinc-950 shadow-[0_18px_50px_rgba(0,0,0,0.34),0_0_0_1px_rgba(148,163,184,0.06)]"
+              showRequirements
+              hideDetailsButton
               customActions={
                 <>
                   <Link href={ROUTES.JOBS}>
-                    <Button color="gray" icon={<FaArrowLeft />}>
+                    <Button
+                      color="gray"
+                      icon={<ArrowLeft className="h-4 w-4" />}
+                      className="rounded-xl border-zinc-800 bg-black/40 text-zinc-200 hover:bg-white/[0.03]"
+                    >
                       Vagas
                     </Button>
                   </Link>
@@ -119,104 +177,99 @@ export function JobDetailsPageContent({ jobId }: JobDetailsPageContentProps) {
               }
             />
           </div>
-          <aside className="space-y-8">
+
+          <aside className="space-y-6">
             {company && (
-              <div
-                className={`${CARD_STYLES.jobCard} border-slate-700/70 bg-zinc-950 shadow-[0_12px_32px_rgba(0,0,0,0.26)]`}
+              <motion.div
+                initial={{ opacity: 0, y: 18 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.32 }}
+                className="rounded-2xl border border-zinc-800 bg-zinc-950/80 p-6 backdrop-blur"
               >
-                <div className="mb-5 flex items-center gap-4">
+                <div className="flex items-center gap-4">
                   {company.media?.logoUrl ? (
                     <Image
                       src={resolveFileUrl(company.media.logoUrl)}
                       alt={`Logo da empresa ${company.tradeName}`}
-                      width={48}
-                      height={48}
+                      width={56}
+                      height={56}
                       unoptimized
-                      className="h-12 w-12 rounded-xl border border-slate-700 object-cover"
+                      className="h-14 w-14 rounded-2xl border border-zinc-800 object-cover"
                     />
                   ) : (
-                    <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-slate-700 bg-black text-lg font-semibold text-gray-300">
+                    <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-zinc-800 bg-black/40 text-sm font-semibold text-zinc-300">
                       {company.tradeName?.slice(0, 2).toUpperCase()}
                     </div>
                   )}
-                  <div>
-                    <div className="text-lg font-bold text-gray-100">{company.tradeName}</div>
+
+                  <div className="min-w-0">
+                    <p className="text-lg font-semibold text-zinc-100">{company.tradeName}</p>
+                    {location && (
+                      <p className="mt-1 inline-flex items-center gap-2 text-sm text-zinc-500">
+                        <MapPin className="h-4 w-4 text-lime-400" />
+                        {location}
+                      </p>
+                    )}
                   </div>
                 </div>
+
                 {company.contacts?.website && (
                   <a
                     href={company.contacts.website}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center gap-2 rounded-xl border border-slate-700/80 bg-black/60 px-3 py-3 text-sm text-gray-300 transition-colors hover:border-slate-500 hover:text-gray-100"
+                    className="mt-5 flex items-center gap-2 rounded-xl border border-zinc-800 bg-black/40 px-4 py-3 text-sm text-zinc-300 transition-all duration-300 hover:border-lime-500/20 hover:text-zinc-100"
                   >
-                    <SlGlobe className="text-base" />
-                    Site da empresa: {company.contacts.website}
+                    <Globe className="h-4 w-4 text-lime-400" />
+                    {company.contacts.website}
                   </a>
                 )}
-              </div>
+              </motion.div>
             )}
+
             {company && <JobLocationMapTest company={company} />}
-            <div
-              className={`${CARD_STYLES.jobCard} border-slate-700/70 bg-zinc-950 shadow-[0_12px_32px_rgba(0,0,0,0.26)]`}
+
+            <motion.div
+              initial={{ opacity: 0, y: 18 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.32, delay: 0.04 }}
+              className="rounded-2xl border border-zinc-800 bg-zinc-950/80 p-6 backdrop-blur"
             >
-              <div className="mb-5 flex items-center gap-3 text-lg font-bold text-gray-100">
-                <CiShare2 className="h-6 w-6" />
+              <div className="mb-5 flex items-center gap-3 text-lg font-semibold text-zinc-100">
+                <Share2 className="h-5 w-5 text-lime-400" />
                 <span>Compartilhar</span>
               </div>
-              <div className="flex items-center justify-between gap-3">
-                <a
-                  href={`https://wa.me/?text=${encodeURIComponent(typeof window !== 'undefined' ? window.location.href : '')}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex h-14 w-14 shrink-0 items-center justify-center rounded-xl border border-slate-700 bg-zinc-900 text-green-300 transition-all hover:-translate-y-0.5 hover:border-green-500 hover:bg-green-600 hover:text-white"
-                  aria-label="Compartilhar vaga no WhatsApp"
-                  style={{ lineHeight: 0 }}
+              <div className="flex flex-wrap gap-3">
+                <button
+                  type="button"
+                  onClick={() => void handleCopyLink()}
+                  className="inline-flex h-12 w-12 cursor-pointer items-center justify-center rounded-xl border border-zinc-800 bg-black/40 text-sm text-zinc-200 transition-all duration-300 hover:border-lime-500/20 hover:text-lime-300"
+                  aria-label="Copiar link"
                 >
-                  <FaWhatsapp size={26} style={{ verticalAlign: 'middle' }} />
-                </a>
-                <a
-                  href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(typeof window !== 'undefined' ? window.location.href : '')}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex h-14 w-14 shrink-0 items-center justify-center rounded-xl border border-slate-700 bg-zinc-900 text-gray-300 transition-all hover:-translate-y-0.5 hover:border-white/70 hover:bg-black hover:text-white"
-                  aria-label="Compartilhar vaga no X"
-                  style={{ lineHeight: 0 }}
-                >
-                  <FaXTwitter size={26} style={{ verticalAlign: 'middle' }} />
-                </a>
-                <a
-                  href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(typeof window !== 'undefined' ? window.location.href : '')}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex h-14 w-14 shrink-0 items-center justify-center rounded-xl border border-slate-700 bg-zinc-900 text-blue-300 transition-all hover:-translate-y-0.5 hover:border-blue-500 hover:bg-blue-700 hover:text-white"
-                  aria-label="Compartilhar vaga no Facebook"
-                  style={{ lineHeight: 0 }}
-                >
-                  <FaFacebook size={26} style={{ verticalAlign: 'middle' }} />
-                </a>
-                <a
-                  href="https://www.instagram.com/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex h-14 w-14 shrink-0 items-center justify-center rounded-xl border border-slate-700 bg-zinc-900 text-pink-300 transition-all hover:-translate-y-0.5 hover:border-pink-500 hover:bg-gradient-to-br hover:from-pink-500 hover:via-red-500 hover:to-yellow-500 hover:text-white"
-                  aria-label="Compartilhar vaga no Instagram"
-                  style={{ lineHeight: 0 }}
-                >
-                  <FaInstagram size={26} style={{ verticalAlign: 'middle' }} />
-                </a>
-                <a
-                  href={`https://www.linkedin.com/shareArticle?mini=true&url=${encodeURIComponent(typeof window !== 'undefined' ? window.location.href : '')}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex h-14 w-14 shrink-0 items-center justify-center rounded-xl border border-slate-700 bg-zinc-900 text-sky-300 transition-all hover:-translate-y-0.5 hover:border-sky-500 hover:bg-sky-800 hover:text-white"
-                  aria-label="Compartilhar vaga no LinkedIn"
-                  style={{ lineHeight: 0 }}
-                >
-                  <FaLinkedinIn size={26} style={{ verticalAlign: 'middle' }} />
-                </a>
+                  <Copy className="h-4 w-4" />
+                </button>
+                <ShareButton
+                  href={`https://wa.me/?text=${encodeURIComponent(currentUrl)}`}
+                  icon={<FaWhatsapp className="h-4 w-4" />}
+                  className="border-zinc-800 bg-black/40 text-zinc-200 hover:border-[#25D366]/30 hover:text-[#25D366]"
+                />
+                <ShareButton
+                  href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(currentUrl)}`}
+                  icon={<FaXTwitter className="h-4 w-4" />}
+                  className="border-zinc-800 bg-black/40 text-zinc-200 hover:border-white/30 hover:text-white"
+                />
+                <ShareButton
+                  href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(currentUrl)}`}
+                  icon={<FaFacebookF className="h-4 w-4" />}
+                  className="border-zinc-800 bg-black/40 text-zinc-200 hover:border-[#1877F2]/30 hover:text-[#1877F2]"
+                />
+                <ShareButton
+                  href={`https://www.linkedin.com/shareArticle?mini=true&url=${encodeURIComponent(currentUrl)}`}
+                  icon={<FaLinkedinIn className="h-4 w-4" />}
+                  className="border-zinc-800 bg-black/40 text-zinc-200 hover:border-[#0A66C2]/30 hover:text-[#0A66C2]"
+                />
               </div>
-            </div>
+            </motion.div>
           </aside>
         </div>
       </div>

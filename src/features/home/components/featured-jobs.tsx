@@ -1,14 +1,36 @@
 'use client';
 
+import Image from 'next/image';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { ArrowRight, BriefcaseBusiness, MapPin, Sparkles, Users } from 'lucide-react';
+import { ArrowRight, BriefcaseBusiness, Building2, MapPin, Users, Wallet } from 'lucide-react';
 import { ROUTES } from '@/constants/routes';
 import { useJobs } from '@/hooks/use-jobs';
+import { resolveFileUrl } from '@/utils/file-url';
 
 export function FeaturedJobs() {
   const { jobs, isLoading, error } = useJobs();
   const featuredJobs = jobs.slice(0, 3);
+
+  const formatSalary = (salary?: number | string) => {
+    if (typeof salary === 'number') {
+      return new Intl.NumberFormat('pt-BR', {
+        style: 'currency',
+        currency: 'BRL',
+        maximumFractionDigits: 0,
+      }).format(salary);
+    }
+
+    return salary || 'Salário a combinar';
+  };
+
+  const formatSlots = (slots?: number) => {
+    if (!slots || slots <= 1) {
+      return '1 vaga';
+    }
+
+    return `${slots} vagas`;
+  };
 
   return (
     <section className="border-t border-zinc-900 bg-black py-24">
@@ -18,14 +40,11 @@ export function FeaturedJobs() {
             <p className="text-sm font-medium uppercase tracking-[0.26em] text-lime-400">
               Vagas em destaque
             </p>
-            <h2 className="mt-4 text-3xl font-semibold tracking-[-0.05em] text-zinc-50 sm:text-4xl">
-              Oportunidades com posicionamento claro, operação séria e expectativa real.
-            </h2>
           </div>
 
           <Link
             href={ROUTES.JOBS}
-            className="inline-flex items-center gap-2 text-sm text-zinc-300 transition-colors hover:text-zinc-50"
+            className="inline-flex items-center gap-2 rounded-xl border border-lime-500/20 bg-lime-500/10 px-4 py-2.5 text-sm font-medium text-lime-300 transition-all hover:-translate-y-0.5 hover:border-lime-500/35 hover:bg-lime-500/15 hover:text-lime-200"
           >
             Ver todas as vagas
             <ArrowRight className="h-4 w-4" />
@@ -50,46 +69,50 @@ export function FeaturedJobs() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, amount: 0.35 }}
                 transition={{ duration: 0.45, delay: index * 0.08 }}
-                className="rounded-2xl border border-zinc-800 bg-zinc-950/90 p-8 shadow-[0_20px_60px_rgba(0,0,0,0.28)] backdrop-blur transition-all duration-300 hover:border-lime-500/30 hover:shadow-[0_0_0_1px_rgba(34,197,94,0.08),0_20px_60px_rgba(0,0,0,0.32),0_0_30px_rgba(34,197,94,0.08)]"
+                className="overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-950/80 shadow-[0_20px_60px_rgba(0,0,0,0.28)] backdrop-blur transition-all duration-300 hover:-translate-y-0.5 hover:border-lime-500/30 hover:shadow-[0_0_0_1px_rgba(34,197,94,0.08),0_20px_60px_rgba(0,0,0,0.32),0_0_30px_rgba(34,197,94,0.08)]"
               >
-                <div className="flex items-start justify-between gap-4">
-                  <span className="inline-flex items-center gap-2 rounded-full border border-lime-500/15 bg-lime-500/10 px-3 py-1 text-xs text-lime-300">
-                    <Sparkles className="h-3.5 w-3.5" />
-                    Destaque
-                  </span>
-                  <span className="text-xs uppercase tracking-[0.24em] text-zinc-500">
-                    {job.contractType || 'Fitness'}
-                  </span>
+                <div className="relative h-44 bg-[radial-gradient(circle_at_top,rgba(199,245,29,0.16),transparent_48%),linear-gradient(180deg,rgba(24,24,27,0.7),rgba(9,9,11,0.95))]">
+                  {job.media?.coverUrl && (
+                    <Image
+                      src={resolveFileUrl(job.media.coverUrl)}
+                      alt={job.title}
+                      fill
+                      unoptimized
+                      className="object-cover"
+                    />
+                  )}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent" />
+
+                  <div className="absolute left-4 top-4 inline-flex items-center gap-2 rounded-full border border-lime-500/20 bg-black/70 px-3 py-1.5 text-xs font-medium text-lime-300 backdrop-blur">
+                    <Wallet className="h-3.5 w-3.5" />
+                    {formatSalary(job.benefits?.salary)}
+                  </div>
+
+                  {job.contractType && (
+                    <div className="absolute right-4 top-4 inline-flex items-center gap-2 rounded-full border border-zinc-800 bg-black/70 px-3 py-1.5 text-[11px] uppercase tracking-[0.18em] text-zinc-200 backdrop-blur">
+                      <BriefcaseBusiness className="h-3.5 w-3.5 text-lime-400" />
+                      {job.contractType}
+                    </div>
+                  )}
+
+                  <div className="absolute bottom-0 left-0 w-full px-6 pb-5 pt-12">
+                    <h3 className="text-xl font-semibold text-zinc-50">{job.title}</h3>
+                    <div className="mt-2 flex flex-wrap items-center gap-3 text-sm text-zinc-300">
+                      <span className="inline-flex items-center gap-2">
+                        <Building2 className="h-4 w-4 text-lime-400" />
+                        {job.company.tradeName}
+                      </span>
+                      <span className="inline-flex items-center gap-2">
+                        <MapPin className="h-4 w-4 text-lime-400" />
+                        {job.company.contacts?.address?.city || 'Brasil'}
+                      </span>
+                      <span className="inline-flex items-center gap-2">
+                        <Users className="h-4 w-4 text-lime-400" />
+                        {formatSlots(job.slots)}
+                      </span>
+                    </div>
+                  </div>
                 </div>
-
-                <h3 className="mt-6 text-2xl font-semibold tracking-[-0.04em] text-zinc-50">
-                  {job.title}
-                </h3>
-                <p className="mt-2 text-sm text-zinc-500">{job.company.tradeName}</p>
-
-                <p className="mt-5 line-clamp-4 text-sm leading-7 text-zinc-400">
-                  {job.description}
-                </p>
-
-                <div className="mt-6 flex flex-wrap gap-3 text-xs text-zinc-400">
-                  <span className="inline-flex items-center gap-2 rounded-full border border-zinc-800 px-3 py-1.5">
-                    <Users className="h-3.5 w-3.5 text-lime-400" />
-                    {job.slots} vaga(s)
-                  </span>
-                  <span className="inline-flex items-center gap-2 rounded-full border border-zinc-800 px-3 py-1.5">
-                    <MapPin className="h-3.5 w-3.5 text-lime-400" />
-                    {job.company.contacts?.address?.city || 'Brasil'}
-                  </span>
-                </div>
-
-                <Link
-                  href={`${ROUTES.JOBS}/${job.slug || job._id}`}
-                  className="mt-8 inline-flex items-center gap-2 text-sm font-medium text-zinc-100 transition-colors hover:text-lime-400"
-                >
-                  <BriefcaseBusiness className="h-4 w-4" />
-                  Ver oportunidade
-                  <ArrowRight className="h-4 w-4" />
-                </Link>
               </motion.article>
             ))}
         </div>

@@ -12,7 +12,7 @@ import { ProductRoleEnum } from '@/types/entities/user.entity';
 import { LanguageDropdown } from './language-dropdown';
 
 const NAV_LINK_BASE =
-  'rounded-full px-3 py-2 text-sm text-zinc-100 transition-colors duration-200 hover:text-white';
+  'rounded-full px-3 py-2 text-sm text-zinc-50 transition-colors duration-200 hover:text-lime-500';
 const NAV_LINK_ACTIVE = 'text-lime-400';
 
 export function Header() {
@@ -98,14 +98,14 @@ export function Header() {
             <>
               <Link
                 href={ROUTES.SIGN_IN}
-                className="inline-flex items-center gap-2 rounded-full border border-zinc-700 bg-zinc-900/80 px-4 py-2 text-sm text-zinc-100 transition-all duration-300 hover:border-zinc-600 hover:bg-zinc-900"
+                className="inline-flex items-center gap-2 rounded-full bg-zinc-50 px-4 py-2 text-sm font-medium text-black transition-all duration-300 hover:bg-white"
               >
                 <LogIn className="h-4 w-4" />
                 Entrar
               </Link>
               <Link
                 href={ROUTES.SIGN_UP}
-                className="inline-flex items-center gap-2 rounded-full bg-zinc-50 px-4 py-2 text-sm font-medium text-black transition-all duration-300 hover:bg-white"
+                className="inline-flex items-center gap-2 rounded-full bg-lime-500 px-4 py-2 text-sm font-medium text-black transition-all duration-300 hover:bg-lime-400"
               >
                 Criar conta
                 <ArrowRight className="h-4 w-4" />
@@ -117,7 +117,7 @@ export function Header() {
             <>
               <Link
                 href={ROUTES.PROFILE}
-                className="inline-flex items-center gap-2 rounded-full border border-zinc-700 bg-zinc-900/80 px-4 py-2 text-sm text-zinc-100 transition-all duration-300 hover:border-zinc-600 hover:bg-zinc-900"
+                className="inline-flex items-center gap-2 rounded-full border border-lime-500/20 bg-lime-500/10 px-4 py-2 text-sm text-lime-300 transition-all duration-300 hover:border-lime-500/35 hover:bg-lime-500/15 hover:text-lime-200"
               >
                 <UserRound className="h-4 w-4" />
                 Perfil
@@ -127,7 +127,7 @@ export function Header() {
                 onClick={() => {
                   void handleSignOut();
                 }}
-                className="inline-flex items-center gap-2 rounded-full border border-zinc-700 bg-zinc-900/80 px-4 py-2 text-sm text-zinc-100 transition-all duration-300 hover:border-zinc-600 hover:bg-zinc-900"
+                className="inline-flex items-center gap-2 rounded-full border border-red-500/20 bg-red-500/10 px-4 py-2 text-sm text-red-200 transition-all duration-300 hover:border-red-500/35 hover:bg-red-500/15 hover:text-red-100"
               >
                 <LogOut className="h-4 w-4" />
                 Sair
@@ -167,7 +167,11 @@ export function Header() {
                     key={item.href}
                     href={item.href}
                     onClick={() => setMenuOpen(false)}
-                    className="rounded-2xl px-4 py-3 text-sm text-zinc-200 transition-colors hover:bg-white/[0.04] hover:text-zinc-50"
+                    className={`rounded-2xl px-4 py-3 text-sm transition-colors hover:bg-lime-500/10 hover:text-lime-400 ${
+                      pathname.startsWith(item.href) && item.href !== ROUTES.HOME
+                        ? 'text-lime-400'
+                        : 'text-zinc-50'
+                    }`}
                   >
                     {item.label}
                   </Link>
@@ -179,7 +183,7 @@ export function Header() {
                   <Link
                     href={ROUTES.SIGN_IN}
                     onClick={() => setMenuOpen(false)}
-                    className="inline-flex items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm text-zinc-100"
+                    className="inline-flex items-center justify-center gap-2 rounded-2xl bg-zinc-50 px-4 py-3 text-sm font-medium text-black transition-all duration-300 hover:bg-white"
                   >
                     <LogIn className="h-4 w-4" />
                     Entrar
@@ -187,7 +191,7 @@ export function Header() {
                   <Link
                     href={ROUTES.SIGN_UP}
                     onClick={() => setMenuOpen(false)}
-                    className="inline-flex items-center justify-center gap-2 rounded-2xl bg-zinc-50 px-4 py-3 text-sm font-medium text-black"
+                    className="inline-flex items-center justify-center gap-2 rounded-2xl bg-lime-500 px-4 py-3 text-sm font-medium text-black transition-all duration-300 hover:bg-lime-400"
                   >
                     <UserRoundPlus className="h-4 w-4" />
                     Criar conta
@@ -200,7 +204,7 @@ export function Header() {
                   <Link
                     href={ROUTES.PROFILE}
                     onClick={() => setMenuOpen(false)}
-                    className="inline-flex items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm text-zinc-100"
+                    className="inline-flex items-center justify-center gap-2 rounded-2xl border border-lime-500/20 bg-lime-500/10 px-4 py-3 text-sm text-lime-300 transition-all duration-300 hover:border-lime-500/35 hover:bg-lime-500/15 hover:text-lime-200"
                   >
                     <UserRound className="h-4 w-4" />
                     Perfil
@@ -210,7 +214,7 @@ export function Header() {
                     onClick={() => {
                       void handleSignOut();
                     }}
-                    className="inline-flex items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm text-zinc-100"
+                    className="inline-flex items-center justify-center gap-2 rounded-2xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-200 transition-all duration-300 hover:border-red-500/35 hover:bg-red-500/15 hover:text-red-100"
                   >
                     <LogOut className="h-4 w-4" />
                     Sair

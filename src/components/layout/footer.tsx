@@ -1,5 +1,13 @@
 import Link from 'next/link';
-import { ArrowUpRight, Globe, Play, Radio, Send, ShieldCheck } from 'lucide-react';
+import { ArrowUpRight } from 'lucide-react';
+import {
+  FaDiscord,
+  FaFacebookF,
+  FaInstagram,
+  FaLinkedinIn,
+  FaXTwitter,
+  FaYoutube,
+} from 'react-icons/fa6';
 import { ROUTES } from '@/constants/routes';
 
 const FOOTER_LINKS = [
@@ -10,46 +18,84 @@ const FOOTER_LINKS = [
 ];
 
 const SOCIAL_LINKS = [
-  { href: '#', label: 'Instagram', icon: Globe },
-  { href: '#', label: 'LinkedIn', icon: Send },
-  { href: '#', label: 'X', icon: Radio },
-  { href: '#', label: 'YouTube', icon: Play },
+  {
+    href: '#',
+    label: 'Facebook',
+    icon: FaFacebookF,
+    hoverClassName: 'hover:border-[#1877F2]/30 hover:text-[#1877F2]',
+  },
+  {
+    href: '#',
+    label: 'Instagram',
+    icon: FaInstagram,
+    hoverClassName: 'hover:border-[#E4405F]/30 hover:text-[#E4405F]',
+  },
+  {
+    href: '#',
+    label: 'X',
+    icon: FaXTwitter,
+    hoverClassName: 'hover:border-white/30 hover:text-white',
+  },
+  {
+    href: '#',
+    label: 'YouTube',
+    icon: FaYoutube,
+    hoverClassName: 'hover:border-[#FF0000]/30 hover:text-[#FF0000]',
+  },
+  {
+    href: '#',
+    label: 'LinkedIn',
+    icon: FaLinkedinIn,
+    hoverClassName: 'hover:border-[#0A66C2]/30 hover:text-[#0A66C2]',
+  },
+  {
+    href: '#',
+    label: 'Discord',
+    icon: FaDiscord,
+    hoverClassName: 'hover:border-[#5865F2]/30 hover:text-[#5865F2]',
+  },
 ];
 
 export function Footer() {
+  const baseYear = 2026;
+  const currentYear = new Date().getFullYear();
+  const copyrightYears = currentYear > baseYear ? `${baseYear} - ${currentYear}` : `${baseYear}`;
+
   return (
     <footer className="border-t border-zinc-800 bg-black">
       <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
         <div className="grid gap-12 lg:grid-cols-[1.5fr_1fr]">
           <div className="space-y-6">
-            <div className="inline-flex items-center gap-3 rounded-full border border-white/8 bg-white/[0.03] px-4 py-2">
-              <span className="flex h-9 w-9 items-center justify-center rounded-full border border-lime-500/30 bg-lime-500/10 text-lime-400">
-                <ShieldCheck className="h-4 w-4" />
-              </span>
+            <div className="inline-flex items-center gap-3">
               <span className="text-xl font-semibold tracking-[-0.04em]">
                 <span className="text-zinc-50">fite</span>
                 <span className="text-lime-400">match</span>
               </span>
             </div>
-
-            <div className="max-w-xl space-y-3">
-              <p className="text-lg text-zinc-100">
-                Infraestrutura de contratação para operações fitness que querem velocidade, precisão
-                e consistência.
-              </p>
-              <p className="text-sm leading-7 text-zinc-500">
-                Centralize vagas, validação de candidatos e posicionamento da sua marca empregadora
-                em uma experiência moderna, direta e escalável.
-              </p>
+            <p className="text-sm font-medium uppercase tracking-[0.24em] text-zinc-500">Canais</p>
+            <div className="flex flex-wrap gap-3">
+              {SOCIAL_LINKS.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <Link
+                    key={item.label}
+                    href={item.href}
+                    className={`inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-zinc-800 bg-zinc-950 text-zinc-400 transition-all hover:-translate-y-0.5 ${item.hoverClassName}`}
+                    aria-label={item.label}
+                  >
+                    <Icon className="h-4 w-4" />
+                  </Link>
+                );
+              })}
             </div>
           </div>
 
           <div className="grid gap-10 sm:grid-cols-2">
-            <div className="space-y-4">
+            <div className="space-y-4 sm:col-start-2 sm:text-right">
               <p className="text-sm font-medium uppercase tracking-[0.24em] text-zinc-500">
                 Navegação
               </p>
-              <div className="flex flex-col gap-3">
+              <div className="flex flex-col gap-3 sm:items-end">
                 {FOOTER_LINKS.map((link) => (
                   <Link
                     key={link.href}
@@ -63,32 +109,23 @@ export function Footer() {
               </div>
             </div>
 
-            <div className="space-y-4">
-              <p className="text-sm font-medium uppercase tracking-[0.24em] text-zinc-500">
-                Canais
-              </p>
-              <div className="flex flex-wrap gap-3">
-                {SOCIAL_LINKS.map((item) => {
-                  const Icon = item.icon;
-                  return (
-                    <Link
-                      key={item.label}
-                      href={item.href}
-                      className="inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-zinc-800 bg-zinc-950 text-zinc-400 transition-all hover:-translate-y-0.5 hover:border-zinc-700 hover:text-lime-400"
-                      aria-label={item.label}
-                    >
-                      <Icon className="h-4 w-4" />
-                    </Link>
-                  );
-                })}
-              </div>
-            </div>
+            <div className="space-y-4" />
           </div>
         </div>
 
         <div className="mt-16 flex flex-col gap-3 border-t border-zinc-800 pt-6 text-sm text-zinc-500 sm:flex-row sm:items-center sm:justify-between">
-          <p>© 2026 fitematch. Todos os direitos reservados.</p>
-          <p>Fitness hiring infrastructure for modern gyms.</p>
+          <p>© {copyrightYears} fitematch. Todos os direitos reservados.</p>
+          <p>
+            Developed by{' '}
+            <a
+              href="https://drowper.com"
+              target="_blank"
+              rel="noreferrer noopener"
+              className="transition-colors hover:text-zinc-100"
+            >
+              drowper
+            </a>
+          </p>
         </div>
       </div>
     </footer>

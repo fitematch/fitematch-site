@@ -2,13 +2,13 @@
 
 import { useEffect, useState } from 'react';
 import { useForm, useWatch, useFieldArray } from 'react-hook-form';
+import { Save } from 'lucide-react';
 import {
   FaGlobeAmericas,
   FaPassport,
   FaPhoneSquare,
   FaRegTrashAlt,
   FaTelegramPlane,
-  FaSave,
   FaTshirt,
   FaWhatsapp,
 } from 'react-icons/fa';
@@ -144,7 +144,6 @@ export function ProfileForm() {
   return <CandidateProfileForm />;
 }
 
-
 export function CandidateProfileForm() {
   const { user, updateMe } = useAuth();
   const { showSuccess, showError } = useFlashMessage();
@@ -200,10 +199,33 @@ export function CandidateProfileForm() {
     startYear: currentYear,
     endYear: currentYear,
   });
-  const boxClassName = 'rounded-2xl border border-gray-500 bg-black p-6';
+  const boxClassName =
+    'rounded-[1.75rem] border border-zinc-800 bg-black/90 p-7 shadow-[0_18px_50px_rgba(0,0,0,0.36)] backdrop-blur transition-all duration-300 hover:-translate-y-0.5 hover:border-lime-300/25 hover:shadow-[0_0_0_1px_rgba(199,245,29,0.06),0_20px_52px_rgba(0,0,0,0.4)]';
   const fieldClassName =
-    'rounded-xl border border-gray-500 bg-black text-gray-300 placeholder:text-gray-500';
-  const labelClassName = 'text-gray-300';
+    'rounded-xl border border-zinc-800 bg-zinc-950 text-zinc-200 placeholder:text-zinc-500';
+  const labelClassName = 'text-zinc-300';
+  const sectionTitleClassName = 'uppercase text-lime-400';
+  const sectionIconClassName = 'text-lime-400';
+  const sectionToggleIconClassName = 'text-zinc-500';
+  const saveButtonClassName =
+    'rounded-xl border-lime-500/20 bg-lime-500/10 text-lime-300 hover:bg-lime-500/15';
+  const nestedCardClassName =
+    'rounded-2xl border border-zinc-800 bg-black/75 p-5 shadow-[0_12px_30px_rgba(0,0,0,0.24)] backdrop-blur transition-all duration-300 hover:-translate-y-0.5 hover:border-lime-300/20';
+  const modalCardClassName =
+    'w-full max-w-3xl rounded-[1.75rem] border border-zinc-800 bg-black/95 p-6 shadow-[0_24px_80px_rgba(0,0,0,0.44)] backdrop-blur';
+  const optionCardClassName =
+    'flex items-center gap-3 rounded-xl border border-zinc-800 bg-black/70 px-4 py-3 text-zinc-100 transition-all duration-300 hover:border-lime-400/30 hover:bg-zinc-900';
+  const stepperButtonClassName =
+    'flex h-[50px] w-[50px] shrink-0 items-center justify-center rounded-xl border border-zinc-800 bg-black/70 text-zinc-100 transition-all duration-300 hover:border-lime-400/30 hover:bg-zinc-900 hover:text-lime-300 disabled:cursor-not-allowed disabled:opacity-40';
+  const numericInputClassName =
+    'w-full appearance-none bg-transparent text-center text-zinc-200 outline-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none';
+  const modalHeadingClassName =
+    'flex items-center gap-3 text-xl font-semibold uppercase tracking-[0.16em] text-zinc-100';
+  const modalCloseButtonClassName =
+    'text-2xl leading-none text-zinc-500 transition-colors hover:text-zinc-100';
+  const modalDescriptionClassName = 'text-sm text-zinc-400';
+  const nestedSectionTitleClassName =
+    'mb-4 text-lg font-semibold uppercase tracking-[0.16em] text-zinc-100';
 
   const {
     control,
@@ -251,7 +273,7 @@ export function CandidateProfileForm() {
   async function submitCandidateUpdate(
     payload: UpdateMeRequest,
     successMessage: string,
-    errorMessage: string
+    errorMessage: string,
   ) {
     try {
       await updateMe(payload);
@@ -301,12 +323,9 @@ export function CandidateProfileForm() {
     currentValue: number | undefined,
     delta: number,
     min = 0,
-    precision = 1
+    precision = 1,
   ) {
-    const nextValue = Math.max(
-      min,
-      Number((Number(currentValue || 0) + delta).toFixed(precision))
-    );
+    const nextValue = Math.max(min, Number((Number(currentValue || 0) + delta).toFixed(precision)));
     setValue(field, nextValue, { shouldDirty: true, shouldTouch: true });
   }
 
@@ -325,14 +344,10 @@ export function CandidateProfileForm() {
       shouldDirty: true,
       shouldTouch: true,
     });
-    setValue(
-      'candidateProfile.contacts.address.neighborhood',
-      result.neighborhood,
-      {
-        shouldDirty: true,
-        shouldTouch: true,
-      }
-    );
+    setValue('candidateProfile.contacts.address.neighborhood', result.neighborhood, {
+      shouldDirty: true,
+      shouldTouch: true,
+    });
     setValue('candidateProfile.contacts.address.city', result.city, {
       shouldDirty: true,
       shouldTouch: true,
@@ -408,10 +423,7 @@ export function CandidateProfileForm() {
       isOngoing: educationDraft.isOngoing,
     };
 
-    const nextEducations = [
-      ...(getValues('candidateProfile.educations') || []),
-      nextEducation,
-    ];
+    const nextEducations = [...(getValues('candidateProfile.educations') || []), nextEducation];
 
     void submitCandidateUpdate(
       {
@@ -421,7 +433,7 @@ export function CandidateProfileForm() {
         },
       },
       'Formação salva com sucesso.',
-      'Não foi possível salvar a formação.'
+      'Não foi possível salvar a formação.',
     ).then((saved) => {
       if (!saved) {
         return;
@@ -460,7 +472,7 @@ export function CandidateProfileForm() {
         },
       },
       'Experiência profissional salva com sucesso.',
-      'Não foi possível salvar a experiência profissional.'
+      'Não foi possível salvar a experiência profissional.',
     ).then((saved) => {
       if (!saved) {
         return;
@@ -476,7 +488,7 @@ export function CandidateProfileForm() {
     void submitCandidateUpdate(
       { name: getValues('name') },
       'Dados básicos atualizados com sucesso.',
-      'Não foi possível atualizar os dados básicos.'
+      'Não foi possível atualizar os dados básicos.',
     );
   }
 
@@ -497,7 +509,7 @@ export function CandidateProfileForm() {
         },
       },
       'Telefone atualizado com sucesso.',
-      'Não foi possível atualizar o telefone.'
+      'Não foi possível atualizar o telefone.',
     );
   }
 
@@ -532,9 +544,7 @@ export function CandidateProfileForm() {
         ? {
             cref: {
               number: hasValue(cref?.number) ? String(cref?.number) : '',
-              category: hasValue(cref?.category)
-                ? String(cref?.category)
-                : '',
+              category: hasValue(cref?.category) ? String(cref?.category) : '',
               isActive: Boolean(cref?.isActive),
             },
           }
@@ -545,12 +555,8 @@ export function CandidateProfileForm() {
       hasValue(passport?.expirationDate)
         ? {
             passport: {
-              number: hasValue(passport?.number)
-                ? String(passport?.number)
-                : '',
-              country: hasValue(passport?.country)
-                ? String(passport?.country)
-                : '',
+              number: hasValue(passport?.number) ? String(passport?.number) : '',
+              country: hasValue(passport?.country) ? String(passport?.country) : '',
               expirationDate: passport?.expirationDate as Date,
             },
           }
@@ -565,7 +571,7 @@ export function CandidateProfileForm() {
         },
       },
       'Documentos atualizados com sucesso.',
-      'Não foi possível atualizar os documentos.'
+      'Não foi possível atualizar os documentos.',
     );
   }
 
@@ -576,9 +582,7 @@ export function CandidateProfileForm() {
       ...(hasValue(address?.street) ? { street: address?.street } : {}),
       ...(hasValue(address?.number) ? { number: address?.number } : {}),
       ...(hasValue(address?.complement) ? { complement: address?.complement } : {}),
-      ...(hasValue(address?.neighborhood)
-        ? { neighborhood: address?.neighborhood }
-        : {}),
+      ...(hasValue(address?.neighborhood) ? { neighborhood: address?.neighborhood } : {}),
       ...(hasValue(address?.city) ? { city: address?.city } : {}),
       ...(hasValue(address?.state) ? { state: address?.state } : {}),
       ...(hasValue(address?.country) ? { country: address?.country } : {}),
@@ -595,7 +599,7 @@ export function CandidateProfileForm() {
         },
       },
       'Endereço atualizado com sucesso.',
-      'Não foi possível atualizar o endereço.'
+      'Não foi possível atualizar o endereço.',
     );
   }
 
@@ -610,7 +614,7 @@ export function CandidateProfileForm() {
         },
       },
       'Currículo atualizado com sucesso.',
-      'Não foi possível atualizar o currículo.'
+      'Não foi possível atualizar o currículo.',
     );
   }
 
@@ -623,16 +627,14 @@ export function CandidateProfileForm() {
         },
       },
       'Etnia atualizada com sucesso.',
-      'Não foi possível atualizar a etnia.'
+      'Não foi possível atualizar a etnia.',
     );
   }
 
   function handleSaveDiversity() {
     const diversity = getValues('candidateProfile.diversity');
     const nextDiversity = {
-      ...(hasValue(diversity?.genderIdentity)
-        ? { genderIdentity: diversity?.genderIdentity }
-        : {}),
+      ...(hasValue(diversity?.genderIdentity) ? { genderIdentity: diversity?.genderIdentity } : {}),
       ...(hasValue(diversity?.sexualOrientation)
         ? { sexualOrientation: diversity?.sexualOrientation }
         : {}),
@@ -646,7 +648,7 @@ export function CandidateProfileForm() {
         },
       },
       'Diversidade atualizada com sucesso.',
-      'Não foi possível atualizar a diversidade.'
+      'Não foi possível atualizar a diversidade.',
     );
   }
 
@@ -671,7 +673,7 @@ export function CandidateProfileForm() {
         },
       },
       'Atributos físicos atualizados com sucesso.',
-      'Não foi possível atualizar os atributos físicos.'
+      'Não foi possível atualizar os atributos físicos.',
     );
   }
 
@@ -702,7 +704,7 @@ export function CandidateProfileForm() {
         },
       },
       'Uniforme atualizado com sucesso.',
-      'Não foi possível atualizar o uniforme.'
+      'Não foi possível atualizar o uniforme.',
     );
   }
 
@@ -715,7 +717,7 @@ export function CandidateProfileForm() {
         },
       },
       'Disponibilidade atualizada com sucesso.',
-      'Não foi possível atualizar a disponibilidade.'
+      'Não foi possível atualizar a disponibilidade.',
     );
   }
 
@@ -730,7 +732,7 @@ export function CandidateProfileForm() {
 
     const currentEducations = getValues('candidateProfile.educations') || [];
     const nextEducations = currentEducations.filter(
-      (_, itemIndex) => itemIndex !== educationIndexToDelete
+      (_, itemIndex) => itemIndex !== educationIndexToDelete,
     );
 
     void submitCandidateUpdate(
@@ -741,7 +743,7 @@ export function CandidateProfileForm() {
         },
       },
       'Formação apagada com sucesso.',
-      'Não foi possível apagar a formação.'
+      'Não foi possível apagar a formação.',
     ).then((saved) => {
       if (!saved) {
         return;
@@ -765,10 +767,9 @@ export function CandidateProfileForm() {
       return;
     }
 
-    const currentExperiences =
-      getValues('candidateProfile.professionalExperiences') || [];
+    const currentExperiences = getValues('candidateProfile.professionalExperiences') || [];
     const nextExperiences = currentExperiences.filter(
-      (_, itemIndex) => itemIndex !== experienceIndexToDelete
+      (_, itemIndex) => itemIndex !== experienceIndexToDelete,
     );
 
     void submitCandidateUpdate(
@@ -779,7 +780,7 @@ export function CandidateProfileForm() {
         },
       },
       'Experiência profissional apagada com sucesso.',
-      'Não foi possível apagar a experiência profissional.'
+      'Não foi possível apagar a experiência profissional.',
     ).then((saved) => {
       if (!saved) {
         return;
@@ -796,13 +797,16 @@ export function CandidateProfileForm() {
 
   return (
     <form className="space-y-8">
-        <div className={boxClassName}>
+      <div className={boxClassName}>
         <ProfileSectionTitle
           title="Dados Básicos"
           icon={GrDocumentText}
           onIconClick={() => setShowBasic((v) => !v)}
           iconClickable
           expanded={showBasic}
+          titleClassName={sectionTitleClassName}
+          iconClassName={sectionIconClassName}
+          toggleIconClassName={sectionToggleIconClassName}
         />
         {showBasic && (
           <div className="mt-6 grid gap-4 md:grid-cols-2">
@@ -834,9 +838,10 @@ export function CandidateProfileForm() {
               <Button
                 type="button"
                 variant="positive"
-                icon={<FaSave />}
+                icon={<Save className="h-4 w-4" />}
                 disabled={isSubmitting}
                 onClick={handleSaveBasic}
+                className={saveButtonClassName}
               >
                 Salvar
               </Button>
@@ -851,6 +856,9 @@ export function CandidateProfileForm() {
           onIconClick={() => setShowPhone((v) => !v)}
           iconClickable
           expanded={showPhone}
+          titleClassName={sectionTitleClassName}
+          iconClassName={sectionIconClassName}
+          toggleIconClassName={sectionToggleIconClassName}
         />
         {showPhone && (
           <div className="mt-6 grid gap-4 md:grid-cols-2">
@@ -876,22 +884,22 @@ export function CandidateProfileForm() {
             </div>
             <div className="flex items-end md:col-start-1 md:row-start-2">
               <div className="grid w-full gap-3 md:grid-cols-2">
-                <label className="flex flex-1 items-center gap-2 rounded-xl border border-gray-500 bg-black px-4 py-3 text-gray-100 placeholder:text-gray-300">
+                <label className={`${optionCardClassName} flex-1`}>
                   <input
                     type="checkbox"
-                    className="h-4 w-4 accent-gray-300"
+                    className="h-4 w-4 accent-lime-400"
                     {...register('candidateProfile.contacts.phone.isWhatsapp')}
                   />
-                  <FaWhatsapp className="h-5 w-5 text-green-500" />
+                  <FaWhatsapp className="h-5 w-5 text-lime-400" />
                   <span>WhatsApp</span>
                 </label>
-                <label className="flex flex-1 items-center gap-2 rounded-xl border border-gray-500 bg-black px-4 py-3 text-gray-100 placeholder:text-gray-300">
+                <label className={`${optionCardClassName} flex-1`}>
                   <input
                     type="checkbox"
-                    className="h-4 w-4 accent-gray-300"
+                    className="h-4 w-4 accent-lime-400"
                     {...register('candidateProfile.contacts.phone.isTelegram')}
                   />
-                  <FaTelegramPlane className="h-5 w-5 text-sky-500" />
+                  <FaTelegramPlane className="h-5 w-5 text-lime-400" />
                   <span>Telegram</span>
                 </label>
               </div>
@@ -900,9 +908,10 @@ export function CandidateProfileForm() {
               <Button
                 type="button"
                 variant="positive"
-                icon={<FaSave />}
+                icon={<Save className="h-4 w-4" />}
                 disabled={isSubmitting}
                 onClick={handleSavePhone}
+                className={saveButtonClassName}
               >
                 Salvar
               </Button>
@@ -918,6 +927,9 @@ export function CandidateProfileForm() {
           onIconClick={() => setShowAddress((v) => !v)}
           iconClickable
           expanded={showAddress}
+          titleClassName={sectionTitleClassName}
+          iconClassName={sectionIconClassName}
+          toggleIconClassName={sectionToggleIconClassName}
         />
         {showAddress && (
           <div className="mt-6 grid gap-4 md:grid-cols-2">
@@ -939,7 +951,7 @@ export function CandidateProfileForm() {
             <div className="hidden md:block" />
             {isZipCodeLoading && (
               <div className="md:col-span-2">
-                <p className="text-sm text-gray-300">Consultando CEP...</p>
+                <p className="text-sm text-zinc-400">Consultando CEP...</p>
               </div>
             )}
             {zipCodeError && (
@@ -1041,9 +1053,10 @@ export function CandidateProfileForm() {
               <Button
                 type="button"
                 variant="positive"
-                icon={<FaSave />}
+                icon={<Save className="h-4 w-4" />}
                 disabled={isSubmitting}
                 onClick={handleSaveAddress}
+                className={saveButtonClassName}
               >
                 Salvar
               </Button>
@@ -1059,11 +1072,14 @@ export function CandidateProfileForm() {
           onIconClick={() => setShowContacts((v) => !v)}
           iconClickable
           expanded={showContacts}
+          titleClassName={sectionTitleClassName}
+          iconClassName={sectionIconClassName}
+          toggleIconClassName={sectionToggleIconClassName}
         />
         {showContacts && (
           <div className="mt-6 space-y-4">
-            <div className="rounded-2xl border border-gray-500 bg-black p-4">
-              <h3 className="mb-4 text-lg font-semibold uppercase text-gray-100">RG</h3>
+            <div className={nestedCardClassName}>
+              <h3 className={nestedSectionTitleClassName}>RG</h3>
               <div className="grid gap-4 md:grid-cols-2">
                 <Input
                   label="Número"
@@ -1090,8 +1106,8 @@ export function CandidateProfileForm() {
               </div>
             </div>
 
-            <div className="rounded-2xl border border-gray-500 bg-black p-4">
-              <h3 className="mb-4 text-lg font-semibold uppercase text-gray-100">CPF</h3>
+            <div className={nestedCardClassName}>
+              <h3 className={nestedSectionTitleClassName}>CPF</h3>
               <div className="grid gap-4 md:grid-cols-2">
                 <Input
                   label="Número"
@@ -1104,13 +1120,13 @@ export function CandidateProfileForm() {
               </div>
             </div>
 
-            <div className="rounded-2xl border border-gray-500 bg-black p-4">
-              <h3 className="mb-4 text-lg font-semibold uppercase text-gray-100">CREF</h3>
+            <div className={nestedCardClassName}>
+              <h3 className={nestedSectionTitleClassName}>CREF</h3>
               <div className="grid gap-4 md:grid-cols-2">
-                <label className="flex items-center gap-3 self-end rounded-xl border border-gray-500 bg-black px-4 py-3 text-gray-300">
+                <label className={`${optionCardClassName} self-end`}>
                   <input
                     type="checkbox"
-                    className="h-4 w-4 accent-gray-300"
+                    className="h-4 w-4 accent-lime-400"
                     {...register('candidateProfile.documents.cref.isActive')}
                   />
                   <span>Ativo</span>
@@ -1133,10 +1149,8 @@ export function CandidateProfileForm() {
               </div>
             </div>
 
-            <div className="rounded-2xl border border-gray-500 bg-black p-4">
-              <h3 className="mb-4 text-lg font-semibold uppercase text-gray-100">
-                Passaporte
-              </h3>
+            <div className={nestedCardClassName}>
+              <h3 className={nestedSectionTitleClassName}>Passaporte</h3>
               <div className="grid gap-4 md:grid-cols-2">
                 <Input
                   label="Código"
@@ -1166,9 +1180,10 @@ export function CandidateProfileForm() {
               <Button
                 type="button"
                 variant="positive"
-                icon={<FaSave />}
+                icon={<Save className="h-4 w-4" />}
                 disabled={isSubmitting}
                 onClick={handleSaveDocuments}
+                className={saveButtonClassName}
               >
                 Salvar
               </Button>
@@ -1184,6 +1199,9 @@ export function CandidateProfileForm() {
           onIconClick={() => setShowMedia((v) => !v)}
           iconClickable
           expanded={showMedia}
+          titleClassName={sectionTitleClassName}
+          iconClassName={sectionIconClassName}
+          toggleIconClassName={sectionToggleIconClassName}
         />
         {showMedia && (
           <div className="mt-6 grid gap-4 md:grid-cols-2">
@@ -1210,9 +1228,10 @@ export function CandidateProfileForm() {
               <Button
                 type="button"
                 variant="positive"
-                icon={<FaSave />}
+                icon={<Save className="h-4 w-4" />}
                 disabled={isSubmitting}
                 onClick={handleSaveMedia}
+                className={saveButtonClassName}
               >
                 Salvar
               </Button>
@@ -1228,6 +1247,9 @@ export function CandidateProfileForm() {
           onIconClick={() => setShowEthnicity((v) => !v)}
           iconClickable
           expanded={showEthnicity}
+          titleClassName={sectionTitleClassName}
+          iconClassName={sectionIconClassName}
+          toggleIconClassName={sectionToggleIconClassName}
         />
         {showEthnicity && (
           <div className="mt-6 grid gap-4 md:grid-cols-2">
@@ -1246,9 +1268,10 @@ export function CandidateProfileForm() {
               <Button
                 type="button"
                 variant="positive"
-                icon={<FaSave />}
+                icon={<Save className="h-4 w-4" />}
                 disabled={isSubmitting}
                 onClick={handleSaveEthnicity}
+                className={saveButtonClassName}
               >
                 Salvar
               </Button>
@@ -1264,6 +1287,9 @@ export function CandidateProfileForm() {
           onIconClick={() => setShowDiversity((v) => !v)}
           iconClickable
           expanded={showDiversity}
+          titleClassName={sectionTitleClassName}
+          iconClassName={sectionIconClassName}
+          toggleIconClassName={sectionToggleIconClassName}
         />
         {showDiversity && (
           <div className="mt-6 grid gap-4 md:grid-cols-2">
@@ -1291,9 +1317,10 @@ export function CandidateProfileForm() {
               <Button
                 type="button"
                 variant="positive"
-                icon={<FaSave />}
+                icon={<Save className="h-4 w-4" />}
                 disabled={isSubmitting}
                 onClick={handleSaveDiversity}
+                className={saveButtonClassName}
               >
                 Salvar
               </Button>
@@ -1309,6 +1336,9 @@ export function CandidateProfileForm() {
           onIconClick={() => setShowPhysicalAttributes((v) => !v)}
           iconClickable
           expanded={showPhysicalAttributes}
+          titleClassName={sectionTitleClassName}
+          iconClassName={sectionIconClassName}
+          toggleIconClassName={sectionToggleIconClassName}
         />
         {showPhysicalAttributes && (
           <div className="mt-6 grid gap-4 md:grid-cols-2">
@@ -1325,28 +1355,28 @@ export function CandidateProfileForm() {
                       heightValue,
                       -0.01,
                       0,
-                      2
+                      2,
                     )
                   }
-                  className="flex h-[50px] w-[50px] shrink-0 items-center justify-center rounded-xl border border-gray-300 bg-gray-100 text-black transition-colors hover:bg-gray-300"
+                  className={stepperButtonClassName}
                   aria-label="Diminuir altura"
                 >
                   <FiMinusCircle className="h-6 w-6" />
                 </button>
-                <div className={`${fieldClassName} flex h-[50px] flex-1 items-center rounded-xl px-4`}>
+                <div
+                  className={`${fieldClassName} flex h-[50px] flex-1 items-center rounded-xl px-4`}
+                >
                   <input
                     type="number"
                     min={0}
                     step={0.01}
-                    className="w-full bg-transparent text-center text-gray-300 outline-none appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+                    className={numericInputClassName}
                     placeholder="1.60"
                     {...register('candidateProfile.physicalAttributes.height', {
                       valueAsNumber: true,
                     })}
                   />
-                  <span className="ml-2 shrink-0 text-sm font-medium text-gray-300">
-                    CM
-                  </span>
+                  <span className="ml-2 shrink-0 text-sm font-medium text-zinc-400">CM</span>
                 </div>
                 <button
                   type="button"
@@ -1356,10 +1386,10 @@ export function CandidateProfileForm() {
                       heightValue,
                       0.01,
                       0,
-                      2
+                      2,
                     )
                   }
-                  className="flex h-[50px] w-[50px] shrink-0 items-center justify-center rounded-xl border border-gray-300 bg-gray-100 text-black transition-colors hover:bg-gray-300"
+                  className={stepperButtonClassName}
                   aria-label="Aumentar altura"
                 >
                   <FiPlusCircle className="h-6 w-6" />
@@ -1379,28 +1409,28 @@ export function CandidateProfileForm() {
                       weightValue,
                       -0.01,
                       0,
-                      2
+                      2,
                     )
                   }
-                  className="flex h-[50px] w-[50px] shrink-0 items-center justify-center rounded-xl border border-gray-300 bg-gray-100 text-black transition-colors hover:bg-gray-300"
+                  className={stepperButtonClassName}
                   aria-label="Diminuir peso"
                 >
                   <FiMinusCircle className="h-6 w-6" />
                 </button>
-                <div className={`${fieldClassName} flex h-[50px] flex-1 items-center rounded-xl px-4`}>
+                <div
+                  className={`${fieldClassName} flex h-[50px] flex-1 items-center rounded-xl px-4`}
+                >
                   <input
                     type="number"
                     min={0}
                     step={0.01}
-                    className="w-full bg-transparent text-center text-gray-300 outline-none appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+                    className={numericInputClassName}
                     placeholder="70"
                     {...register('candidateProfile.physicalAttributes.weight', {
                       valueAsNumber: true,
                     })}
                   />
-                  <span className="ml-2 shrink-0 text-sm font-medium text-gray-300">
-                    KG
-                  </span>
+                  <span className="ml-2 shrink-0 text-sm font-medium text-zinc-400">KG</span>
                 </div>
                 <button
                   type="button"
@@ -1410,10 +1440,10 @@ export function CandidateProfileForm() {
                       weightValue,
                       0.01,
                       0,
-                      2
+                      2,
                     )
                   }
-                  className="flex h-[50px] w-[50px] shrink-0 items-center justify-center rounded-xl border border-gray-300 bg-gray-100 text-black transition-colors hover:bg-gray-300"
+                  className={stepperButtonClassName}
                   aria-label="Aumentar peso"
                 >
                   <FiPlusCircle className="h-6 w-6" />
@@ -1424,9 +1454,10 @@ export function CandidateProfileForm() {
               <Button
                 type="button"
                 variant="positive"
-                icon={<FaSave />}
+                icon={<Save className="h-4 w-4" />}
                 disabled={isSubmitting}
                 onClick={handleSavePhysicalAttributes}
+                className={saveButtonClassName}
               >
                 Salvar
               </Button>
@@ -1442,6 +1473,9 @@ export function CandidateProfileForm() {
           onIconClick={() => setShowUniform((v) => !v)}
           iconClickable
           expanded={showUniform}
+          titleClassName={sectionTitleClassName}
+          iconClassName={sectionIconClassName}
+          toggleIconClassName={sectionToggleIconClassName}
         />
         {showUniform && (
           <div className="mt-6 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -1450,7 +1484,10 @@ export function CandidateProfileForm() {
               labelClassName={labelClassName}
               className={fieldClassName}
               leftIcon={FaTshirt}
-              options={Object.values(ClothingSizeEnum).map((value) => ({ value, label: value.toUpperCase() }))}
+              options={Object.values(ClothingSizeEnum).map((value) => ({
+                value,
+                label: value.toUpperCase(),
+              }))}
               {...register('candidateProfile.uniform.tShirtSize')}
             />
             <Select
@@ -1458,7 +1495,10 @@ export function CandidateProfileForm() {
               labelClassName={labelClassName}
               className={fieldClassName}
               leftIcon={GiMonclerJacket}
-              options={Object.values(ClothingSizeEnum).map((value) => ({ value, label: value.toUpperCase() }))}
+              options={Object.values(ClothingSizeEnum).map((value) => ({
+                value,
+                label: value.toUpperCase(),
+              }))}
               {...register('candidateProfile.uniform.jacketSize')}
             />
             <Select
@@ -1466,7 +1506,10 @@ export function CandidateProfileForm() {
               labelClassName={labelClassName}
               className={fieldClassName}
               leftIcon={GiUnderwearShorts}
-              options={Object.values(ClothingSizeEnum).map((value) => ({ value, label: value.toUpperCase() }))}
+              options={Object.values(ClothingSizeEnum).map((value) => ({
+                value,
+                label: value.toUpperCase(),
+              }))}
               {...register('candidateProfile.uniform.shortSize')}
             />
             <Select
@@ -1474,7 +1517,10 @@ export function CandidateProfileForm() {
               labelClassName={labelClassName}
               className={fieldClassName}
               leftIcon={PiPantsFill}
-              options={Object.values(ClothingSizeEnum).map((value) => ({ value, label: value.toUpperCase() }))}
+              options={Object.values(ClothingSizeEnum).map((value) => ({
+                value,
+                label: value.toUpperCase(),
+              }))}
               {...register('candidateProfile.uniform.pantsSize')}
             />
             <Select
@@ -1482,7 +1528,10 @@ export function CandidateProfileForm() {
               labelClassName={labelClassName}
               className={fieldClassName}
               leftIcon={GiConverseShoe}
-              options={Object.values(ShoesSizeUnitEnum).map((value) => ({ value, label: value.toUpperCase() }))}
+              options={Object.values(ShoesSizeUnitEnum).map((value) => ({
+                value,
+                label: value.toUpperCase(),
+              }))}
               {...register('candidateProfile.uniform.shoeSizeUnit')}
             />
             <div>
@@ -1494,26 +1543,22 @@ export function CandidateProfileForm() {
                   type="button"
                   disabled={!hasShoeSizeUnit}
                   onClick={() =>
-                    updateNumericField(
-                      'candidateProfile.uniform.shoeSize',
-                      shoeSizeValue,
-                      -1,
-                      0,
-                      0
-                    )
+                    updateNumericField('candidateProfile.uniform.shoeSize', shoeSizeValue, -1, 0, 0)
                   }
-                  className="flex h-[50px] w-[50px] shrink-0 items-center justify-center rounded-xl border border-gray-300 bg-gray-100 text-black transition-colors hover:bg-gray-300 disabled:cursor-not-allowed disabled:opacity-40"
+                  className={stepperButtonClassName}
                   aria-label="Diminuir calçado"
                 >
                   <FiMinusCircle className="h-6 w-6" />
                 </button>
-                <div className={`${fieldClassName} flex h-[50px] flex-1 items-center rounded-xl px-4 ${!hasShoeSizeUnit ? 'opacity-60' : ''}`}>
+                <div
+                  className={`${fieldClassName} flex h-[50px] flex-1 items-center rounded-xl px-4 ${!hasShoeSizeUnit ? 'opacity-60' : ''}`}
+                >
                   <input
                     type="number"
                     min={0}
                     step={1}
                     disabled={!hasShoeSizeUnit}
-                    className="w-full bg-transparent text-center text-gray-300 outline-none appearance-none disabled:cursor-not-allowed [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+                    className={`${numericInputClassName} disabled:cursor-not-allowed`}
                     placeholder="36"
                     {...register('candidateProfile.uniform.shoeSize', {
                       valueAsNumber: true,
@@ -1527,7 +1572,7 @@ export function CandidateProfileForm() {
                     })}
                   />
                   {shoeSizeUnitValue && (
-                    <span className="ml-2 shrink-0 text-sm font-medium uppercase text-gray-300">
+                    <span className="ml-2 shrink-0 text-sm font-medium uppercase text-zinc-400">
                       {shoeSizeUnitValue}
                     </span>
                   )}
@@ -1536,15 +1581,9 @@ export function CandidateProfileForm() {
                   type="button"
                   disabled={!hasShoeSizeUnit}
                   onClick={() =>
-                    updateNumericField(
-                      'candidateProfile.uniform.shoeSize',
-                      shoeSizeValue,
-                      1,
-                      0,
-                      0
-                    )
+                    updateNumericField('candidateProfile.uniform.shoeSize', shoeSizeValue, 1, 0, 0)
                   }
-                  className="flex h-[50px] w-[50px] shrink-0 items-center justify-center rounded-xl border border-gray-300 bg-gray-100 text-black transition-colors hover:bg-gray-300 disabled:cursor-not-allowed disabled:opacity-40"
+                  className={stepperButtonClassName}
                   aria-label="Aumentar calçado"
                 >
                   <FiPlusCircle className="h-6 w-6" />
@@ -1560,9 +1599,10 @@ export function CandidateProfileForm() {
               <Button
                 type="button"
                 variant="positive"
-                icon={<FaSave />}
+                icon={<Save className="h-4 w-4" />}
                 disabled={isSubmitting}
                 onClick={handleSaveUniform}
+                className={saveButtonClassName}
               >
                 Salvar
               </Button>
@@ -1578,6 +1618,9 @@ export function CandidateProfileForm() {
           onIconClick={() => setShowEducation((v) => !v)}
           iconClickable
           expanded={showEducation}
+          titleClassName={sectionTitleClassName}
+          iconClassName={sectionIconClassName}
+          toggleIconClassName={sectionToggleIconClassName}
         />
         {showEducation && (
           <div className="mt-4 space-y-4">
@@ -1594,10 +1637,10 @@ export function CandidateProfileForm() {
             {educationFields.map((education, index) => (
               <div
                 key={education.id}
-                className="grid gap-4 rounded-2xl border border-gray-500 bg-black p-6 md:grid-cols-2"
+                className={`grid gap-4 md:grid-cols-2 ${nestedCardClassName}`}
               >
                 <div className="md:col-span-2">
-                  <h3 className="text-lg font-semibold uppercase text-gray-100">
+                  <h3 className={nestedSectionTitleClassName}>
                     {`Formação ${String(index + 1).padStart(2, '0')}`}
                   </h3>
                 </div>
@@ -1661,6 +1704,9 @@ export function CandidateProfileForm() {
           onIconClick={() => setShowExperiences((v) => !v)}
           iconClickable
           expanded={showExperiences}
+          titleClassName={sectionTitleClassName}
+          iconClassName={sectionIconClassName}
+          toggleIconClassName={sectionToggleIconClassName}
         />
         {showExperiences && (
           <div className="mt-4 space-y-4">
@@ -1677,10 +1723,10 @@ export function CandidateProfileForm() {
             {experienceFields.map((experience, index) => (
               <div
                 key={experience.id}
-                className="grid gap-4 rounded-2xl border border-gray-500 bg-black p-6 md:grid-cols-2"
+                className={`grid gap-4 md:grid-cols-2 ${nestedCardClassName}`}
               >
                 <div className="md:col-span-2">
-                  <h3 className="text-lg font-semibold uppercase text-gray-100">
+                  <h3 className={nestedSectionTitleClassName}>
                     {`Experiência Profissional ${String(index + 1).padStart(2, '0')}`}
                   </h3>
                 </div>
@@ -1744,6 +1790,9 @@ export function CandidateProfileForm() {
           onIconClick={() => setShowAvailability((v) => !v)}
           iconClickable
           expanded={showAvailability}
+          titleClassName={sectionTitleClassName}
+          iconClassName={sectionIconClassName}
+          toggleIconClassName={sectionToggleIconClassName}
         />
         {showAvailability && (
           <div className="mt-4 grid grid-cols-1 gap-2 md:grid-cols-2">
@@ -1761,9 +1810,10 @@ export function CandidateProfileForm() {
               <Button
                 type="button"
                 variant="positive"
-                icon={<FaSave />}
+                icon={<Save className="h-4 w-4" />}
                 disabled={isSubmitting}
                 onClick={handleSaveAvailability}
+                className={saveButtonClassName}
               >
                 Salvar
               </Button>
@@ -1774,16 +1824,16 @@ export function CandidateProfileForm() {
 
       {isEducationModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 px-4">
-          <div className="w-full max-w-3xl rounded-2xl border border-gray-500 bg-black p-6">
+          <div className={modalCardClassName}>
             <div className="mb-6 flex items-start justify-between gap-4">
-              <div className="flex items-center gap-3 text-xl font-semibold uppercase text-gray-100">
-                <GiGraduateCap className="h-5 w-5 shrink-0" />
+              <div className={modalHeadingClassName}>
+                <GiGraduateCap className="h-5 w-5 shrink-0 text-lime-400" />
                 <h2>{`CADASTRAR FORMAÇÃO ${nextEducationNumber}`}</h2>
               </div>
               <button
                 type="button"
                 onClick={() => setIsEducationModalOpen(false)}
-                className="text-2xl leading-none text-gray-300 transition-colors hover:text-gray-100"
+                className={modalCloseButtonClassName}
                 aria-label="Fechar modal"
               >
                 ×
@@ -1791,10 +1841,10 @@ export function CandidateProfileForm() {
             </div>
 
             <div className="grid gap-4 md:grid-cols-2">
-              <label className="flex items-center gap-3 self-end rounded-xl border border-gray-500 bg-black px-4 py-3 text-gray-300">
+              <label className={`${optionCardClassName} self-end`}>
                 <input
                   type="checkbox"
-                  className="h-4 w-4 accent-gray-300"
+                  className="h-4 w-4 accent-lime-400"
                   checked={educationDraft.isOngoing}
                   onChange={(event) =>
                     setEducationDraft((current) => ({
@@ -1854,7 +1904,7 @@ export function CandidateProfileForm() {
                   <button
                     type="button"
                     onClick={() => updateEducationDraftYear('startYear', -1)}
-                    className="flex h-[50px] w-[50px] shrink-0 items-center justify-center rounded-xl border border-gray-300 bg-gray-100 text-black transition-colors hover:bg-gray-300"
+                    className={stepperButtonClassName}
                     aria-label="Diminuir ano de início"
                   >
                     <FiMinusCircle className="h-6 w-6" />
@@ -1873,7 +1923,7 @@ export function CandidateProfileForm() {
                   <button
                     type="button"
                     onClick={() => updateEducationDraftYear('startYear', 1)}
-                    className="flex h-[50px] w-[50px] shrink-0 items-center justify-center rounded-xl border border-gray-300 bg-gray-100 text-black transition-colors hover:bg-gray-300"
+                    className={stepperButtonClassName}
                     aria-label="Aumentar ano de início"
                   >
                     <FiPlusCircle className="h-6 w-6" />
@@ -1889,7 +1939,7 @@ export function CandidateProfileForm() {
                   <button
                     type="button"
                     onClick={() => updateEducationDraftYear('endYear', -1)}
-                    className="flex h-[50px] w-[50px] shrink-0 items-center justify-center rounded-xl border border-gray-300 bg-gray-100 text-black transition-colors hover:bg-gray-300"
+                    className={stepperButtonClassName}
                     aria-label="Diminuir ano de término"
                   >
                     <FiMinusCircle className="h-6 w-6" />
@@ -1908,7 +1958,7 @@ export function CandidateProfileForm() {
                   <button
                     type="button"
                     onClick={() => updateEducationDraftYear('endYear', 1)}
-                    className="flex h-[50px] w-[50px] shrink-0 items-center justify-center rounded-xl border border-gray-300 bg-gray-100 text-black transition-colors hover:bg-gray-300"
+                    className={stepperButtonClassName}
                     aria-label="Aumentar ano de término"
                   >
                     <FiPlusCircle className="h-6 w-6" />
@@ -1920,8 +1970,9 @@ export function CandidateProfileForm() {
                 <Button
                   type="button"
                   variant="positive"
-                  icon={<FaSave />}
+                  icon={<Save className="h-4 w-4" />}
                   onClick={handleSaveEducation}
+                  className={saveButtonClassName}
                 >
                   Salvar
                 </Button>
@@ -1933,16 +1984,16 @@ export function CandidateProfileForm() {
 
       {isExperienceModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 px-4">
-          <div className="w-full max-w-3xl rounded-2xl border border-gray-500 bg-black p-6">
+          <div className={modalCardClassName}>
             <div className="mb-6 flex items-start justify-between gap-4">
-              <div className="flex items-center gap-3 text-xl font-semibold uppercase text-gray-100">
-                <FaSave className="h-5 w-5 shrink-0" />
+              <div className={modalHeadingClassName}>
+                <Save className="h-5 w-5 shrink-0 text-lime-400" />
                 <h2>{`CADASTRAR EXPERIÊNCIA PROFISSIONAL ${nextExperienceNumber}`}</h2>
               </div>
               <button
                 type="button"
                 onClick={() => setIsExperienceModalOpen(false)}
-                className="text-2xl leading-none text-gray-300 transition-colors hover:text-gray-100"
+                className={modalCloseButtonClassName}
                 aria-label="Fechar modal"
               >
                 ×
@@ -1950,10 +2001,10 @@ export function CandidateProfileForm() {
             </div>
 
             <div className="grid gap-4 md:grid-cols-2">
-              <label className="flex items-center gap-3 self-end rounded-xl border border-gray-500 bg-black px-4 py-3 text-gray-300">
+              <label className={`${optionCardClassName} self-end`}>
                 <input
                   type="checkbox"
-                  className="h-4 w-4 accent-gray-300"
+                  className="h-4 w-4 accent-lime-400"
                   checked={experienceDraft.isCurrent}
                   onChange={(event) =>
                     setExperienceDraft((current) => ({
@@ -2001,7 +2052,7 @@ export function CandidateProfileForm() {
                   <button
                     type="button"
                     onClick={() => updateExperienceDraftYear('startYear', -1)}
-                    className="flex h-[50px] w-[50px] shrink-0 items-center justify-center rounded-xl border border-gray-300 bg-gray-100 text-black transition-colors hover:bg-gray-300"
+                    className={stepperButtonClassName}
                     aria-label="Diminuir ano de início da experiência"
                   >
                     <FiMinusCircle className="h-6 w-6" />
@@ -2020,7 +2071,7 @@ export function CandidateProfileForm() {
                   <button
                     type="button"
                     onClick={() => updateExperienceDraftYear('startYear', 1)}
-                    className="flex h-[50px] w-[50px] shrink-0 items-center justify-center rounded-xl border border-gray-300 bg-gray-100 text-black transition-colors hover:bg-gray-300"
+                    className={stepperButtonClassName}
                     aria-label="Aumentar ano de início da experiência"
                   >
                     <FiPlusCircle className="h-6 w-6" />
@@ -2037,7 +2088,7 @@ export function CandidateProfileForm() {
                     type="button"
                     onClick={() => updateExperienceDraftYear('endYear', -1)}
                     disabled={experienceDraft.isCurrent}
-                    className="flex h-[50px] w-[50px] shrink-0 items-center justify-center rounded-xl border border-gray-300 bg-gray-100 text-black transition-colors hover:bg-gray-300 disabled:cursor-not-allowed disabled:opacity-40"
+                    className={stepperButtonClassName}
                     aria-label="Diminuir ano de término da experiência"
                   >
                     <FiMinusCircle className="h-6 w-6" />
@@ -2058,7 +2109,7 @@ export function CandidateProfileForm() {
                     type="button"
                     onClick={() => updateExperienceDraftYear('endYear', 1)}
                     disabled={experienceDraft.isCurrent}
-                    className="flex h-[50px] w-[50px] shrink-0 items-center justify-center rounded-xl border border-gray-300 bg-gray-100 text-black transition-colors hover:bg-gray-300 disabled:cursor-not-allowed disabled:opacity-40"
+                    className={stepperButtonClassName}
                     aria-label="Aumentar ano de término da experiência"
                   >
                     <FiPlusCircle className="h-6 w-6" />
@@ -2070,8 +2121,9 @@ export function CandidateProfileForm() {
                 <Button
                   type="button"
                   variant="positive"
-                  icon={<FaSave />}
+                  icon={<Save className="h-4 w-4" />}
                   onClick={handleSaveExperience}
+                  className={saveButtonClassName}
                 >
                   Salvar
                 </Button>
@@ -2083,18 +2135,16 @@ export function CandidateProfileForm() {
 
       {educationIndexToDelete !== null && educationFields[educationIndexToDelete] && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 px-4">
-          <div className="w-full max-w-3xl rounded-2xl border border-gray-500 bg-black p-6">
+          <div className={modalCardClassName}>
             <div className="mb-6 flex items-start justify-between gap-4">
-              <div className="flex items-center gap-3 text-xl font-semibold uppercase text-gray-100">
-                <FaRegTrashAlt className="h-5 w-5 shrink-0" />
-                <h2>
-                  {`APAGAR FORMAÇÃO ${String(educationIndexToDelete + 1).padStart(2, '0')}`}
-                </h2>
+              <div className={modalHeadingClassName}>
+                <FaRegTrashAlt className="h-5 w-5 shrink-0 text-lime-400" />
+                <h2>{`APAGAR FORMAÇÃO ${String(educationIndexToDelete + 1).padStart(2, '0')}`}</h2>
               </div>
               <button
                 type="button"
                 onClick={cancelDeleteEducation}
-                className="text-2xl leading-none text-gray-300 transition-colors hover:text-gray-100"
+                className={modalCloseButtonClassName}
                 aria-label="Fechar modal"
               >
                 ×
@@ -2102,11 +2152,9 @@ export function CandidateProfileForm() {
             </div>
 
             <div className="space-y-4">
-              <p className="text-gray-300">
-                Confirme a exclusão da formação abaixo.
-              </p>
+              <p className={modalDescriptionClassName}>Confirme a exclusão da formação abaixo.</p>
 
-              <div className="grid gap-4 rounded-2xl border border-gray-500 bg-black p-6 md:grid-cols-2">
+              <div className={`grid gap-4 md:grid-cols-2 ${nestedCardClassName}`}>
                 <Input
                   label="Cursando"
                   labelClassName={labelClassName}
@@ -2150,11 +2198,7 @@ export function CandidateProfileForm() {
               </div>
 
               <div className="flex justify-end gap-3">
-                <Button
-                  type="button"
-                  variant="profile"
-                  onClick={cancelDeleteEducation}
-                >
+                <Button type="button" variant="profile" onClick={cancelDeleteEducation}>
                   Cancelar
                 </Button>
                 <Button
@@ -2174,20 +2218,21 @@ export function CandidateProfileForm() {
 
       {experienceIndexToDelete !== null && experienceFields[experienceIndexToDelete] && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 px-4">
-          <div className="w-full max-w-3xl rounded-2xl border border-gray-500 bg-black p-6">
+          <div className={modalCardClassName}>
             <div className="mb-6 flex items-start justify-between gap-4">
-              <div className="flex items-center gap-3 text-xl font-semibold uppercase text-gray-100">
-                <FaRegTrashAlt className="h-5 w-5 shrink-0" />
+              <div className={modalHeadingClassName}>
+                <FaRegTrashAlt className="h-5 w-5 shrink-0 text-lime-400" />
                 <h2>
-                  {`APAGAR EXPERIÊNCIA PROFISSIONAL ${String(
-                    experienceIndexToDelete + 1
-                  ).padStart(2, '0')}`}
+                  {`APAGAR EXPERIÊNCIA PROFISSIONAL ${String(experienceIndexToDelete + 1).padStart(
+                    2,
+                    '0',
+                  )}`}
                 </h2>
               </div>
               <button
                 type="button"
                 onClick={cancelDeleteExperience}
-                className="text-2xl leading-none text-gray-300 transition-colors hover:text-gray-100"
+                className={modalCloseButtonClassName}
                 aria-label="Fechar modal"
               >
                 ×
@@ -2195,11 +2240,11 @@ export function CandidateProfileForm() {
             </div>
 
             <div className="space-y-4">
-              <p className="text-gray-300">
+              <p className={modalDescriptionClassName}>
                 Confirme a exclusão da experiência profissional abaixo.
               </p>
 
-              <div className="grid gap-4 rounded-2xl border border-gray-500 bg-black p-6 md:grid-cols-2">
+              <div className={`grid gap-4 md:grid-cols-2 ${nestedCardClassName}`}>
                 <Input
                   label="Atual"
                   labelClassName={labelClassName}
@@ -2243,11 +2288,7 @@ export function CandidateProfileForm() {
               </div>
 
               <div className="flex justify-end gap-3">
-                <Button
-                  type="button"
-                  variant="profile"
-                  onClick={cancelDeleteExperience}
-                >
+                <Button type="button" variant="profile" onClick={cancelDeleteExperience}>
                   Cancelar
                 </Button>
                 <Button
@@ -2257,9 +2298,10 @@ export function CandidateProfileForm() {
                   disabled={isSubmitting}
                   onClick={confirmDeleteExperience}
                 >
-                  {`Apagar Experiência Profissional ${String(
-                    experienceIndexToDelete + 1
-                  ).padStart(2, '0')}`}
+                  {`Apagar Experiência Profissional ${String(experienceIndexToDelete + 1).padStart(
+                    2,
+                    '0',
+                  )}`}
                 </Button>
               </div>
             </div>

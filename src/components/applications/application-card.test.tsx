@@ -30,26 +30,23 @@ describe('ApplicationCard', () => {
   });
 
   it('render dados', () => {
-    renderWithProviders(
-      <ApplicationCard application={application as never} />
-    );
+    renderWithProviders(<ApplicationCard application={application as never} />);
 
     expect(screen.getByText('Personal Trainer')).toBeInTheDocument();
     expect(screen.getByText('Smart Fit')).toBeInTheDocument();
-    expect(screen.getByText('Aplicado')).toBeInTheDocument();
+    expect(screen.getByText('APLICADO')).toBeInTheDocument();
+    expect(screen.getByText('Smart Fit - Personal Trainer')).toBeInTheDocument();
   });
 
   it('botão cancelar', async () => {
     const user = userEvent.setup();
 
-    renderWithProviders(
-      <ApplicationCard application={application as never} />
-    );
+    renderWithProviders(<ApplicationCard application={application as never} />);
 
     await user.click(screen.getByRole('button', { name: /Cancelar Candidatura/i }));
 
-    expect(screen.getByText('Cancelar Aplicação')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /Confirmar Cancelamento/i })).toBeInTheDocument();
+    expect(screen.getByText('Cancelar aplicação')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Confirmar cancelamento/i })).toBeInTheDocument();
   });
 
   it('callback delete', async () => {
@@ -57,11 +54,11 @@ describe('ApplicationCard', () => {
     const onDeleted = jest.fn();
 
     renderWithProviders(
-      <ApplicationCard application={application as never} onDeleted={onDeleted} />
+      <ApplicationCard application={application as never} onDeleted={onDeleted} />,
     );
 
     await user.click(screen.getByRole('button', { name: /Cancelar Candidatura/i }));
-    await user.click(screen.getByRole('button', { name: /Confirmar Cancelamento/i }));
+    await user.click(screen.getByRole('button', { name: /Confirmar cancelamento/i }));
 
     await waitFor(() => {
       expect(onDeleted).toHaveBeenCalledTimes(1);

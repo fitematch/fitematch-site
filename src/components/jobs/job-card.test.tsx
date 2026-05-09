@@ -56,42 +56,38 @@ describe('JobCard', () => {
     render(<JobCard job={job as never} company={company as never} />);
 
     expect(screen.getByText('Personal Trainer')).toBeInTheDocument();
-    expect(screen.getByText('São Paulo - SP')).toBeInTheDocument();
+    expect(screen.getByText('São Paulo · SP')).toBeInTheDocument();
   });
 
   it('links', () => {
     render(<JobCard job={job as never} company={company as never} />);
 
-    expect(screen.getByRole('link', { name: /Detalhes/i })).toHaveAttribute(
-      'href',
-      '/jobs/job-1'
-    );
+    expect(screen.getByRole('link', { name: /Detalhes/i })).toHaveAttribute('href', '/jobs/job-1');
   });
 
   it('badges', () => {
     render(<JobCard job={job as never} company={company as never} />);
 
     expect(screen.getByText('clt')).toBeInTheDocument();
-    expect(screen.getByText('2 vagas disponíveis')).toBeInTheDocument();
+    expect(screen.getByText('2 vagas')).toBeInTheDocument();
     expect(screen.getByText(/R\$?\s?3.500,00/)).toBeInTheDocument();
   });
 
   it('fallback de imagem', () => {
     render(
       <JobCard
-        job={{
-          ...job,
-          media: undefined,
-        } as never}
+        job={
+          {
+            ...job,
+            media: undefined,
+          } as never
+        }
         company={company as never}
-      />
+      />,
     );
 
     expect(screen.queryByAltText('Personal Trainer')).not.toBeInTheDocument();
-    expect(screen.getByText('2 vagas disponíveis')).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /Detalhes/i })).toHaveAttribute(
-      'href',
-      '/jobs/job-1'
-    );
+    expect(screen.getByText('2 vagas')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /Detalhes/i })).toHaveAttribute('href', '/jobs/job-1');
   });
 });

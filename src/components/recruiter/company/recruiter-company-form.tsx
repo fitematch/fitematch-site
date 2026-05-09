@@ -1,19 +1,22 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
 import { FieldErrors, useForm, useWatch } from 'react-hook-form';
-import { FaBuilding, FaSave } from 'react-icons/fa';
-import { Button } from '@/components/ui/button';
+import { motion } from 'framer-motion';
+import { BadgeCheck, Building2, Globe, Landmark, MapPin, Save } from 'lucide-react';
 import { PhoneInput } from '@/components/form/phone-input';
+import { Button } from '@/components/ui/button';
+import { EmptyState } from '@/components/ui/empty-state';
 import { FileUpload } from '@/components/ui/file-upload';
 import { Input } from '@/components/ui/input';
+import { Skeleton } from '@/components/ui/skeleton';
+import { useFlashMessage } from '@/contexts/flash-message-context';
 import { useAddressByZipCode } from '@/hooks/use-address-by-zipcode';
 import { useCompanyByCnpj } from '@/hooks/use-company-by-cnpj';
 import { CompanyService } from '@/services/company/company.service';
 import { ApiError } from '@/services/http/api-error';
 import { UploadService } from '@/services/upload/upload.service';
 import { CompanyEntity } from '@/types/entities/company.entity';
-import { useFlashMessage } from '@/contexts/flash-message-context';
 
 interface RecruiterCompanyFormValues {
   tradeName: string;
@@ -66,6 +69,96 @@ function formatCnpj(value: string) {
   return `${digits.slice(0, 2)}.${digits.slice(2, 5)}.${digits.slice(5, 8)}/${digits.slice(8, 12)}-${digits.slice(12)}`;
 }
 
+function SummaryCard({
+  label,
+  value,
+  helper,
+  icon,
+}: {
+  label: string;
+  value: string;
+  helper: string;
+  icon: ReactNode;
+}) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 18 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3 }}
+      className="rounded-2xl border border-zinc-800 bg-zinc-950/80 p-6 backdrop-blur transition-all duration-300 hover:border-lime-500/20 hover:shadow-[0_0_0_1px_rgba(34,197,94,0.05),0_18px_60px_rgba(0,0,0,0.28)]"
+    >
+      <div className="flex items-center justify-between">
+        <div className="flex h-11 w-11 items-center justify-center rounded-2xl border border-lime-500/20 bg-lime-500/10 text-lime-400">
+          {icon}
+        </div>
+        <span className="text-xs uppercase tracking-[0.22em] text-zinc-600">{label}</span>
+      </div>
+      <p className="mt-6 truncate text-2xl font-semibold tracking-[-0.04em] text-zinc-50">
+        {value}
+      </p>
+      <p className="mt-2 text-sm text-zinc-500">{helper}</p>
+    </motion.div>
+  );
+}
+
+function SectionCard({
+  title,
+  description,
+  icon,
+  children,
+}: {
+  title: string;
+  description: string;
+  icon: ReactNode;
+  children: ReactNode;
+}) {
+  return (
+    <motion.fieldset
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.34 }}
+      className="rounded-2xl border border-zinc-800 bg-black/30 p-5"
+    >
+      <div className="mb-5 flex items-start gap-3">
+        <div className="flex h-10 w-10 items-center justify-center rounded-2xl border border-lime-500/20 bg-lime-500/10 text-lime-400">
+          {icon}
+        </div>
+        <div>
+          <legend className="text-sm font-semibold uppercase tracking-[0.18em] text-zinc-100">
+            {title}
+          </legend>
+          <p className="mt-1 text-sm text-zinc-500">{description}</p>
+        </div>
+      </div>
+      {children}
+    </motion.fieldset>
+  );
+}
+
+function LoadingState() {
+  return (
+    <div className="space-y-6">
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        {Array.from({ length: 4 }).map((_, index) => (
+          <Skeleton
+            key={index}
+            className="h-40 rounded-2xl border border-zinc-800 bg-zinc-950/80"
+          />
+        ))}
+      </div>
+
+      <div className="rounded-2xl border border-zinc-800 bg-zinc-950/80 p-6 backdrop-blur">
+        <div className="space-y-5">
+          <Skeleton className="h-8 w-56 rounded-xl bg-black/50" />
+          <Skeleton className="h-28 rounded-2xl bg-black/50" />
+          <Skeleton className="h-28 rounded-2xl bg-black/50" />
+          <Skeleton className="h-28 rounded-2xl bg-black/50" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function RecruiterCompanyForm() {
   const { showSuccess, showError } = useFlashMessage();
   const [isLoadingCompany, setIsLoadingCompany] = useState(true);
@@ -82,7 +175,8 @@ export function RecruiterCompanyForm() {
     isLoading: isZipCodeLoading,
     error: zipCodeError,
   } = useAddressByZipCode();
-  const labelClassName = 'text-gray-300';
+
+  const labelClassName = 'text-zinc-300';
   const fieldClassName =
     'rounded-xl border border-zinc-800 bg-zinc-950 text-zinc-200 placeholder:text-zinc-500';
 
@@ -102,18 +196,47 @@ export function RecruiterCompanyForm() {
     mode: 'onSubmit',
     reValidateMode: 'onChange',
   });
-  const phoneCountryValue = useWatch({
-    control,
-    name: 'phoneCountry',
-  });
-  const phoneNumberValue = useWatch({
-    control,
-    name: 'phoneNumber',
-  });
-  const logoUrlValue = useWatch({
-    control,
-    name: 'logoUrl',
-  });
+
+  const phoneCountryValue = useWatch({ control, name: 'phoneCountry' });
+  const phoneNumberValue = useWatch({ control, name: 'phoneNumber' });
+  const logoUrlValue = useWatch({ control, name: 'logoUrl' });
+  const tradeNameValue = useWatch({ control, name: 'tradeName' });
+  const cnpjValue = useWatch({ control, name: 'cnpj' });
+  const cityValue = useWatch({ control, name: 'city' });
+  const stateValue = useWatch({ control, name: 'state' });
+
+  const summaryItems = useMemo(
+    () => [
+      {
+        label: 'Empresa',
+        value: tradeNameValue?.trim() || 'Sem nome fantasia',
+        helper: 'Nome comercial para exibição',
+        icon: <Building2 className="h-4 w-4" />,
+      },
+      {
+        label: 'Documento',
+        value: cnpjValue?.trim() || 'CNPJ não informado',
+        helper: 'Documento de Identificação Fiscal',
+        icon: <Landmark className="h-4 w-4" />,
+      },
+      {
+        label: 'Localização',
+        value:
+          cityValue?.trim() && stateValue?.trim()
+            ? `${cityValue.trim()} - ${stateValue.trim()}`
+            : 'Localização não definida',
+        helper: 'Base principal da empresa cadastrada',
+        icon: <MapPin className="h-4 w-4" />,
+      },
+      {
+        label: 'Status',
+        value: hasCompany ? 'Configurada' : 'Pendente',
+        helper: hasCompany ? 'Empresa cadastrada no sistema.' : 'Cadastre sua empresa',
+        icon: <BadgeCheck className="h-4 w-4" />,
+      },
+    ],
+    [cityValue, cnpjValue, hasCompany, stateValue, tradeNameValue],
+  );
 
   const reloadCompany = useCallback(
     async (options?: { silentNotFound?: boolean }) => {
@@ -185,9 +308,7 @@ export function RecruiterCompanyForm() {
     };
 
     try {
-      await (hasCompany
-        ? await CompanyService.updateMine(payload)
-        : await CompanyService.createMine(payload));
+      await (hasCompany ? CompanyService.updateMine(payload) : CompanyService.createMine(payload));
       await reloadCompany();
 
       if (hasCompany) {
@@ -214,6 +335,7 @@ export function RecruiterCompanyForm() {
     required: 'Informe o CEP.',
     validate: (value) => value.replace(/\D/g, '').length === 8 || 'Informe um CEP válido.',
   });
+
   const cnpjField = register('cnpj', {
     required: 'Informe o CNPJ.',
     validate: (value) => value.replace(/\D/g, '').length === 14 || 'Informe um CNPJ válido.',
@@ -268,85 +390,119 @@ export function RecruiterCompanyForm() {
   }
 
   if (isLoadingCompany) {
-    return (
-      <div className="rounded-2xl border border-zinc-800 bg-zinc-950/90 p-6 text-zinc-400 backdrop-blur">
-        Carregando dados da empresa...
-      </div>
-    );
+    return <LoadingState />;
   }
 
   return (
-    <form
-      onSubmit={handleSubmit(onSubmit, onInvalidSubmit)}
-      className="rounded-2xl border border-zinc-800 bg-zinc-950/90 p-6 shadow-[0_18px_60px_rgba(0,0,0,0.28)] backdrop-blur"
-    >
-      <div className="mb-6 flex items-center gap-3 text-zinc-100">
-        <FaBuilding />
-        <h2 className="text-xl font-semibold uppercase">Dados da empresa</h2>
-      </div>
+    <div className="space-y-6">
+      <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        {summaryItems.map((item) => (
+          <SummaryCard
+            key={item.label}
+            label={item.label}
+            value={item.value}
+            helper={item.helper}
+            icon={item.icon}
+          />
+        ))}
+      </section>
 
-      <div className="space-y-4">
-        <fieldset className="rounded-2xl border border-zinc-800 bg-black/30 p-5">
-          <legend className="px-2 text-sm font-semibold uppercase text-zinc-100">Empresa</legend>
+      {!hasCompany && !tradeNameValue && !cnpjValue && (
+        <div className="rounded-2xl border border-zinc-800 bg-zinc-950/80 p-6 backdrop-blur">
+          <EmptyState message="Nenhuma empresa cadastrada ainda. Preencha os dados abaixo para iniciar sua operação." />
+        </div>
+      )}
 
-          <div className="grid gap-4">
-            <div className="grid gap-4 md:grid-cols-2">
+      <form
+        onSubmit={handleSubmit(onSubmit, onInvalidSubmit)}
+        className="rounded-2xl border border-zinc-800 bg-zinc-950/80 p-6 shadow-[0_18px_60px_rgba(0,0,0,0.28)] backdrop-blur"
+      >
+        <div className="mb-6 flex flex-col gap-4 border-b border-zinc-800 pb-6 md:flex-row md:items-end md:justify-between">
+          <div>
+            <div className="flex items-center gap-3 text-zinc-100">
+              <span className="flex h-11 w-11 items-center justify-center rounded-2xl border border-lime-500/20 bg-lime-500/10 text-lime-400">
+                <Building2 className="h-4 w-4" />
+              </span>
               <div>
-                <FileUpload
-                  label="Logo da empresa"
-                  accept="image/*"
-                  value={logoUrlValue}
-                  onUpload={async (file) => {
-                    const response = await UploadService.uploadCompanyLogo(file);
-
-                    setValue('logoUrl', response.url, {
-                      shouldDirty: true,
-                      shouldTouch: true,
-                      shouldValidate: true,
-                    });
-
-                    return response.url;
-                  }}
-                />
+                <h2 className="text-xl font-semibold text-zinc-50">Dados da empresa</h2>
+                <p className="mt-1 text-sm text-zinc-500">
+                  Centralize informações institucionais, contato e endereço da operação.
+                </p>
               </div>
-              <div className="hidden md:block" />
             </div>
-            <input type="hidden" {...register('logoUrl')} />
+          </div>
+        </div>
 
-            <div className="grid gap-4 md:grid-cols-2">
-              <div>
-                <Input
-                  label="CNPJ"
-                  labelClassName={labelClassName}
-                  className={fieldClassName}
-                  placeholder="00.000.000/0000-00"
-                  error={errors.cnpj?.message}
-                  {...cnpjField}
-                  onChange={(event) => {
-                    clearCnpjError();
-                    const formattedValue = formatCnpj(event.target.value);
+        <div className="space-y-4">
+          <SectionCard
+            title="Empresa"
+            description="Defina identidade visual, razão social e documento fiscal da operação."
+            icon={<Building2 className="h-4 w-4" />}
+          >
+            <div className="grid gap-4">
+              <div className="grid gap-4 md:grid-cols-2">
+                <div>
+                  <FileUpload
+                    label="Logo da empresa"
+                    accept="image/*"
+                    value={logoUrlValue}
+                    onUpload={async (file) => {
+                      const response = await UploadService.uploadCompanyLogo(file);
 
-                    setValue('cnpj', formattedValue, {
-                      shouldDirty: true,
-                      shouldTouch: true,
-                      shouldValidate: true,
-                    });
-                  }}
-                  onBlur={(event) => {
-                    cnpjField.onBlur(event);
-                    void handleCnpjLookup(event.target.value);
-                  }}
-                />
+                      setValue('logoUrl', response.url, {
+                        shouldDirty: true,
+                        shouldTouch: true,
+                        shouldValidate: true,
+                      });
+
+                      return response.url;
+                    }}
+                  />
+                </div>
               </div>
-              <div />
-            </div>
 
-            {isCnpjLoading && <p className="text-sm text-zinc-400">Consultando CNPJ...</p>}
+              <input type="hidden" {...register('logoUrl')} />
 
-            {cnpjError && <p className="text-sm text-red-100">{cnpjError}</p>}
+              <div className="grid gap-4 md:grid-cols-2">
+                <div>
+                  <Input
+                    label="CNPJ"
+                    labelClassName={labelClassName}
+                    className={fieldClassName}
+                    placeholder="00.000.000/0000-00"
+                    error={errors.cnpj?.message}
+                    {...cnpjField}
+                    onChange={(event) => {
+                      clearCnpjError();
+                      const formattedValue = formatCnpj(event.target.value);
 
-            <div className="grid gap-4 md:grid-cols-2">
-              <div>
+                      setValue('cnpj', formattedValue, {
+                        shouldDirty: true,
+                        shouldTouch: true,
+                        shouldValidate: true,
+                      });
+                    }}
+                    onBlur={(event) => {
+                      cnpjField.onBlur(event);
+                      void handleCnpjLookup(event.target.value);
+                    }}
+                  />
+                </div>
+              </div>
+
+              {isCnpjLoading && (
+                <div className="rounded-xl border border-zinc-800 bg-black/40 px-4 py-3 text-sm text-zinc-400">
+                  Consultando CNPJ...
+                </div>
+              )}
+
+              {cnpjError && (
+                <div className="rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-200">
+                  {cnpjError}
+                </div>
+              )}
+
+              <div className="grid gap-4 md:grid-cols-2">
                 <Input
                   label="Nome fantasia"
                   labelClassName={labelClassName}
@@ -357,9 +513,7 @@ export function RecruiterCompanyForm() {
                     validate: (value) => value.trim().length > 0 || 'Informe o nome fantasia.',
                   })}
                 />
-              </div>
 
-              <div>
                 <Input
                   label="Razão social"
                   labelClassName={labelClassName}
@@ -372,51 +526,49 @@ export function RecruiterCompanyForm() {
                 />
               </div>
             </div>
-          </div>
-        </fieldset>
+          </SectionCard>
 
-        <fieldset className="rounded-2xl border border-zinc-800 bg-black/30 p-5">
-          <legend className="px-2 text-sm font-semibold uppercase text-zinc-100">Contato</legend>
-
-          <div className="grid gap-4">
-            <div className="grid gap-4 md:grid-cols-2">
-              <div>
-                <input type="hidden" {...register('phoneCountry')} />
-                <input
-                  type="hidden"
-                  {...register('phoneNumber', {
-                    required: 'Informe o telefone.',
-                    validate: (value) =>
-                      value.replace(/\D/g, '').length >= 8 || 'Informe o telefone.',
-                  })}
-                />
-                <PhoneInput
-                  label="Telefone"
-                  labelClassName={labelClassName}
-                  countryValue={phoneCountryValue || '+55'}
-                  numberValue={phoneNumberValue || ''}
-                  onCountryChange={(value) =>
-                    setValue('phoneCountry', value, {
-                      shouldDirty: true,
-                      shouldTouch: true,
-                      shouldValidate: true,
-                    })
-                  }
-                  onNumberChange={(value) =>
-                    setValue('phoneNumber', value, {
-                      shouldDirty: true,
-                      shouldTouch: true,
-                      shouldValidate: true,
-                    })
-                  }
-                  error={errors.phoneNumber?.message}
-                />
+          <SectionCard
+            title="Contato"
+            description="Organize os canais que candidatos e parceiros vão utilizar para falar com sua empresa."
+            icon={<Globe className="h-4 w-4" />}
+          >
+            <div className="grid gap-4">
+              <div className="grid gap-4 md:grid-cols-2">
+                <div>
+                  <input type="hidden" {...register('phoneCountry')} />
+                  <input
+                    type="hidden"
+                    {...register('phoneNumber', {
+                      required: 'Informe o telefone.',
+                      validate: (value) =>
+                        value.replace(/\D/g, '').length >= 8 || 'Informe o telefone.',
+                    })}
+                  />
+                  <PhoneInput
+                    labelClassName={labelClassName}
+                    countryValue={phoneCountryValue || '+55'}
+                    numberValue={phoneNumberValue || ''}
+                    onCountryChange={(value) =>
+                      setValue('phoneCountry', value, {
+                        shouldDirty: true,
+                        shouldTouch: true,
+                        shouldValidate: true,
+                      })
+                    }
+                    onNumberChange={(value) =>
+                      setValue('phoneNumber', value, {
+                        shouldDirty: true,
+                        shouldTouch: true,
+                        shouldValidate: true,
+                      })
+                    }
+                    error={errors.phoneNumber?.message}
+                  />
+                </div>
               </div>
-              <div />
-            </div>
 
-            <div className="grid gap-4 md:grid-cols-2">
-              <div>
+              <div className="grid gap-4 md:grid-cols-2">
                 <Input
                   label="E-mail"
                   labelClassName={labelClassName}
@@ -431,58 +583,64 @@ export function RecruiterCompanyForm() {
                     },
                   })}
                 />
-              </div>
 
-              <div>
                 <Input
                   label="Website"
                   labelClassName={labelClassName}
                   className={fieldClassName}
+                  placeholder="https://suaempresa.com.br"
                   {...register('website')}
                 />
               </div>
             </div>
-          </div>
-        </fieldset>
+          </SectionCard>
 
-        <fieldset className="rounded-2xl border border-zinc-800 bg-black/30 p-5">
-          <legend className="px-2 text-sm font-semibold uppercase text-zinc-100">Endereço</legend>
+          <SectionCard
+            title="Endereço"
+            description="Defina a base da empresa para exibição operacional e preenchimento das vagas."
+            icon={<MapPin className="h-4 w-4" />}
+          >
+            <div className="grid gap-4">
+              <div className="grid gap-4 md:grid-cols-2">
+                <div>
+                  <Input
+                    label="CEP"
+                    labelClassName={labelClassName}
+                    className={fieldClassName}
+                    placeholder="01310-100"
+                    error={errors.zipCode?.message}
+                    {...zipCodeField}
+                    onChange={(event) => {
+                      clearZipCodeError();
+                      const formattedValue = formatZipCode(event.target.value);
 
-          <div className="grid gap-4">
-            <div className="grid gap-4 md:grid-cols-2">
-              <div>
-                <Input
-                  label="CEP"
-                  labelClassName={labelClassName}
-                  className={fieldClassName}
-                  placeholder="01310-100"
-                  error={errors.zipCode?.message}
-                  {...zipCodeField}
-                  onChange={(event) => {
-                    clearZipCodeError();
-                    const formattedValue = formatZipCode(event.target.value);
-
-                    setValue('zipCode', formattedValue, {
-                      shouldDirty: true,
-                      shouldTouch: true,
-                      shouldValidate: true,
-                    });
-                  }}
-                  onBlur={(event) => {
-                    zipCodeField.onBlur(event);
-                    void handleZipCodeLookup(event.target.value);
-                  }}
-                />
+                      setValue('zipCode', formattedValue, {
+                        shouldDirty: true,
+                        shouldTouch: true,
+                        shouldValidate: true,
+                      });
+                    }}
+                    onBlur={(event) => {
+                      zipCodeField.onBlur(event);
+                      void handleZipCodeLookup(event.target.value);
+                    }}
+                  />
+                </div>
               </div>
-              <div />
-            </div>
 
-            {isZipCodeLoading && <p className="text-sm text-zinc-400">Consultando CEP...</p>}
+              {isZipCodeLoading && (
+                <div className="rounded-xl border border-zinc-800 bg-black/40 px-4 py-3 text-sm text-zinc-400">
+                  Consultando CEP...
+                </div>
+              )}
 
-            {zipCodeError && <p className="text-sm text-red-100">{zipCodeError}</p>}
+              {zipCodeError && (
+                <div className="rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-200">
+                  {zipCodeError}
+                </div>
+              )}
 
-            <div className="grid gap-4 md:grid-cols-2">
-              <div>
+              <div className="grid gap-4 md:grid-cols-2">
                 <Input
                   label="Rua"
                   labelClassName={labelClassName}
@@ -493,10 +651,8 @@ export function RecruiterCompanyForm() {
                     validate: (value) => value.trim().length > 0 || 'Informe a rua.',
                   })}
                 />
-              </div>
 
-              <div className="grid gap-4 md:grid-cols-2">
-                <div>
+                <div className="grid gap-4 md:grid-cols-2">
                   <Input
                     label="Número"
                     labelClassName={labelClassName}
@@ -507,9 +663,7 @@ export function RecruiterCompanyForm() {
                       validate: (value) => value.trim().length > 0 || 'Informe o número.',
                     })}
                   />
-                </div>
 
-                <div>
                   <Input
                     label="Complemento"
                     labelClassName={labelClassName}
@@ -518,10 +672,8 @@ export function RecruiterCompanyForm() {
                   />
                 </div>
               </div>
-            </div>
 
-            <div className="grid gap-4 md:grid-cols-2">
-              <div>
+              <div className="grid gap-4 md:grid-cols-2">
                 <Input
                   label="Bairro"
                   labelClassName={labelClassName}
@@ -532,10 +684,8 @@ export function RecruiterCompanyForm() {
                     validate: (value) => value.trim().length > 0 || 'Informe o bairro.',
                   })}
                 />
-              </div>
 
-              <div className="grid gap-4 md:grid-cols-2">
-                <div>
+                <div className="grid gap-4 md:grid-cols-2">
                   <Input
                     label="Cidade"
                     labelClassName={labelClassName}
@@ -546,9 +696,7 @@ export function RecruiterCompanyForm() {
                       validate: (value) => value.trim().length > 0 || 'Informe a cidade.',
                     })}
                   />
-                </div>
 
-                <div>
                   <Input
                     label="Estado"
                     labelClassName={labelClassName}
@@ -562,16 +710,22 @@ export function RecruiterCompanyForm() {
                 </div>
               </div>
             </div>
-          </div>
-        </fieldset>
-      </div>
+          </SectionCard>
+        </div>
 
-      <div className="mt-6 flex justify-end">
-        <Button type="submit" variant="positive" icon={<FaSave />} disabled={isSubmitting}>
-          {hasCompany ? 'Atualizar empresa' : 'Salvar empresa'}
-        </Button>
-      </div>
-    </form>
+        <div className="mt-6 flex justify-end border-t border-zinc-800 pt-6">
+          <Button
+            type="submit"
+            variant="positive"
+            icon={<Save className="h-4 w-4" />}
+            disabled={isSubmitting}
+            className="rounded-xl border-lime-500/20 bg-lime-500/10 px-5 py-2.5 text-lime-300 hover:bg-lime-500/15"
+          >
+            {isSubmitting ? 'Salvando...' : hasCompany ? 'Atualizar empresa' : 'Salvar empresa'}
+          </Button>
+        </div>
+      </form>
+    </div>
   );
 }
 

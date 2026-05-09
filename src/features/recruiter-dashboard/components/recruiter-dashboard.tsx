@@ -124,7 +124,7 @@ export function RecruiterDashboard() {
   ];
 
   return (
-    <DashboardShell title="Dashboard recruiter" subtitle="Visão geral da operação de contratação">
+    <DashboardShell title="" subtitle="">
       <div className="space-y-8">
         <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
           {metrics.map((metric, index) => {
@@ -282,12 +282,21 @@ export function RecruiterDashboard() {
                   ))}
 
                 {!isLoading &&
-                  jobs.map((job) => (
-                    <tr key={job._id} className="transition-colors hover:bg-white/[0.02]">
+                  jobs.map((job, index) => (
+                    <tr
+                      key={
+                        job._id ||
+                        job.slug ||
+                        `${job.title}-${job.updatedAt || job.createdAt || index}`
+                      }
+                      className="transition-colors hover:bg-white/[0.02]"
+                    >
                       <td className="px-6 py-5">
                         <div>
                           <p className="text-sm font-medium text-zinc-100">{job.title}</p>
-                          <p className="mt-1 text-sm text-zinc-500">{job.company.tradeName}</p>
+                          <p className="mt-1 text-sm text-zinc-500">
+                            {job.company?.tradeName || 'Empresa não informada'}
+                          </p>
                         </div>
                       </td>
                       <td className="px-6 py-5">

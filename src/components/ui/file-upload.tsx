@@ -86,7 +86,10 @@ export function FileUpload({
     };
   }, [localPreviewUrl, pendingPreviewUrl]);
 
-  const previewUrl = localPreviewUrl || value;
+  const persistedPreviewUrl = value ? resolveFileUrl(value) : '';
+  const shouldPreferPersistedPreview =
+    Boolean(persistedPreviewUrl) && Boolean(localPreviewUrl?.startsWith('blob:'));
+  const previewUrl = shouldPreferPersistedPreview ? persistedPreviewUrl : localPreviewUrl || value;
   const fileName = uploadedFile?.name || getFileNameFromUrl(value);
   const resolvedPreviewUrl = resolveFileUrl(previewUrl);
   const hasImagePreview = isImageFile(uploadedFile, previewUrl);
@@ -173,9 +176,7 @@ export function FileUpload({
 
   return (
     <div className="w-full">
-      <label className="mb-1 block text-sm font-medium text-gray-300">
-        {label}
-      </label>
+      <label className="mb-1 block text-sm font-medium text-gray-300">{label}</label>
 
       <div className="rounded-2xl border border-gray-500 bg-black p-4">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
@@ -241,9 +242,7 @@ export function FileUpload({
           </div>
 
           {pendingPreviewUrl && (
-            <div
-              className="relative w-full overflow-hidden rounded-2xl border border-gray-500 bg-white"
-            >
+            <div className="relative w-full overflow-hidden rounded-2xl border border-gray-500 bg-white">
               <Image
                 src={pendingPreviewUrl}
                 alt="Preview para confirmacao"

@@ -1,6 +1,8 @@
 import { Metadata } from 'next';
 import { RecruiterPageHeader } from '@/components/recruiter/recruiter-page-header';
 import { RecruiterJobForm } from '@/components/recruiter/jobs/recruiter-job-form';
+import { ROUTES } from '@/constants/routes';
+import { DashboardShell } from '@/features/recruiter-dashboard/components/dashboard-shell';
 
 export const metadata: Metadata = {
   title: 'Nova vaga',
@@ -12,15 +14,20 @@ export const metadata: Metadata = {
 
 export default function RecruiterNewJobPage() {
   return (
-    <section className="min-h-screen bg-black px-4 py-20">
-      <div className="mx-auto max-w-5xl">
+    <DashboardShell title="" subtitle="">
+      <div className="mx-auto w-full max-w-7xl">
         <RecruiterPageHeader
-          title="Nova vaga"
-          description="Publique uma nova vaga para candidatos da plataforma."
+          breadcrumbs={[
+            { label: 'Home', href: ROUTES.HOME },
+            { label: 'Minhas vagas', href: ROUTES.RECRUITER_JOBS },
+            { label: 'Nova vaga' },
+          ]}
+          title=""
+          description=""
         />
 
         <RecruiterJobForm mode="create" />
       </div>
-    </section>
+    </DashboardShell>
   );
 }

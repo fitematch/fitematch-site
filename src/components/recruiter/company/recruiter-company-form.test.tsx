@@ -51,7 +51,7 @@ function renderCompanyForm() {
     <>
       <RecruiterCompanyForm />
       <FlashMessageProbe />
-    </>
+    </>,
   );
 }
 
@@ -108,7 +108,7 @@ describe('RecruiterCompanyForm', () => {
         HttpResponse.json({
           razao_social: 'Smart Fit Academia LTDA',
           nome_fantasia: 'Smart Fit',
-        })
+        }),
       ),
       http.get('https://viacep.com.br/ws/:zipCode/json/', () =>
         HttpResponse.json({
@@ -117,8 +117,8 @@ describe('RecruiterCompanyForm', () => {
           bairro: 'Consolação',
           localidade: 'São Paulo',
           uf: 'SP',
-        })
-      )
+        }),
+      ),
     );
   });
 
@@ -129,9 +129,7 @@ describe('RecruiterCompanyForm', () => {
 
     renderCompanyForm();
 
-    expect(
-      await screen.findByRole('button', { name: /Salvar empresa/i })
-    ).toBeInTheDocument();
+    expect(await screen.findByRole('button', { name: /Salvar empresa/i })).toBeInTheDocument();
 
     await fillRequiredFields(user);
 
@@ -142,33 +140,27 @@ describe('RecruiterCompanyForm', () => {
     });
 
     expect(
-      await screen.findByText('Empresa cadastrada com sucesso e enviada para aprovação.')
+      await screen.findByText('Empresa cadastrada com sucesso e enviada para aprovação.'),
     ).toBeInTheDocument();
-    expect(
-      document.querySelector('input[name="phoneCountry"]')
-    ).toHaveValue('+1');
+    expect(document.querySelector('input[name="phoneCountry"]')).toHaveValue('+1');
     expect(mockDb.upload.lastUpload?.endpoint).toBe('/upload/company-logo');
   });
 
   it('GET /company/me com dados', async () => {
     renderCompanyForm();
 
-    expect(
-      await screen.findByRole('button', { name: /Atualizar empresa/i })
-    ).toBeInTheDocument();
-    expect(
-      document.querySelector('input[name="tradeName"]')
-    ).toHaveValue('Smart Fit');
-    expect(
-      document.querySelector('input[name="legalName"]')
-    ).toHaveValue('Smart Fit Academia LTDA');
+    expect(await screen.findByRole('button', { name: /Atualizar empresa/i })).toBeInTheDocument();
+    expect(document.querySelector('input[name="tradeName"]')).toHaveValue('Smart Fit');
+    expect(document.querySelector('input[name="legalName"]')).toHaveValue(
+      'Smart Fit Academia LTDA',
+    );
   });
 
   it('renderiza loading inicial', () => {
     mockDb.company.mineStatus = 200;
     const { container } = renderCompanyForm();
 
-    expect(container).toHaveTextContent('Carregando dados da empresa...');
+    expect(container.querySelector('.animate-pulse')).toBeInTheDocument();
   });
 
   it('mostra erro quando falha ao carregar empresa', async () => {
@@ -177,7 +169,7 @@ describe('RecruiterCompanyForm', () => {
     renderCompanyForm();
 
     expect(
-      await screen.findByText('Não foi possível carregar os dados da empresa.')
+      await screen.findByText('Não foi possível carregar os dados da empresa.'),
     ).toBeInTheDocument();
   });
 
@@ -192,7 +184,7 @@ describe('RecruiterCompanyForm', () => {
     await user.click(screen.getByRole('button', { name: /Salvar empresa/i }));
 
     expect(
-      await screen.findByText('Preencha os campos obrigatórios para salvar a empresa.')
+      await screen.findByText('Preencha os campos obrigatórios para salvar a empresa.'),
     ).toBeInTheDocument();
   });
 
@@ -216,9 +208,7 @@ describe('RecruiterCompanyForm', () => {
     await screen.findByRole('button', { name: /Atualizar empresa/i });
     await user.click(screen.getByRole('button', { name: /Atualizar empresa/i }));
 
-    expect(
-      await screen.findByText('Empresa atualizada com sucesso.')
-    ).toBeInTheDocument();
+    expect(await screen.findByText('Empresa atualizada com sucesso.')).toBeInTheDocument();
   });
 
   it('mostra erro quando falha ao salvar empresa', async () => {
@@ -227,8 +217,8 @@ describe('RecruiterCompanyForm', () => {
     mockDb.company.mine = null;
     server.use(
       http.post(apiUrl(API_ENDPOINTS.COMPANY_ME), () =>
-        HttpResponse.json({ message: 'Falha ao criar.' }, { status: 500 })
-      )
+        HttpResponse.json({ message: 'Falha ao criar.' }, { status: 500 }),
+      ),
     );
 
     renderCompanyForm();
@@ -237,9 +227,7 @@ describe('RecruiterCompanyForm', () => {
     await fillRequiredFields(user);
     await user.click(screen.getByRole('button', { name: /Salvar empresa/i }));
 
-    expect(
-      await screen.findByText('Não foi possível cadastrar a empresa.')
-    ).toBeInTheDocument();
+    expect(await screen.findByText('Não foi possível cadastrar a empresa.')).toBeInTheDocument();
   });
 
   it('ignora lookup de CNPJ quando a consulta não retorna dados', async () => {
@@ -248,8 +236,8 @@ describe('RecruiterCompanyForm', () => {
     mockDb.company.mine = null;
     server.use(
       http.get('https://brasilapi.com.br/api/cnpj/v1/:cnpj', () =>
-        HttpResponse.json({ message: 'CNPJ não encontrado.' }, { status: 404 })
-      )
+        HttpResponse.json({ message: 'CNPJ não encontrado.' }, { status: 404 }),
+      ),
     );
 
     renderCompanyForm();
@@ -259,9 +247,7 @@ describe('RecruiterCompanyForm', () => {
     screen.getByPlaceholderText('00.000.000/0000-00').blur();
 
     await waitFor(() => {
-      expect(
-        document.querySelector('input[name="tradeName"]')
-      ).toHaveValue('');
+      expect(document.querySelector('input[name="tradeName"]')).toHaveValue('');
     });
   });
 
@@ -271,8 +257,8 @@ describe('RecruiterCompanyForm', () => {
     mockDb.company.mine = null;
     server.use(
       http.get('https://viacep.com.br/ws/:zipCode/json/', () =>
-        HttpResponse.json({ erro: true }, { status: 404 })
-      )
+        HttpResponse.json({ erro: true }, { status: 404 }),
+      ),
     );
 
     renderCompanyForm();
@@ -282,9 +268,7 @@ describe('RecruiterCompanyForm', () => {
     screen.getByPlaceholderText('01310-100').blur();
 
     await waitFor(() => {
-      expect(
-        document.querySelector('input[name="street"]')
-      ).toHaveValue('');
+      expect(document.querySelector('input[name="street"]')).toHaveValue('');
     });
   });
 });

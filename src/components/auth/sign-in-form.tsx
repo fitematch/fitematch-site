@@ -11,6 +11,7 @@ import { SignInRequest } from '@/services/auth/auth.types';
 import { useFlashMessage } from '@/contexts/flash-message-context';
 import { useAuth } from '@/hooks/use-auth';
 import { ROUTES } from '@/constants/routes';
+import { UserStatusEnum } from '@/types/entities/user.entity';
 
 export function SignInForm() {
   const router = useRouter();
@@ -25,7 +26,14 @@ export function SignInForm() {
 
   async function onSubmit(data: SignInRequest) {
     try {
-      await signIn(data);
+      const response = await signIn(data);
+
+      if (response.user?.status === UserStatusEnum.PENDING) {
+        showSuccess('Conta pendente. Ative sua conta para continuar.');
+        router.push(`${ROUTES.ACTIVATE_ACCOUNT}?email=${encodeURIComponent(data.email)}`);
+        return;
+      }
+
       showSuccess('Login realizado com sucesso.');
       router.push(ROUTES.HOME);
     } catch {
@@ -71,15 +79,17 @@ export function SignInForm() {
         />
       </div>
 
-      <Button
-        type="submit"
-        variant="login"
-        icon={<FaSignInAlt />}
-        disabled={isSubmitting}
-        className="mt-6 w-full rounded-2xl border border-lime-500/30 bg-lime-500/10 py-3 text-lime-300 transition-all duration-300 hover:border-lime-400/40 hover:bg-lime-500/14 hover:text-lime-200"
-      >
-        Entrar
-      </Button>
+      <div className="mt-6 flex justify-center">
+        <Button
+          type="submit"
+          variant="login"
+          icon={<FaSignInAlt />}
+          disabled={isSubmitting}
+          className="w-full rounded-2xl border border-lime-500/30 bg-lime-500/10 py-3 text-lime-300 transition-all duration-300 hover:border-lime-400/40 hover:bg-lime-500/14 hover:text-lime-200 sm:w-auto"
+        >
+          Entrar
+        </Button>
+      </div>
 
       <p className="mt-6 text-center text-sm text-zinc-500">
         Ainda não tem conta?{' '}

@@ -1,13 +1,6 @@
 'use client';
 
-import {
-  createContext,
-  ReactNode,
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-} from 'react';
+import { createContext, ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
 import { AuthService } from '@/services/auth/auth.service';
 import {
   AuthUser,
@@ -16,6 +9,7 @@ import {
   UpdateMeRequest,
 } from '@/services/auth/auth.types';
 import { TokenStorage } from '@/services/http/token-storage';
+import { UserStatusEnum } from '@/types/entities/user.entity';
 
 interface AuthContextData {
   user: AuthUser | null;
@@ -65,6 +59,13 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
     try {
       const response = await AuthService.signIn(payload);
+
+      if (response.user?.status === UserStatusEnum.PENDING) {
+        TokenStorage.clearTokens();
+        setUser(null);
+        return response;
+      }
+
       const me = await AuthService.me();
 
       setUser(me);
@@ -150,9 +151,5 @@ export function AuthProvider({ children }: AuthProviderProps) {
     [user, isLoading, signIn, signOut, refreshMe, updateMe],
   );
 
-  return (
-    <AuthContext.Provider value={value}>
-      {children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

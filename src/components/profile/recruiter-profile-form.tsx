@@ -2,8 +2,7 @@
 
 import { useEffect } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
-import { FaSave, FaTelegramPlane, FaUserTie, FaWhatsapp } from 'react-icons/fa';
-import { GrDocumentText } from 'react-icons/gr';
+import { FileText, Save, Send, UserRound, MessageCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { PhoneInput } from '@/components/form/phone-input';
@@ -34,10 +33,11 @@ export function RecruiterProfileForm() {
   const { user, refreshMe, updateMe } = useAuth();
   const { showSuccess, showError } = useFlashMessage();
 
-  const boxClassName = 'rounded-2xl border border-gray-500 bg-black p-6';
+  const boxClassName =
+    'rounded-[1.75rem] border border-zinc-800 bg-black/90 p-7 shadow-[0_18px_50px_rgba(0,0,0,0.36)] backdrop-blur transition-all duration-300 hover:-translate-y-0.5 hover:border-lime-300/25 hover:shadow-[0_0_0_1px_rgba(199,245,29,0.06),0_20px_52px_rgba(0,0,0,0.4)]';
   const fieldClassName =
-      'rounded-xl border border-gray-500 bg-black text-gray-300 placeholder:text-gray-500 disabled:border-gray-500 disabled:bg-black disabled:text-gray-300 disabled:opacity-100';
-  const labelClassName = 'text-gray-300';
+    'rounded-xl border border-zinc-800 bg-zinc-950 text-zinc-200 placeholder:text-zinc-500 disabled:border-zinc-800 disabled:bg-zinc-950 disabled:text-zinc-300 disabled:opacity-100';
+  const labelClassName = 'text-zinc-300';
 
   const {
     register,
@@ -54,13 +54,10 @@ export function RecruiterProfileForm() {
         position: user?.recruiterProfile?.position || '',
         contacts: {
           phone: {
-            country:
-                user?.recruiterProfile?.contacts?.phone?.country || '+55',
+            country: user?.recruiterProfile?.contacts?.phone?.country || '+55',
             number: user?.recruiterProfile?.contacts?.phone?.number || '',
-            isWhatsapp:
-                user?.recruiterProfile?.contacts?.phone?.isWhatsapp || false,
-            isTelegram:
-                user?.recruiterProfile?.contacts?.phone?.isTelegram || false,
+            isWhatsapp: user?.recruiterProfile?.contacts?.phone?.isWhatsapp || false,
+            isTelegram: user?.recruiterProfile?.contacts?.phone?.isTelegram || false,
           },
         },
       },
@@ -75,11 +72,7 @@ export function RecruiterProfileForm() {
     queueMicrotask(() => {
       void refreshMe();
     });
-  }, [
-    refreshMe,
-    user?.recruiterProfile?.companyId,
-    user?.recruiterProfile?.tradeName,
-  ]);
+  }, [refreshMe, user?.recruiterProfile?.companyId, user?.recruiterProfile?.tradeName]);
 
   useEffect(() => {
     reset({
@@ -89,13 +82,10 @@ export function RecruiterProfileForm() {
         position: user?.recruiterProfile?.position || '',
         contacts: {
           phone: {
-            country:
-                user?.recruiterProfile?.contacts?.phone?.country || '+55',
+            country: user?.recruiterProfile?.contacts?.phone?.country || '+55',
             number: user?.recruiterProfile?.contacts?.phone?.number || '',
-            isWhatsapp:
-                user?.recruiterProfile?.contacts?.phone?.isWhatsapp || false,
-            isTelegram:
-                user?.recruiterProfile?.contacts?.phone?.isTelegram || false,
+            isWhatsapp: user?.recruiterProfile?.contacts?.phone?.isWhatsapp || false,
+            isTelegram: user?.recruiterProfile?.contacts?.phone?.isTelegram || false,
           },
         },
       },
@@ -152,143 +142,144 @@ export function RecruiterProfileForm() {
   }
 
   return (
-      <div className="space-y-8">
-        <div className={boxClassName}>
-          <ProfileSectionTitle
-              title="Dados básicos"
-              icon={GrDocumentText}
-              titleClassName="text-gray-300"
-              iconClassName="text-gray-300"
-              toggleIconClassName="text-gray-300"
+    <div className="space-y-8">
+      <div className={boxClassName}>
+        <ProfileSectionTitle
+          title="Dados básicos"
+          icon={FileText as never}
+          titleClassName="text-zinc-100"
+          iconClassName="text-lime-400"
+          toggleIconClassName="text-zinc-500"
+        />
+
+        <div className="mt-6 grid gap-4 md:grid-cols-2">
+          <Input
+            label="Nome"
+            labelClassName={labelClassName}
+            className={fieldClassName}
+            placeholder="Nome"
+            {...register('name')}
           />
 
-          <div className="mt-6 grid gap-4 md:grid-cols-2">
-            <Input
-                label="Nome"
-                labelClassName={labelClassName}
-                className={fieldClassName}
-                placeholder="Nome"
-                {...register('name')}
-            />
+          <div className="hidden md:block" />
 
-            <div className="hidden md:block" />
+          <Input
+            label="E-mail"
+            labelClassName={labelClassName}
+            className={fieldClassName}
+            placeholder="E-mail"
+            value={user?.email || ''}
+            disabled
+          />
 
-            <Input
-                label="E-mail"
-                labelClassName={labelClassName}
-                className={fieldClassName}
-                placeholder="E-mail"
-                value={user?.email || ''}
-                disabled
-            />
-
-            <Input
-                label="Data de nascimento"
-                labelClassName={labelClassName}
-                className={fieldClassName}
-                placeholder="Data de nascimento"
-                value={formatBirthday(user?.birthday)}
-                disabled
-            />
-          </div>
-
-          <div className="mt-6 flex justify-end">
-            <Button
-                type="button"
-                variant="positive"
-                icon={<FaSave />}
-                disabled={isSubmitting}
-                onClick={handleSaveBasic}
-            >
-              Salvar
-            </Button>
-          </div>
+          <Input
+            label="Data de nascimento"
+            labelClassName={labelClassName}
+            className={fieldClassName}
+            placeholder="Data de nascimento"
+            value={formatBirthday(user?.birthday)}
+            disabled
+          />
         </div>
 
-        <div className={boxClassName}>
-          <ProfileSectionTitle
-              title="Dados do recrutador"
-              icon={FaUserTie}
-              titleClassName="text-gray-300"
-              iconClassName="text-gray-300"
-              toggleIconClassName="text-gray-300"
-          />
-
-          <div className="mt-6 grid gap-4 md:grid-cols-2">
-            <Input
-                label="Empresa"
-                labelClassName={labelClassName}
-                className={fieldClassName}
-                placeholder="Empresa"
-                {...register('recruiterProfile.tradeName')}
-            />
-
-            <Input
-                label="Cargo"
-                labelClassName={labelClassName}
-                className={fieldClassName}
-                placeholder="Cargo"
-                {...register('recruiterProfile.position')}
-            />
-
-            <div>
-              <PhoneInput
-                label="Telefone"
-                labelClassName={labelClassName}
-                countryValue={phoneCountryValue || '+55'}
-                numberValue={phoneNumberValue || ''}
-                onCountryChange={(value) =>
-                  setValue('recruiterProfile.contacts.phone.country', value, {
-                    shouldDirty: true,
-                    shouldTouch: true,
-                  })
-                }
-                onNumberChange={(value) =>
-                  setValue('recruiterProfile.contacts.phone.number', value, {
-                    shouldDirty: true,
-                    shouldTouch: true,
-                  })
-                }
-              />
-            </div>
-
-            <div className="flex items-end">
-              <div className="grid w-full gap-3 md:grid-cols-2">
-                <label className="flex items-center gap-2 rounded-xl border border-gray-500 bg-black px-4 py-3 text-gray-100 placeholder:text-gray-300">
-                  <input
-                    type="checkbox"
-                    className="h-4 w-4 accent-gray-300"
-                    {...register('recruiterProfile.contacts.phone.isWhatsapp')}
-                  />
-                  <FaWhatsapp className="h-5 w-5 text-green-500" />
-                  <span>WhatsApp</span>
-                </label>
-                <label className="flex items-center gap-2 rounded-xl border border-gray-500 bg-black px-4 py-3 text-gray-100 placeholder:text-gray-300">
-                  <input
-                    type="checkbox"
-                    className="h-4 w-4 accent-gray-300"
-                    {...register('recruiterProfile.contacts.phone.isTelegram')}
-                  />
-                  <FaTelegramPlane className="h-5 w-5 text-sky-500" />
-                  <span>Telegram</span>
-                </label>
-              </div>
-            </div>
-
-          </div>
-
-          <div className="mt-6 flex justify-end">
-            <Button
-                type="button"
-                variant="positive"
-                icon={<FaSave />}
-                disabled={isSubmitting}
-                onClick={handleSaveRecruiter}
-            >
-              Salvar
-            </Button>
-          </div>
+        <div className="mt-6 flex justify-end">
+          <Button
+            type="button"
+            variant="positive"
+            icon={<Save className="h-4 w-4" />}
+            disabled={isSubmitting}
+            onClick={handleSaveBasic}
+            className="rounded-xl border-lime-500/20 bg-lime-500/10 text-lime-300 hover:bg-lime-500/15"
+          >
+            Salvar
+          </Button>
         </div>
       </div>
+
+      <div className={boxClassName}>
+        <ProfileSectionTitle
+          title="Dados do recrutador"
+          icon={UserRound as never}
+          titleClassName="text-zinc-100"
+          iconClassName="text-lime-400"
+          toggleIconClassName="text-zinc-500"
+        />
+
+        <div className="mt-6 grid gap-4 md:grid-cols-2">
+          <Input
+            label="Empresa"
+            labelClassName={labelClassName}
+            className={fieldClassName}
+            placeholder="Empresa"
+            {...register('recruiterProfile.tradeName')}
+          />
+
+          <Input
+            label="Cargo"
+            labelClassName={labelClassName}
+            className={fieldClassName}
+            placeholder="Cargo"
+            {...register('recruiterProfile.position')}
+          />
+
+          <div>
+            <PhoneInput
+              label="Telefone"
+              labelClassName={labelClassName}
+              countryValue={phoneCountryValue || '+55'}
+              numberValue={phoneNumberValue || ''}
+              onCountryChange={(value) =>
+                setValue('recruiterProfile.contacts.phone.country', value, {
+                  shouldDirty: true,
+                  shouldTouch: true,
+                })
+              }
+              onNumberChange={(value) =>
+                setValue('recruiterProfile.contacts.phone.number', value, {
+                  shouldDirty: true,
+                  shouldTouch: true,
+                })
+              }
+            />
+          </div>
+
+          <div className="flex items-end">
+            <div className="grid w-full gap-3 md:grid-cols-2">
+              <label className="flex items-center gap-2 rounded-xl border border-zinc-800 bg-zinc-950 px-4 py-3 text-zinc-100">
+                <input
+                  type="checkbox"
+                  className="h-4 w-4 accent-lime-400"
+                  {...register('recruiterProfile.contacts.phone.isWhatsapp')}
+                />
+                <MessageCircle className="h-5 w-5 text-lime-400" />
+                <span>WhatsApp</span>
+              </label>
+              <label className="flex items-center gap-2 rounded-xl border border-zinc-800 bg-zinc-950 px-4 py-3 text-zinc-100">
+                <input
+                  type="checkbox"
+                  className="h-4 w-4 accent-lime-400"
+                  {...register('recruiterProfile.contacts.phone.isTelegram')}
+                />
+                <Send className="h-5 w-5 text-lime-400" />
+                <span>Telegram</span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-6 flex justify-end">
+          <Button
+            type="button"
+            variant="positive"
+            icon={<Save className="h-4 w-4" />}
+            disabled={isSubmitting}
+            onClick={handleSaveRecruiter}
+            className="rounded-xl border-lime-500/20 bg-lime-500/10 text-lime-300 hover:bg-lime-500/15"
+          >
+            Salvar
+          </Button>
+        </div>
+      </div>
+    </div>
   );
 }

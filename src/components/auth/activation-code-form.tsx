@@ -77,15 +77,17 @@ export function ActivationCodeForm() {
         />
       </div>
 
-      <Button
-        type="submit"
-        variant="positive"
-        icon={<FaPaperPlane />}
-        disabled={isSubmitting || cooldown > 0}
-        className="mt-6 w-full rounded-2xl border border-lime-500/30 bg-lime-500/10 py-3 text-lime-300 transition-all duration-300 hover:border-lime-400/40 hover:bg-lime-500/14 hover:text-lime-200"
-      >
-        Solicitar código
-      </Button>
+      <div className="mt-6 flex justify-center">
+        <Button
+          type="submit"
+          variant="positive"
+          icon={<FaPaperPlane />}
+          disabled={isSubmitting || cooldown > 0}
+          className="w-full rounded-2xl border border-lime-500/30 bg-lime-500/10 py-3 text-lime-300 transition-all duration-300 hover:border-lime-400/40 hover:bg-lime-500/14 hover:text-lime-200 sm:w-auto"
+        >
+          Solicitar código
+        </Button>
+      </div>
 
       {cooldown > 0 && (
         <p className="mt-3 text-center text-sm text-zinc-500">

@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 import {
@@ -26,25 +27,26 @@ import { PrivacyPolicyModal } from './privacy-policy-modal';
 import { ROUTES } from '@/constants/routes';
 
 interface SignUpFormValues extends SignUpRequest {
-  acceptedTermsOfUse: boolean;
-  acceptedPrivacyPolicy: boolean;
+  acceptedLegalTerms: boolean;
 }
 
 export function SignUpForm() {
+  const router = useRouter();
   const { flashMessage, showSuccess, showError } = useFlashMessage();
   const [isTermsOpen, setIsTermsOpen] = useState(false);
   const [isPrivacyOpen, setIsPrivacyOpen] = useState(false);
+  const [birthdayInput, setBirthdayInput] = useState('');
 
   const {
     control,
     register,
     handleSubmit,
+    setValue,
     formState: { errors, isSubmitting },
   } = useForm<SignUpFormValues>({
     defaultValues: {
       productRole: ProductRoleEnum.CANDIDATE,
-      acceptedTermsOfUse: false,
-      acceptedPrivacyPolicy: false,
+      acceptedLegalTerms: false,
     },
   });
 
@@ -60,6 +62,7 @@ export function SignUpForm() {
     try {
       await AuthService.signUp(payload);
       showSuccess('Conta criada com sucesso.');
+      router.push(`${ROUTES.ACTIVATE_ACCOUNT}?email=${encodeURIComponent(data.email)}`);
     } catch {
       showError('Não foi possível criar sua conta.');
     }
@@ -69,6 +72,46 @@ export function SignUpForm() {
     control,
     name: 'productRole',
   });
+  const acceptedLegalTerms = useWatch({
+    control,
+    name: 'acceptedLegalTerms',
+  });
+
+  function formatBirthdayInput(value: string) {
+    const digits = value.replace(/\D/g, '').slice(0, 8);
+
+    if (digits.length <= 2) {
+      return digits;
+    }
+
+    if (digits.length <= 4) {
+      return `${digits.slice(0, 2)}/${digits.slice(2)}`;
+    }
+
+    return `${digits.slice(0, 2)}/${digits.slice(2, 4)}/${digits.slice(4)}`;
+  }
+
+  function toIsoBirthday(value: string) {
+    const [day, month, year] = value.split('/');
+
+    if (!day || !month || !year || year.length !== 4) {
+      return '';
+    }
+
+    const parsedDate = new Date(`${year}-${month}-${day}T00:00:00`);
+
+    if (Number.isNaN(parsedDate.getTime())) {
+      return '';
+    }
+
+    return `${year}-${month}-${day}`;
+  }
+
+  function handleBirthdayChange(value: string) {
+    const formattedValue = formatBirthdayInput(value);
+    setBirthdayInput(formattedValue);
+    setValue('birthday', toIsoBirthday(formattedValue), { shouldValidate: true });
+  }
 
   return (
     <>
@@ -191,16 +234,21 @@ export function SignUpForm() {
 
           <Input
             icon={<FaBirthdayCake />}
-            type="date"
+            {...register('birthday', { required: 'Informe sua data de nascimento.' })}
+            type="text"
+            inputMode="numeric"
+            placeholder="dd/mm/yyyy"
+            maxLength={10}
+            value={birthdayInput}
+            onChange={(event) => handleBirthdayChange(event.target.value)}
             error={errors.birthday?.message}
             className="border-zinc-800 bg-black text-zinc-100 placeholder:text-zinc-500"
-            {...register('birthday', { required: 'Informe sua data de nascimento.' })}
           />
 
           <label className="flex gap-3 text-sm text-zinc-300">
             <input
               type="checkbox"
-              {...register('acceptedTermsOfUse', { required: true })}
+              {...register('acceptedLegalTerms', { required: true })}
               className="mt-0.5 rounded border-zinc-700 bg-black text-lime-500"
             />
             <span>
@@ -211,18 +259,8 @@ export function SignUpForm() {
                 className="text-lime-400 underline"
               >
                 Termos de Uso
-              </button>
-            </span>
-          </label>
-
-          <label className="flex gap-3 text-sm text-zinc-300">
-            <input
-              type="checkbox"
-              {...register('acceptedPrivacyPolicy', { required: true })}
-              className="mt-0.5 rounded border-zinc-700 bg-black text-lime-500"
-            />
-            <span>
-              Aceito a{' '}
+              </button>{' '}
+              e a{' '}
               <button
                 type="button"
                 onClick={() => setIsPrivacyOpen(true)}
@@ -233,15 +271,17 @@ export function SignUpForm() {
             </span>
           </label>
 
-          <Button
-            type="submit"
-            variant="positive"
-            icon={<FaUserPlus />}
-            disabled={isSubmitting}
-            className="w-full rounded-2xl border border-lime-500/30 bg-lime-500/10 py-3 text-lime-300 transition-all duration-300 hover:border-lime-400/40 hover:bg-lime-500/14 hover:text-lime-200"
-          >
-            Criar cadastro
-          </Button>
+          <div className="flex justify-center">
+            <Button
+              type="submit"
+              variant="positive"
+              icon={<FaUserPlus />}
+              disabled={isSubmitting || !acceptedLegalTerms}
+              className="w-full rounded-2xl border border-lime-500/30 bg-lime-500/10 py-3 text-lime-300 transition-all duration-300 hover:border-lime-400/40 hover:bg-lime-500/14 hover:text-lime-200 sm:w-auto"
+            >
+              Criar cadastro
+            </Button>
+          </div>
 
           <p className="mt-6 text-center text-sm text-zinc-500">
             Já tem conta?{' '}

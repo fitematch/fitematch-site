@@ -18,7 +18,7 @@ interface SelectProps extends SelectHTMLAttributes<HTMLSelectElement> {
 export function Select({
   options,
   label,
-  labelClassName = 'text-gray-300',
+  labelClassName = 'text-zinc-300',
   error,
   leftIcon: LeftIcon,
   className = '',
@@ -27,18 +27,16 @@ export function Select({
   return (
     <div className="w-full">
       {label && (
-        <label className={`mb-1 block text-sm font-medium ${labelClassName}`}>
-          {label}
-        </label>
+        <label className={`mb-1 block text-sm font-medium ${labelClassName}`}>{label}</label>
       )}
       <div className="relative">
         {LeftIcon && (
-          <span className="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 rounded-md bg-gray-100 p-2 text-black">
+          <span className="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 rounded-xl border border-zinc-800 bg-black/40 p-2 text-lime-400">
             <LeftIcon className="h-4 w-4" />
           </span>
         )}
         <select
-          className={`h-[50px] w-full appearance-none rounded-md border bg-black py-3 pr-12 text-gray-100 ${LeftIcon ? 'pl-14' : 'px-4'} ${className}`}
+          className={`h-[50px] w-full appearance-none rounded-xl border border-zinc-800 bg-zinc-950 py-3 pr-12 text-zinc-100 outline-none transition-all duration-300 hover:border-zinc-700 focus:border-lime-500/20 ${LeftIcon ? 'pl-14' : 'px-4'} ${className}`}
           {...props}
         >
           <option value="">Selecione...</option>
@@ -48,7 +46,7 @@ export function Select({
             </option>
           ))}
         </select>
-        <span className="pointer-events-none absolute top-1/2 right-4 -translate-y-1/2 text-gray-300">
+        <span className="pointer-events-none absolute top-1/2 right-4 -translate-y-1/2 text-zinc-400">
           <MdKeyboardDoubleArrowDown className="h-5 w-5" />
         </span>
       </div>

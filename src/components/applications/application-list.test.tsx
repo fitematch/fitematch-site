@@ -22,7 +22,7 @@ describe('ApplicationList', () => {
     renderWithProviders(<ApplicationList />);
 
     expect(
-      await screen.findByText('Não foi possível carregar suas candidaturas.')
+      await screen.findByText('Não foi possível carregar suas candidaturas.'),
     ).toBeInTheDocument();
   });
 
@@ -32,7 +32,7 @@ describe('ApplicationList', () => {
     renderWithProviders(<ApplicationList />);
 
     expect(
-      await screen.findByText('Você ainda não se candidatou a nenhuma vaga!')
+      await screen.findByText('Você ainda não se candidatou a nenhuma vaga!'),
     ).toBeInTheDocument();
   });
 
@@ -52,7 +52,8 @@ describe('ApplicationList', () => {
 
     expect(await screen.findByText('Personal Trainer')).toBeInTheDocument();
     expect(screen.getByText('Smart Fit')).toBeInTheDocument();
-    expect(screen.getByText('Aplicado')).toBeInTheDocument();
+    expect(screen.getByText('APLICADO')).toBeInTheDocument();
+    expect(screen.getByText('Smart Fit - Personal Trainer')).toBeInTheDocument();
   });
 
   it('cancelar aplicação e refetch após delete', async () => {
@@ -78,21 +79,17 @@ describe('ApplicationList', () => {
     await user.click(
       within(card as HTMLElement).getByRole('button', {
         name: /Cancelar Candidatura/i,
-      })
+      }),
     );
 
     expect(
-      await screen.findByText(/Você realmente deseja cancelar sua aplicação/i)
+      await screen.findByText(/Você realmente deseja cancelar sua candidatura/i),
     ).toBeInTheDocument();
 
-    await user.click(
-      screen.getByRole('button', { name: /Confirmar Cancelamento/i })
-    );
+    await user.click(screen.getByRole('button', { name: /Confirmar cancelamento/i }));
 
     await waitFor(() => {
-      expect(
-        screen.getByText('Você ainda não se candidatou a nenhuma vaga!')
-      ).toBeInTheDocument();
+      expect(screen.getByText('Você ainda não se candidatou a nenhuma vaga!')).toBeInTheDocument();
     });
   });
 });

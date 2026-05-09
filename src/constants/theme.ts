@@ -104,8 +104,8 @@ export const THEME = {
       'border border-green-500 text-green-500 hover:border-green-500 hover:bg-green-800 hover:text-green-100',
     buttonRecruiter:
       'border border-blue-500 text-blue-500 hover:border-blue-500 hover:bg-blue-800 hover:text-blue-100',
-    boxBorder: 'border-slate-800/80 hover:border-slate-700',
-    boxBackground: 'bg-gradient-to-br from-slate-950 via-black to-slate-900/90',
+    boxBorder: 'border-zinc-800 hover:border-lime-500/20',
+    boxBackground: '',
     boxTitle: 'text-gray-100',
     boxText: 'text-gray-400',
   },

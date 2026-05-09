@@ -14,12 +14,12 @@ export const metadata: Metadata = {
 
 export default function RecruiterCompanyPage() {
   return (
-    <DashboardShell title="Minha empresa" subtitle="Configure os dados institucionais da operação">
+    <DashboardShell title="" subtitle="">
       <div className="mx-auto w-full max-w-7xl">
         <RecruiterPageHeader
           breadcrumbs={[{ label: 'Home', href: ROUTES.HOME }, { label: 'Minha empresa' }]}
-          title="Minha empresa"
-          description="Cadastre ou atualize a empresa responsável pelas vagas que você vai publicar na plataforma."
+          title=""
+          description=""
         />
 
         <RecruiterCompanyForm />

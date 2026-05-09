@@ -3,13 +3,13 @@
 import Link from 'next/link';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { FaHome } from 'react-icons/fa';
 import { MdOutlineSocialDistance, MdPlace } from 'react-icons/md';
 import { useAuth } from '@/hooks/use-auth';
 import { ROUTES } from '@/constants/routes';
 import { PublicCompanyResponse } from '@/services/company/company.types';
 import { CARD_STYLES } from '@/constants/styles';
 import { ProductRoleEnum } from '@/types/entities/user.entity';
+import { resolveFileUrl } from '@/utils/file-url';
 
 type Coordinates = {
   lat: number;
@@ -50,7 +50,7 @@ async function geocodeAddress(query: string): Promise<Coordinates | null> {
   }
 
   const response = await fetch(
-    `https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&q=${encodeURIComponent(query)}`
+    `https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&q=${encodeURIComponent(query)}`,
   );
 
   if (!response.ok) {
@@ -99,11 +99,12 @@ export function JobLocationMapTest({ company }: JobLocationMapTestProps) {
 
   const companyAddressQuery = useMemo(
     () => buildAddressQuery(company?.contacts?.address),
-    [company?.contacts?.address]
+    [company?.contacts?.address],
   );
+  const companyLogoUrl = company?.media?.logoUrl || '';
   const candidateAddressQuery = useMemo(
     () => buildAddressQuery(user?.candidateProfile?.contacts?.address),
-    [user?.candidateProfile?.contacts?.address]
+    [user?.candidateProfile?.contacts?.address],
   );
 
   useEffect(() => {
@@ -179,11 +180,25 @@ export function JobLocationMapTest({ company }: JobLocationMapTestProps) {
 
       const companyIcon = L.divIcon({
         html: renderToStaticMarkup(
-          <MdPlace className="h-8 w-8 text-red-500 drop-shadow-[0_2px_2px_rgba(0,0,0,0.45)]" />
+          companyLogoUrl ? (
+            <div className="relative flex items-center justify-center">
+              <div className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-full border-2 border-lime-400 bg-white shadow-[0_6px_18px_rgba(0,0,0,0.35)]">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={resolveFileUrl(companyLogoUrl)}
+                  alt={company?.tradeName || 'Empresa'}
+                  className="h-full w-full object-cover"
+                />
+              </div>
+              <span className="absolute -bottom-1 h-3 w-3 rounded-full border border-zinc-950 bg-lime-400" />
+            </div>
+          ) : (
+            <MdPlace className="h-8 w-8 text-lime-400 drop-shadow-[0_2px_2px_rgba(0,0,0,0.45)]" />
+          ),
         ),
         className: 'bg-transparent border-0',
-        iconSize: [32, 32],
-        iconAnchor: [16, 30],
+        iconSize: companyLogoUrl ? [48, 52] : [32, 32],
+        iconAnchor: companyLogoUrl ? [24, 42] : [16, 30],
         popupAnchor: [0, -28],
       });
 
@@ -192,30 +207,6 @@ export function JobLocationMapTest({ company }: JobLocationMapTestProps) {
       })
         .addTo(map)
         .bindPopup(company?.tradeName || 'Academia');
-
-      if (candidateCoordinates) {
-        const candidateIcon = L.divIcon({
-          html: renderToStaticMarkup(
-            <FaHome className="h-5 w-5 text-blue-500 drop-shadow-[0_2px_2px_rgba(0,0,0,0.45)]" />
-          ),
-          className: 'flex items-center justify-center rounded-full bg-white/95 border border-blue-400 shadow-sm',
-          iconSize: [28, 28],
-          iconAnchor: [14, 14],
-          popupAnchor: [0, -12],
-        });
-
-        L.marker([candidateCoordinates.lat, candidateCoordinates.lng], {
-          icon: candidateIcon,
-        })
-          .addTo(map)
-          .bindPopup(user?.name || 'Candidato');
-
-        const bounds = L.latLngBounds(
-          [companyCoordinates.lat, companyCoordinates.lng],
-          [candidateCoordinates.lat, candidateCoordinates.lng]
-        );
-        map.fitBounds(bounds, { padding: [40, 40] });
-      }
     }
 
     void renderMap();
@@ -223,7 +214,7 @@ export function JobLocationMapTest({ company }: JobLocationMapTestProps) {
     return () => {
       isMounted = false;
     };
-  }, [candidateCoordinates, company?.tradeName, companyCoordinates, user?.name]);
+  }, [companyCoordinates, companyLogoUrl, company?.tradeName]);
 
   useEffect(() => {
     return () => {
@@ -239,9 +230,7 @@ export function JobLocationMapTest({ company }: JobLocationMapTestProps) {
       ? calculateDistanceInKm(candidateCoordinates, companyCoordinates)
       : null;
   const shouldShowUnavailableDistanceMessage =
-    isAuthenticated &&
-    user?.productRole === ProductRoleEnum.CANDIDATE &&
-    !candidateCoordinates;
+    isAuthenticated && user?.productRole === ProductRoleEnum.CANDIDATE && !candidateCoordinates;
   const companyLocation = [
     company?.contacts?.address?.street,
     company?.contacts?.address?.number,
@@ -258,9 +247,11 @@ export function JobLocationMapTest({ company }: JobLocationMapTestProps) {
     : null;
 
   return (
-    <div className={`${CARD_STYLES.jobCard} border-slate-700/70 bg-zinc-950 shadow-[0_12px_32px_rgba(0,0,0,0.26)]`}>
+    <div
+      className={`${CARD_STYLES.jobCard} border-slate-700/70 bg-zinc-950 shadow-[0_12px_32px_rgba(0,0,0,0.26)]`}
+    >
       <div className="mb-4 flex items-center gap-3 text-lg font-bold text-gray-100">
-        <MdPlace className="h-6 w-6" />
+        <MdPlace className="h-6 w-6 text-lime-400" />
         <span>Localização</span>
       </div>
 
@@ -293,7 +284,7 @@ export function JobLocationMapTest({ company }: JobLocationMapTestProps) {
                 rel="noopener noreferrer"
                 className="flex cursor-pointer items-start gap-3 rounded-xl border border-slate-700/70 bg-black/50 px-3 py-3 transition-colors hover:border-slate-500 hover:bg-black/65"
               >
-                <MdPlace className="mt-0.5 h-4 w-4 shrink-0 text-gray-200" />
+                <MdPlace className="mt-0.5 h-4 w-4 shrink-0 text-lime-400" />
                 <p className="leading-6">{companyLocation}</p>
               </a>
             )}

@@ -1,13 +1,22 @@
 'use client';
 
-import { FaDesktop, FaTrash } from 'react-icons/fa';
+import { motion } from 'framer-motion';
+import {
+  Clock3,
+  Globe,
+  Laptop2,
+  MonitorSmartphone,
+  ShieldCheck,
+  ShieldX,
+  TimerReset,
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { AuthSessionResponse } from '@/services/auth/auth.types';
-import { useFlashMessage } from '@/contexts/flash-message-context';
 import { getFriendlySessionDevice } from '@/utils/session-device';
 
 interface SessionCardProps {
   session: AuthSessionResponse;
+  index?: number;
   onRevoke: (sessionId: string) => Promise<void>;
 }
 
@@ -22,20 +31,43 @@ function formatSessionDate(value?: string | Date) {
     return String(value);
   }
 
-  const day = String(date.getDate()).padStart(2, '0');
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const year = String(date.getFullYear()).slice(-2);
-  const hours = String(date.getHours()).padStart(2, '0');
-  const minutes = String(date.getMinutes()).padStart(2, '0');
-  const seconds = String(date.getSeconds()).padStart(2, '0');
+  return new Intl.DateTimeFormat('pt-BR', {
+    dateStyle: 'short',
+    timeStyle: 'medium',
+  }).format(date);
+}
 
-  return `${day}/${month}/${year} às ${hours}:${minutes}:${seconds}`;
+function formatRelativeTime(value?: string | Date) {
+  if (!value) {
+    return null;
+  }
+
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return null;
+  }
+
+  const diffInMinutes = Math.max(1, Math.round((Date.now() - date.getTime()) / 60000));
+
+  if (diffInMinutes < 60) {
+    return `${diffInMinutes} min atrás`;
+  }
+
+  const diffInHours = Math.round(diffInMinutes / 60);
+
+  if (diffInHours < 24) {
+    return `${diffInHours} h atrás`;
+  }
+
+  const diffInDays = Math.round(diffInHours / 24);
+  return `${diffInDays} d atrás`;
 }
 
 function formatSessionDuration(
   createdAt?: string | Date,
   revokedAt?: string | Date,
-  expiresAt?: string | Date
+  expiresAt?: string | Date,
 ) {
   if (!createdAt) {
     return null;
@@ -44,10 +76,7 @@ function formatSessionDuration(
   const createdAtDate = new Date(createdAt);
   const endDate = revokedAt ? new Date(revokedAt) : new Date();
 
-  if (
-    Number.isNaN(createdAtDate.getTime()) ||
-    Number.isNaN(endDate.getTime())
-  ) {
+  if (Number.isNaN(createdAtDate.getTime()) || Number.isNaN(endDate.getTime())) {
     return null;
   }
 
@@ -55,6 +84,7 @@ function formatSessionDuration(
     expiresAt && !revokedAt && !Number.isNaN(new Date(expiresAt).getTime())
       ? new Date(Math.min(endDate.getTime(), new Date(expiresAt).getTime()))
       : endDate;
+
   const diffInMs = maxEndDate.getTime() - createdAtDate.getTime();
 
   if (diffInMs <= 0) {
@@ -69,71 +99,121 @@ function formatSessionDuration(
   return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
 }
 
-export function SessionCard({ session, onRevoke }: SessionCardProps) {
-  const { showSuccess, showError } = useFlashMessage();
-
+export function SessionCard({ session, index = 0, onRevoke }: SessionCardProps) {
   const isRevoked = Boolean(session.revokedAt);
+  const deviceLabel = getFriendlySessionDevice(session.userAgent);
   const createdAtLabel = formatSessionDate(session.createdAt);
   const expiresAtLabel = formatSessionDate(session.expiresAt);
   const revokedAtLabel = formatSessionDate(session.revokedAt);
+  const lastSeenLabel = formatRelativeTime(session.createdAt);
   const totalSessionTime = formatSessionDuration(
     session.createdAt,
     session.revokedAt,
-    session.expiresAt
+    session.expiresAt,
   );
 
   async function handleRevoke() {
-    try {
-      await onRevoke(session.id);
-      showSuccess('Sessão revogada com sucesso.');
-    } catch {
-      showError('Não foi possível revogar a sessão.');
-    }
+    await onRevoke(session.id);
   }
 
   return (
-    <article className="rounded-2xl border border-gray-500 bg-black p-6">
-      <div className="flex items-start justify-between gap-6">
-        <div>
-          <div className={`flex items-center gap-3 ${isRevoked ? 'text-red-100' : 'text-green-100'}`}>
-            <FaDesktop />
-            <span className="text-sm uppercase">
-              {isRevoked ? 'Revogada' : 'Ativa'}
+    <motion.article
+      initial={{ opacity: 0, y: 18 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.32, delay: index * 0.04 }}
+      className="rounded-2xl border border-zinc-800 bg-zinc-950/80 p-5 backdrop-blur transition-all duration-300 hover:border-lime-500/20 hover:bg-zinc-950/90 hover:shadow-[0_0_0_1px_rgba(34,197,94,0.05),0_18px_60px_rgba(0,0,0,0.28)]"
+    >
+      <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
+        <div className="min-w-0 flex-1">
+          <div className="flex flex-wrap items-center gap-3">
+            <span className="flex h-11 w-11 items-center justify-center rounded-2xl border border-lime-500/20 bg-lime-500/10 text-lime-400">
+              <MonitorSmartphone className="h-4 w-4" />
             </span>
+            <div className="min-w-0">
+              <div className="flex flex-wrap items-center gap-2">
+                <h3 className="truncate text-base font-semibold text-zinc-50">{deviceLabel}</h3>
+                <span
+                  className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-[11px] uppercase tracking-[0.18em] ${
+                    isRevoked
+                      ? 'border-red-500/20 bg-red-500/10 text-red-200'
+                      : 'border-lime-500/20 bg-lime-500/10 text-lime-300'
+                  }`}
+                >
+                  {isRevoked ? (
+                    <ShieldX className="h-3.5 w-3.5" />
+                  ) : (
+                    <ShieldCheck className="h-3.5 w-3.5" />
+                  )}
+                  {isRevoked ? 'Revogada' : 'Ativa'}
+                </span>
+              </div>
+              <p className="mt-1 text-sm text-zinc-500">
+                {session.userAgent || 'Dispositivo sem user agent identificado'}
+              </p>
+            </div>
           </div>
 
-          <h3 className="mt-4 text-xl font-semibold text-gray-100">
-            {getFriendlySessionDevice(session.userAgent)}
-          </h3>
+          <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+            <div className="rounded-xl border border-zinc-800 bg-black/40 p-4">
+              <div className="flex items-center gap-2 text-xs uppercase tracking-[0.18em] text-zinc-500">
+                <Globe className="h-3.5 w-3.5" />
+                IP
+              </div>
+              <p className="mt-2 text-sm text-zinc-200">{session.ipAddress || 'Não informado'}</p>
+            </div>
 
-          <div className="mt-3 space-y-1 text-sm text-gray-300">
-            {session.ipAddress && <p>IP: {session.ipAddress}</p>}
-            {createdAtLabel && (
-              <p className={!isRevoked ? 'text-green-100' : undefined}>
-                Criada em: {createdAtLabel}
-              </p>
+            <div className="rounded-xl border border-zinc-800 bg-black/40 p-4">
+              <div className="flex items-center gap-2 text-xs uppercase tracking-[0.18em] text-zinc-500">
+                <Clock3 className="h-3.5 w-3.5" />
+                Iniciada
+              </div>
+              <p className="mt-2 text-sm text-zinc-200">{createdAtLabel || 'Sem registro'}</p>
+            </div>
+
+            <div className="rounded-xl border border-zinc-800 bg-black/40 p-4">
+              <div className="flex items-center gap-2 text-xs uppercase tracking-[0.18em] text-zinc-500">
+                <TimerReset className="h-3.5 w-3.5" />
+                Duração
+              </div>
+              <p className="mt-2 text-sm text-zinc-200">{totalSessionTime || 'Em processamento'}</p>
+            </div>
+
+            <div className="rounded-xl border border-zinc-800 bg-black/40 p-4">
+              <div className="flex items-center gap-2 text-xs uppercase tracking-[0.18em] text-zinc-500">
+                <Laptop2 className="h-3.5 w-3.5" />
+                Última atividade
+              </div>
+              <p className="mt-2 text-sm text-zinc-200">{lastSeenLabel || 'Agora há pouco'}</p>
+            </div>
+          </div>
+
+          <div className="mt-4 flex flex-wrap gap-x-6 gap-y-2 text-sm text-zinc-500">
+            {expiresAtLabel && (
+              <span>
+                Expira em: <span className="text-zinc-300">{expiresAtLabel}</span>
+              </span>
             )}
-            {expiresAtLabel && <p className="text-blue-100">Expira em: {expiresAtLabel}</p>}
             {revokedAtLabel && (
-              <p className="text-red-100">
-                Revogada em: {revokedAtLabel}
-              </p>
+              <span>
+                Revogada em: <span className="text-zinc-300">{revokedAtLabel}</span>
+              </span>
             )}
-            {totalSessionTime && <p className="font-semibold">Tempo total: {totalSessionTime}</p>}
           </div>
         </div>
 
         {!isRevoked && (
-          <Button
-            type="button"
-            variant="danger"
-            icon={<FaTrash />}
-            onClick={handleRevoke}
-          >
-            Revogar
-          </Button>
+          <div className="shrink-0">
+            <Button
+              type="button"
+              variant="danger"
+              onClick={handleRevoke}
+              className="rounded-xl border-red-500/20 bg-red-500/10 px-4 py-2.5 text-red-200 hover:bg-red-500/15"
+            >
+              Revogar sessão
+            </Button>
+          </div>
         )}
       </div>
-    </article>
+    </motion.article>
   );
 }

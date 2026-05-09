@@ -10,8 +10,7 @@ export const API_ENDPOINTS = {
   AUTH_SIGN_OUT: '/auth/sign-out',
 
   AUTH_SESSIONS: '/auth/sessions',
-  AUTH_REVOKE_SESSION: (sessionId: string) =>
-    `/auth/sessions/${sessionId}/revoke`,
+  AUTH_REVOKE_SESSION: (sessionId: string) => `/auth/sessions/${sessionId}/revoke`,
 
   UPLOAD_COMPANY_LOGO: '/upload/company-logo',
   UPLOAD_JOB_COVER: '/upload/job-cover',
@@ -21,6 +20,8 @@ export const API_ENDPOINTS = {
   COMPANY_ME: '/company/me',
   COMPANY_PUBLIC: '/company/public',
   COMPANY_BY_ID: (companyId: string) => `/company/${companyId}`,
+
+  USER: '/user',
 
   JOB: '/job',
   JOB_ME: '/job/me',
