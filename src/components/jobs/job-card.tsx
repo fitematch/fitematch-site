@@ -29,18 +29,30 @@ interface JobCardProps {
 }
 
 function getEducationLevelLabel(value: EducationLevelEnum) {
-  return {
-    [EducationLevelEnum.HIGH_SCHOOL]: 'Ensino Médio',
-    [EducationLevelEnum.TECHNICAL]: 'Técnico',
-    [EducationLevelEnum.BACHELOR]: 'Bacharelado',
-    [EducationLevelEnum.ASSOCIATE]: 'Tecnólogo',
-    [EducationLevelEnum.POSTGRADUATE]: 'Pós-graduação',
-    [EducationLevelEnum.MBA]: 'MBA',
-    [EducationLevelEnum.MASTER]: 'Mestrado',
-    [EducationLevelEnum.DOCTORATE]: 'Doutorado',
-    [EducationLevelEnum.EXTENSION]: 'Extensão',
-    [EducationLevelEnum.OTHER]: 'Outro',
-  }[value];
+  return (
+    {
+      [EducationLevelEnum.HIGH_SCHOOL]: 'Ensino Médio',
+      [EducationLevelEnum.TECHNICAL]: 'Técnico',
+      [EducationLevelEnum.BACHELOR]: 'Bacharelado',
+      [EducationLevelEnum.ASSOCIATE]: 'Tecnólogo',
+      [EducationLevelEnum.POSTGRADUATE]: 'Pós-graduação',
+      [EducationLevelEnum.MBA]: 'MBA',
+      [EducationLevelEnum.MASTER]: 'Mestrado',
+      [EducationLevelEnum.DOCTORATE]: 'Doutorado',
+      [EducationLevelEnum.EXTENSION]: 'Extensão',
+      [EducationLevelEnum.OTHER]: 'Outro',
+    }[value] || value
+  );
+}
+
+function getEducationLevelsLabel(value?: EducationLevelEnum | EducationLevelEnum[]) {
+  if (!value) {
+    return '';
+  }
+
+  const values = Array.isArray(value) ? value : [value];
+
+  return values.map(getEducationLevelLabel).filter(Boolean).join(', ');
 }
 
 function getSlotsLabel(slots?: number) {
@@ -49,6 +61,20 @@ function getSlotsLabel(slots?: number) {
   }
 
   return `${slots} vagas`;
+}
+
+function getSalaryLabel(salary?: number | string) {
+  if (!salary) {
+    return '';
+  }
+
+  if (typeof salary === 'string') {
+    return salary;
+  }
+
+  return `R$ ${salary.toLocaleString('pt-BR', {
+    minimumFractionDigits: 2,
+  })}`;
 }
 
 function BenefitItem({
@@ -91,6 +117,10 @@ export function JobCard({
   const address = displayCompany?.contacts?.address;
   const location = address ? [address.city, address.state].filter(Boolean).join(' · ') : '';
   const isListCard = !hideDetailsButton;
+  const salaryLabel = getSalaryLabel(job.benefits?.salary as number | string | undefined);
+  const educationLevelsLabel = getEducationLevelsLabel(
+    job.requirements?.educationLevel as EducationLevelEnum | EducationLevelEnum[] | undefined,
+  );
 
   return (
     <article
@@ -172,14 +202,10 @@ export function JobCard({
 
       <div className={`space-y-5 ${isListCard ? 'flex flex-1 flex-col' : ''}`}>
         <div className="flex flex-wrap gap-2">
-          {isListCard && job.benefits?.salary && (
+          {isListCard && salaryLabel && (
             <span className="inline-flex items-center gap-2 rounded-full border border-lime-500/20 bg-lime-500/10 px-3 py-1.5 text-xs font-medium text-lime-300">
               <Wallet className="h-3.5 w-3.5" />
-              {typeof job.benefits.salary === 'string'
-                ? job.benefits.salary
-                : `R$ ${job.benefits.salary.toLocaleString('pt-BR', {
-                    minimumFractionDigits: 2,
-                  })}`}
+              {salaryLabel}
             </span>
           )}
           <span className="inline-flex items-center gap-2 rounded-full border border-zinc-800 bg-black/40 px-3 py-1.5 text-xs text-zinc-300">
@@ -200,14 +226,10 @@ export function JobCard({
 
         {!isListCard && (
           <div className="flex flex-wrap gap-2">
-            {job.benefits?.salary && (
+            {salaryLabel && (
               <div className="inline-flex items-center gap-2 rounded-full border border-lime-500/20 bg-lime-500/10 px-3 py-1.5 text-xs font-medium text-lime-300">
                 <Wallet className="h-3.5 w-3.5" />
-                {typeof job.benefits.salary === 'string'
-                  ? job.benefits.salary
-                  : `R$ ${job.benefits.salary.toLocaleString('pt-BR', {
-                      minimumFractionDigits: 2,
-                    })}`}
+                {salaryLabel}
               </div>
             )}
             <span className="inline-flex items-center gap-2 rounded-full border border-zinc-800 bg-black/40 px-3 py-1.5 text-xs text-zinc-300">
@@ -218,7 +240,7 @@ export function JobCard({
         )}
 
         {(showRequirements || isListCard) &&
-          (job.requirements?.educationLevel ||
+          (educationLevelsLabel ||
             job.requirements?.minExperienceYears ||
             job.requirements?.maxExperienceYears) && (
             <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
@@ -233,11 +255,9 @@ export function JobCard({
                 />
               )}
 
-              {job.requirements?.educationLevel && (
+              {educationLevelsLabel && (
                 <RequirementItem
-                  value={getEducationLevelLabel(
-                    job.requirements.educationLevel as EducationLevelEnum,
-                  )}
+                  value={educationLevelsLabel}
                   icon={<GraduationCap className="h-4 w-4" />}
                 />
               )}
