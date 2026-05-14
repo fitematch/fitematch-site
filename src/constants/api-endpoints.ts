@@ -32,4 +32,6 @@ export const API_ENDPOINTS = {
   APPLY_ME: '/apply/me',
   APPLY_BY_ID: (applyId: string) => `/apply/${applyId}`,
   APPLY_BY_JOB_ID: (jobId: string) => `/apply/job/${jobId}`,
+
+  DASHBOARD_SUMMARY: '/dashboard/summary',
 };

@@ -4,10 +4,11 @@ import { CompanyStatusEnum } from '@/types/entities/company.entity';
 import { JobStatusEnum } from '@/types/entities/job.entity';
 import { ProductRoleEnum, UserStatusEnum } from '@/types/entities/user.entity';
 
-export const apiBaseUrl =
-  (process.env.NEXT_PUBLIC_API_URL ||
-    process.env.NEXT_PUBLIC_API_BASE_URL ||
-    'http://localhost:3000').replace(/\/+$/, '');
+export const apiBaseUrl = (
+  process.env.NEXT_PUBLIC_API_URL ||
+  process.env.NEXT_PUBLIC_API_BASE_URL ||
+  'http://localhost:3000'
+).replace(/\/+$/, '');
 
 export function apiUrl(endpoint: string) {
   return `${apiBaseUrl}/${endpoint.replace(/^\/+/, '')}`;
@@ -89,6 +90,27 @@ const baseApply = {
 };
 
 export interface MockDb {
+  dashboard: {
+    summaryStatus: number;
+    summary: {
+      users: {
+        total: number;
+        lastWeek: number;
+      };
+      companies: {
+        total: number;
+        lastWeek: number;
+      };
+      jobs: {
+        total: number;
+        lastWeek: number;
+      };
+      applications: {
+        total: number;
+        lastWeek: number;
+      };
+    };
+  };
   auth: {
     signInStatus: number;
     signInErrorMessage: string;
@@ -130,20 +152,40 @@ export interface MockDb {
     errorMessage: string;
   };
   upload: {
-    lastUpload:
-      | {
-          endpoint: string;
-          fileName: string;
-          fileType: string;
-          contentType: string | null;
-        }
-      | null;
+    lastUpload: {
+      endpoint: string;
+      fileName: string;
+      fileType: string;
+      contentType: string | null;
+    } | null;
   };
 }
 
 export const mockDb: MockDb = {} as MockDb;
 
 export function resetMockDb() {
+  mockDb.dashboard = {
+    summaryStatus: 200,
+    summary: {
+      users: {
+        total: 3,
+        lastWeek: 3,
+      },
+      companies: {
+        total: 1,
+        lastWeek: 1,
+      },
+      jobs: {
+        total: 3,
+        lastWeek: 3,
+      },
+      applications: {
+        total: 2,
+        lastWeek: 2,
+      },
+    },
+  };
+
   mockDb.auth = {
     signInStatus: 200,
     signInErrorMessage: 'Credenciais inválidas.',
@@ -168,10 +210,30 @@ export function resetMockDb() {
 
   mockDb.company = {
     mineStatus: 200,
-    mine: { ...baseCompany, contacts: { ...baseCompany.contacts, address: { ...baseCompany.contacts.address }, phone: { ...baseCompany.contacts.phone } }, documents: { ...baseCompany.documents }, media: { ...baseCompany.media } },
+    mine: {
+      ...baseCompany,
+      contacts: {
+        ...baseCompany.contacts,
+        address: { ...baseCompany.contacts.address },
+        phone: { ...baseCompany.contacts.phone },
+      },
+      documents: { ...baseCompany.documents },
+      media: { ...baseCompany.media },
+    },
     publicStatus: 200,
     publicErrorMessage: 'Não foi possível carregar as empresas.',
-    publicList: [{ ...baseCompany, contacts: { ...baseCompany.contacts, address: { ...baseCompany.contacts.address }, phone: { ...baseCompany.contacts.phone } }, documents: { ...baseCompany.documents }, media: { ...baseCompany.media } }],
+    publicList: [
+      {
+        ...baseCompany,
+        contacts: {
+          ...baseCompany.contacts,
+          address: { ...baseCompany.contacts.address },
+          phone: { ...baseCompany.contacts.phone },
+        },
+        documents: { ...baseCompany.documents },
+        media: { ...baseCompany.media },
+      },
+    ],
   };
 
   const companyCopy = mockDb.company.mine || baseCompany;

@@ -1,12 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { CompanyStatusEnum } from '@/types/entities/company.entity';
-import { JobStatusEnum } from '@/types/entities/job.entity';
-import { UserStatusEnum } from '@/types/entities/user.entity';
-import { CompanyService } from '@/services/company/company.service';
-import { JobService } from '@/services/job/job.service';
-import { UserService } from '@/services/user/user.service';
+import { DashboardService } from '@/services/dashboard/dashboard.service';
 
 interface HomeHeroStat {
   label: string;
@@ -17,23 +12,6 @@ interface HomeHeroStat {
 interface UseHomeHeroStatsState {
   stats: HomeHeroStat[];
   isLoading: boolean;
-}
-
-function isWithinLast7Days(date?: string | Date): boolean {
-  if (!date) {
-    return false;
-  }
-
-  const parsedDate = new Date(date);
-
-  if (Number.isNaN(parsedDate.getTime())) {
-    return false;
-  }
-
-  const now = Date.now();
-  const sevenDaysAgo = now - 7 * 24 * 60 * 60 * 1000;
-
-  return parsedDate.getTime() >= sevenDaysAgo;
 }
 
 function formatWeeklyMeta(total: number, singular: string, plural: string): string {
@@ -60,6 +38,11 @@ const INITIAL_STATS: HomeHeroStat[] = [
     value: '0',
     meta: 'Carregando...',
   },
+  {
+    label: 'APLICAÇÕES ATIVAS',
+    value: '0',
+    meta: 'Carregando...',
+  },
 ];
 
 export function useHomeHeroStats() {
@@ -73,54 +56,40 @@ export function useHomeHeroStats() {
 
     async function loadStats() {
       try {
-        const [users, companies, jobs] = await Promise.all([
-          UserService.list().catch(() => []),
-          CompanyService.list().catch(() => []),
-          JobService.list().catch(() => []),
-        ]);
+        const summary = await DashboardService.summary();
 
         if (!isMounted) {
           return;
         }
 
-        const activeUsers = users.filter((user) => user.status !== UserStatusEnum.BANNED);
-        const newUsersLast7Days = activeUsers.filter((user) =>
-          isWithinLast7Days(user.createdAt),
-        ).length;
-
-        const activeCompanies = companies.filter(
-          (company) => company.status === CompanyStatusEnum.ACTIVE,
-        );
-        const newCompaniesLast7Days = activeCompanies.filter((company) =>
-          isWithinLast7Days(company.createdAt),
-        ).length;
-
-        const activeJobs = jobs.filter((job) => job.status === JobStatusEnum.ACTIVE);
-        const newJobsLast7Days = activeJobs.filter((job) =>
-          isWithinLast7Days(job.createdAt),
-        ).length;
-
         setState({
           stats: [
             {
               label: 'USUÁRIOS CADASTRADOS',
-              value: String(activeUsers.length),
-              meta: newUsersLast7Days
-                ? formatWeeklyMeta(newUsersLast7Days, 'novo', 'novos')
+              value: String(summary.users.total),
+              meta: summary.users.lastWeek
+                ? formatWeeklyMeta(summary.users.lastWeek, 'novo', 'novos')
                 : 'Sem novos na semana',
             },
             {
               label: 'EMPRESAS VERIFICADAS',
-              value: String(activeCompanies.length),
-              meta: newCompaniesLast7Days
-                ? formatWeeklyMeta(newCompaniesLast7Days, 'nova', 'novas')
+              value: String(summary.companies.total),
+              meta: summary.companies.lastWeek
+                ? formatWeeklyMeta(summary.companies.lastWeek, 'nova', 'novas')
                 : 'Sem novas na semana',
             },
             {
               label: 'VAGAS ATIVAS NO SITE',
-              value: String(activeJobs.length),
-              meta: newJobsLast7Days
-                ? formatWeeklyMeta(newJobsLast7Days, 'nova', 'novas')
+              value: String(summary.jobs.total),
+              meta: summary.jobs.lastWeek
+                ? formatWeeklyMeta(summary.jobs.lastWeek, 'nova', 'novas')
+                : 'Sem novas na semana',
+            },
+            {
+              label: 'APLICAÇÕES ATIVAS',
+              value: String(summary.applications.total),
+              meta: summary.applications.lastWeek
+                ? formatWeeklyMeta(summary.applications.lastWeek, 'nova', 'novas')
                 : 'Sem novas na semana',
             },
           ],
@@ -145,6 +114,11 @@ export function useHomeHeroStats() {
             },
             {
               label: 'VAGAS ATIVAS NO SITE',
+              value: '0',
+              meta: 'Não foi possível carregar',
+            },
+            {
+              label: 'APLICAÇÕES ATIVAS',
               value: '0',
               meta: 'Não foi possível carregar',
             },
