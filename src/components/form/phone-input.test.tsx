@@ -41,12 +41,10 @@ describe('PhoneInput', () => {
         numberValue="11987654321"
         onCountryChange={jest.fn()}
         onNumberChange={jest.fn()}
-      />
+      />,
     );
 
-    expect(
-      screen.getByDisplayValue('+55 (11) 98765-4321')
-    ).toBeInTheDocument();
+    expect(screen.getByDisplayValue('+55 (11) 98765-4321')).toBeInTheDocument();
   });
 
   it('ddi', async () => {
@@ -59,7 +57,7 @@ describe('PhoneInput', () => {
         numberValue=""
         onCountryChange={onCountryChange}
         onNumberChange={jest.fn()}
-      />
+      />,
     );
 
     await user.click(screen.getByRole('button', { name: /Brasil/i }));
@@ -78,13 +76,10 @@ describe('PhoneInput', () => {
         numberValue=""
         onCountryChange={jest.fn()}
         onNumberChange={onNumberChange}
-      />
+      />,
     );
 
-    await user.type(
-      screen.getByPlaceholderText('+55 (##) #####-####'),
-      '11987654321'
-    );
+    await user.type(screen.getByPlaceholderText('+55 (##) #####-####'), '11987654321');
 
     await waitFor(() => {
       expect(onNumberChange).toHaveBeenCalled();
@@ -102,7 +97,7 @@ describe('PhoneInput', () => {
         numberValue=""
         onCountryChange={onCountryChange}
         onNumberChange={onNumberChange}
-      />
+      />,
     );
 
     await user.type(screen.getByPlaceholderText('+55 (##) #####-####'), '11');
@@ -123,7 +118,7 @@ describe('PhoneInput', () => {
           onNumberChange={jest.fn()}
         />
         <button type="button">fora</button>
-      </div>
+      </div>,
     );
 
     await user.click(screen.getByRole('button', { name: /Brasil/i }));
@@ -146,7 +141,7 @@ describe('PhoneInput', () => {
         onNumberChange={jest.fn()}
         error="Telefone inválido"
         disabled
-      />
+      />,
     );
 
     expect(screen.getByText('Telefone inválido')).toBeInTheDocument();
@@ -165,7 +160,7 @@ describe('PhoneInput', () => {
         numberValue=""
         onCountryChange={jest.fn()}
         onNumberChange={jest.fn()}
-      />
+      />,
     );
 
     const trigger = screen.getByRole('button', { name: /Brasil/i });
@@ -176,5 +171,25 @@ describe('PhoneInput', () => {
     await waitFor(() => {
       expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
     });
+  });
+
+  it('mantém o cursor após o código do país ao focar o campo', async () => {
+    const user = userEvent.setup();
+
+    render(
+      <PhoneInput
+        countryValue="+55"
+        numberValue=""
+        onCountryChange={jest.fn()}
+        onNumberChange={jest.fn()}
+      />,
+    );
+
+    const input = screen.getByPlaceholderText('+55 (##) #####-####') as HTMLInputElement;
+
+    await user.click(input);
+
+    expect(input.selectionStart).toBe(3);
+    expect(input.selectionEnd).toBe(3);
   });
 });

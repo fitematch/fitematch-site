@@ -3,12 +3,14 @@
 import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { usePublicCompanies } from '@/hooks/use-public-companies';
+import { getUniqueCompaniesByBrand } from '@/utils/company-brand';
 import { resolveFileUrl } from '@/utils/file-url';
 
 export function PartnerCompanies() {
   const { companies, error, isLoading } = usePublicCompanies();
+  const uniqueCompanies = getUniqueCompaniesByBrand(companies);
 
-  if (!isLoading && !error && companies.length === 0) {
+  if (!isLoading && !error && uniqueCompanies.length === 0) {
     return null;
   }
 
@@ -30,7 +32,7 @@ export function PartnerCompanies() {
 
           {!isLoading &&
             !error &&
-            companies.slice(0, 6).map((company, index) => (
+            uniqueCompanies.slice(0, 6).map((company, index) => (
               <motion.div
                 key={company._id || company.slug || `${company.tradeName}-${index}`}
                 initial={{ opacity: 0, y: 18 }}

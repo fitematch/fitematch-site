@@ -17,7 +17,7 @@ import {
 
 export const JobService = {
   list(): Promise<ListJobsResponse> {
-    return apiClient<ListJobsResponse>(API_ENDPOINTS.JOB, {
+    return apiClient<ListJobsResponse>(`${API_ENDPOINTS.JOB}?page=1&limit=1000`, {
       auth: false,
     });
   },
@@ -53,10 +53,7 @@ export const JobService = {
     });
   },
 
-  updateMine(
-    jobId: string,
-    payload: UpdateMyJobRequest,
-  ): Promise<UpdateMyJobResponse> {
+  updateMine(jobId: string, payload: UpdateMyJobRequest): Promise<UpdateMyJobResponse> {
     return apiClient<UpdateMyJobResponse>(API_ENDPOINTS.JOB_ME_BY_ID(jobId), {
       method: 'PATCH',
       body: JSON.stringify(payload),

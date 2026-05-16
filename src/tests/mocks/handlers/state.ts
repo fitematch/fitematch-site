@@ -1,8 +1,8 @@
 import { API_ENDPOINTS } from '@/constants/api-endpoints';
 import { ApplicationStatusEnum } from '@/types/entities/apply.entity';
 import { CompanyStatusEnum } from '@/types/entities/company.entity';
-import { JobStatusEnum } from '@/types/entities/job.entity';
-import { ProductRoleEnum, UserStatusEnum } from '@/types/entities/user.entity';
+import { JobEntity, JobStatusEnum } from '@/types/entities/job.entity';
+import { ProductRoleEnum, UserEntity, UserStatusEnum } from '@/types/entities/user.entity';
 
 export const apiBaseUrl = (
   process.env.NEXT_PUBLIC_API_URL ||
@@ -14,15 +14,16 @@ export function apiUrl(endpoint: string) {
   return `${apiBaseUrl}/${endpoint.replace(/^\/+/, '')}`;
 }
 
-const baseUser = {
+const baseUser: UserEntity = {
   _id: 'user-1',
   name: 'Rebeca Chambers',
   email: 'rebeca@fitematch.com',
+  password: 'secret',
   birthday: '1980-02-03',
   productRole: ProductRoleEnum.CANDIDATE,
   status: UserStatusEnum.ACTIVE,
-  createdAt: '2026-05-01T10:00:00.000Z',
-  updatedAt: '2026-05-01T10:00:00.000Z',
+  createdAt: new Date('2026-05-01T10:00:00.000Z'),
+  updatedAt: new Date('2026-05-01T10:00:00.000Z'),
 };
 
 const baseCompany = {
@@ -58,7 +59,7 @@ const baseCompany = {
   updatedAt: '2026-05-01T10:00:00.000Z',
 };
 
-const baseJob = {
+const baseJob: JobEntity = {
   _id: 'job-1',
   slug: 'personal-trainer-sao-paulo',
   companyId: 'company-1',
@@ -71,8 +72,8 @@ const baseJob = {
   benefits: {
     salary: 3500,
   },
-  createdAt: '2026-05-01T10:00:00.000Z',
-  updatedAt: '2026-05-02T10:00:00.000Z',
+  createdAt: new Date('2026-05-01T10:00:00.000Z'),
+  updatedAt: new Date('2026-05-02T10:00:00.000Z'),
 };
 
 const baseApply = {
@@ -115,7 +116,7 @@ export interface MockDb {
     signInStatus: number;
     signInErrorMessage: string;
     meStatus: number;
-    meUser: typeof baseUser | null;
+    meUser: UserEntity | null;
     signOutStatus: number;
     signOutMessage: string;
     sessionsStatus: number;
@@ -141,9 +142,9 @@ export interface MockDb {
   job: {
     listStatus: number;
     listErrorMessage: string;
-    list: Array<typeof baseJob>;
+    list: Array<JobEntity>;
     mineStatus: number;
-    mine: Array<typeof baseJob>;
+    mine: Array<JobEntity>;
   };
   apply: {
     listStatus: number;
@@ -237,7 +238,7 @@ export function resetMockDb() {
   };
 
   const companyCopy = mockDb.company.mine || baseCompany;
-  const jobCopy = {
+  const jobCopy: JobEntity = {
     ...baseJob,
     company: companyCopy,
     benefits: { ...baseJob.benefits },

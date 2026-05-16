@@ -29,7 +29,7 @@ import { useFlashMessage } from '@/contexts/flash-message-context';
 import { CompanyService } from '@/services/company/company.service';
 import { ApiError } from '@/services/http/api-error';
 import { UploadService } from '@/services/upload/upload.service';
-import { CompanyEntity, CompanyStatusEnum } from '@/types/entities/company.entity';
+import { CompanyEntity } from '@/types/entities/company.entity';
 import { JobService } from '@/services/job/job.service';
 import {
   EducationLevelEnum,
@@ -117,17 +117,32 @@ const languageLevelOptions = [
   { value: LanguagesLevelEnum.NATIVE, label: 'Nativo' },
 ];
 
-function getLanguageLabel(value: LanguagesEnum) {
-  return languageOptions.find((option) => option.value === value)?.label || value;
-}
-
 function getLanguageLevelLabel(value: LanguagesLevelEnum) {
   return languageLevelOptions.find((option) => option.value === value)?.label || value;
 }
 
+function getLanguageRequirement(languages: LanguageRequirement[], name: LanguagesEnum) {
+  return languages.find((language) => language.name === name);
+}
+
+function normalizeLanguages(languages?: LanguageRequirement[]) {
+  const deduped = new Map<LanguagesEnum, LanguageRequirement>();
+
+  for (const language of languages || []) {
+    deduped.set(language.name, language);
+  }
+
+  deduped.set(LanguagesEnum.PORTUGUESE, {
+    name: LanguagesEnum.PORTUGUESE,
+    level: LanguagesLevelEnum.NATIVE,
+  });
+
+  return Array.from(deduped.values());
+}
+
 function formatCurrencyInput(value?: number) {
   if (value === undefined || Number.isNaN(value)) {
-    return '';
+    return 'R$ ';
   }
 
   return new Intl.NumberFormat('pt-BR', {
@@ -159,6 +174,12 @@ function NumberStepper({
   min?: number;
   error?: string;
 }) {
+  const canDecrease = (value ?? min) > min;
+  const activeButtonClassName =
+    'cursor-pointer border-lime-500/20 bg-lime-500/10 text-lime-300 hover:bg-lime-500/15';
+  const inactiveButtonClassName =
+    'cursor-not-allowed border-lime-500/10 bg-lime-500/5 text-lime-300/50';
+
   return (
     <div>
       <label className="text-sm text-zinc-300">{label}</label>
@@ -166,8 +187,11 @@ function NumberStepper({
         <button
           type="button"
           onClick={() => onChange(Math.max(min, (value ?? min) - 1))}
-          className="absolute left-2 top-1/2 inline-flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-xl border border-zinc-800 bg-zinc-950 text-zinc-300 transition-all duration-300 hover:border-lime-500/20 hover:bg-white/[0.03]"
+          className={`absolute left-2 top-1/2 inline-flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-xl border transition-all duration-300 ${
+            canDecrease ? activeButtonClassName : inactiveButtonClassName
+          }`}
           aria-label={`Diminuir ${label}`}
+          disabled={!canDecrease}
         >
           <MinusCircle className="h-4 w-4" />
         </button>
@@ -184,7 +208,7 @@ function NumberStepper({
         <button
           type="button"
           onClick={() => onChange((value ?? min) + 1)}
-          className="absolute right-2 top-1/2 inline-flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-xl border border-zinc-800 bg-zinc-950 text-zinc-300 transition-all duration-300 hover:border-lime-500/20 hover:bg-white/[0.03]"
+          className={`absolute right-2 top-1/2 inline-flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-xl border transition-all duration-300 ${activeButtonClassName}`}
           aria-label={`Aumentar ${label}`}
         >
           <PlusCircle className="h-4 w-4" />
@@ -255,16 +279,14 @@ export function RecruiterJobForm({ mode, jobId, initialValues }: RecruiterJobFor
   });
   const [languagesError, setLanguagesError] = useState<string | null>(null);
   const [languages, setLanguages] = useState<LanguageRequirement[]>(
-    initialValues?.requirements?.languages || [],
+    normalizeLanguages(initialValues?.requirements?.languages),
   );
   const fieldClassName =
     'mt-2 w-full rounded-xl border border-zinc-800 bg-zinc-950 px-4 py-3 text-zinc-200 outline-none placeholder:text-zinc-500';
   const disabledFieldClassName = `${fieldClassName} disabled:cursor-not-allowed disabled:opacity-100`;
-  const hasCompany = Boolean(user?.recruiterProfile?.companyId);
-  const companyId = user?.recruiterProfile?.companyId || '';
+  const recruiterCompanyId = user?.recruiterProfile?.companyId || '';
   const companyName =
     user?.recruiterProfile?.tradeName || user?.recruiterProfile?.company?.tradeName || '';
-
   const {
     register,
     handleSubmit,
@@ -301,6 +323,10 @@ export function RecruiterJobForm({ mode, jobId, initialValues }: RecruiterJobFor
     control,
     name: 'salary',
   });
+  const descriptionValue = useWatch({
+    control,
+    name: 'description',
+  });
   const healthInsuranceValue = useWatch({
     control,
     name: 'healthInsurance',
@@ -322,12 +348,29 @@ export function RecruiterJobForm({ mode, jobId, initialValues }: RecruiterJobFor
     name: 'coverUrl',
   });
   const previousTitleRef = useRef(titleValue);
+  const salaryInputRef = useRef<HTMLInputElement | null>(null);
+  const availableLanguageOptions = languageOptions.filter(
+    (option) => !languages.some((language) => language.name === option.value),
+  );
+  const descriptionMaxLength = 140;
+  const descriptionRemainingCharacters = descriptionMaxLength - (descriptionValue?.length || 0);
 
-  useEffect(() => {
-    if (!companyId) {
+  const moveSalaryCaretToCurrencyEnd = useCallback(() => {
+    const input = salaryInputRef.current;
+
+    if (!input) {
       return;
     }
 
+    const currencyPrefixIndex = input.value.indexOf('$');
+    const caretPosition = currencyPrefixIndex >= 0 ? currencyPrefixIndex + 2 : 3;
+
+    requestAnimationFrame(() => {
+      input.setSelectionRange(caretPosition, caretPosition);
+    });
+  }, []);
+
+  useEffect(() => {
     async function loadCompanyDetails() {
       setIsLoadingCompanyDetails(true);
       try {
@@ -341,9 +384,11 @@ export function RecruiterJobForm({ mode, jobId, initialValues }: RecruiterJobFor
     }
 
     void loadCompanyDetails();
-  }, [companyId]);
+  }, []);
 
-  const canPublishJob = hasCompany && companyDetails?.status === CompanyStatusEnum.ACTIVE;
+  const resolvedCompanyId = companyDetails?._id || recruiterCompanyId;
+  const hasCompany = Boolean(resolvedCompanyId);
+  const canPublishJob = hasCompany;
 
   useEffect(() => {
     if (errors.slug?.type === 'conflict' && previousTitleRef.current !== titleValue) {
@@ -376,7 +421,7 @@ export function RecruiterJobForm({ mode, jobId, initialValues }: RecruiterJobFor
   const hydrateFromJob = useCallback(
     (job: JobEntity) => {
       reset(buildDefaultValues(job));
-      setLanguages(job.requirements?.languages || []);
+      setLanguages(normalizeLanguages(job.requirements?.languages));
       setLanguagesError(null);
       setCurrentJobId(job._id);
       setCurrentMode('edit');
@@ -386,7 +431,7 @@ export function RecruiterJobForm({ mode, jobId, initialValues }: RecruiterJobFor
 
   const resetToCreateState = useCallback(() => {
     reset(buildDefaultValues());
-    setLanguages([]);
+    setLanguages(normalizeLanguages());
     setLanguagesError(null);
     setCurrentJobId(undefined);
     setCurrentMode('create');
@@ -412,7 +457,7 @@ export function RecruiterJobForm({ mode, jobId, initialValues }: RecruiterJobFor
     }
 
     const basePayload = {
-      companyId,
+      companyId: resolvedCompanyId,
       slug: slugValue,
       title: data.title,
       description: data.description,
@@ -524,8 +569,13 @@ export function RecruiterJobForm({ mode, jobId, initialValues }: RecruiterJobFor
   }
 
   function handleOpenLanguageModal() {
+    if (availableLanguageOptions.length === 0) {
+      showError('Todos os idiomas disponíveis já foram adicionados.');
+      return;
+    }
+
     setLanguageDraft({
-      name: '',
+      name: availableLanguageOptions[0]?.value || '',
       level: '',
     });
     setIsLanguageModalOpen(true);
@@ -534,6 +584,11 @@ export function RecruiterJobForm({ mode, jobId, initialValues }: RecruiterJobFor
   function handleSaveLanguage() {
     if (!languageDraft.name || !languageDraft.level) {
       showError('Selecione o idioma e o nível para adicionar a língua.');
+      return;
+    }
+
+    if (languages.some((language) => language.name === languageDraft.name)) {
+      showError('Esse idioma já foi adicionado.');
       return;
     }
 
@@ -549,6 +604,11 @@ export function RecruiterJobForm({ mode, jobId, initialValues }: RecruiterJobFor
   }
 
   function handleRemoveLanguage(index: number) {
+    if (languages[index]?.name === LanguagesEnum.PORTUGUESE) {
+      showError('Português nativo é obrigatório e não pode ser removido.');
+      return;
+    }
+
     setLanguages((current) => current.filter((_, itemIndex) => itemIndex !== index));
   }
 
@@ -638,8 +698,7 @@ export function RecruiterJobForm({ mode, jobId, initialValues }: RecruiterJobFor
         >
           {!canPublishJob && !isLoadingCompanyDetails ? (
             <div className="rounded-2xl border border-red-500/20 bg-red-500/10 p-5 text-sm text-red-200">
-              Você precisa cadastrar sua empresa e esperar que ela seja aprovada pela plataforma
-              antes de publicar vagas.
+              Você precisa cadastrar sua empresa antes de publicar vagas.
             </div>
           ) : (
             <>
@@ -662,317 +721,326 @@ export function RecruiterJobForm({ mode, jobId, initialValues }: RecruiterJobFor
                 </div>
               </div>
 
-              <div className="grid gap-4">
-                <div className="grid gap-4 md:grid-cols-2">
-                  <div>
-                    <label className="text-sm text-zinc-300">Empresa</label>
-                    <input value={companyName} disabled className={disabledFieldClassName} />
-                  </div>
-                  <div>
-                    <label className="text-sm text-zinc-300">Tipo de contrato</label>
-                    <div className="relative">
-                      <select
-                        className={`${fieldClassName} appearance-none pr-12`}
-                        {...register('contractType', {
-                          required: 'Informe o tipo de contrato.',
-                        })}
-                      >
-                        {contractTypeOptions.map((option) => (
-                          <option key={option.value} value={option.value}>
-                            {option.label}
-                          </option>
-                        ))}
-                      </select>
-                      <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500">
-                        <ChevronDown className="h-5 w-5" />
-                      </span>
-                    </div>
-                    {errors.contractType && (
-                      <p className="mt-1 text-sm text-red-100">{errors.contractType.message}</p>
-                    )}
-                  </div>
+              <div className="grid gap-4 md:grid-cols-2">
+                <div>
+                  <FileUpload
+                    label="Imagem da vaga"
+                    accept="image/*"
+                    value={coverUrlValue}
+                    cropAspectRatio={20 / 7}
+                    onUpload={async (file) => {
+                      const response = await UploadService.uploadJobCover(file);
+
+                      setValue('coverUrl', response.url, {
+                        shouldDirty: true,
+                        shouldTouch: true,
+                        shouldValidate: true,
+                      });
+
+                      return response.url;
+                    }}
+                  />
+                  <input
+                    type="hidden"
+                    {...register('coverUrl', {
+                      required: 'Informe a imagem da vaga.',
+                    })}
+                  />
+                  {errors.coverUrl && (
+                    <p className="mt-1 text-sm text-red-100">{errors.coverUrl.message}</p>
+                  )}
+                </div>
+                <div className="hidden md:block" />
+                <div>
+                  <label className="text-sm text-zinc-300">Título</label>
+                  <input
+                    className={fieldClassName}
+                    {...register('title', {
+                      required: 'Informe o título da vaga.',
+                    })}
+                  />
+                  {errors.title && (
+                    <p className="mt-1 text-sm text-red-100">{errors.title.message}</p>
+                  )}
                 </div>
 
-                <div className="grid gap-4 md:grid-cols-2">
-                  <div>
-                    <FileUpload
-                      label="Imagem da vaga"
-                      accept="image/*"
-                      value={coverUrlValue}
-                      cropAspectRatio={20 / 7}
-                      onUpload={async (file) => {
-                        const response = await UploadService.uploadJobCover(file);
-
-                        setValue('coverUrl', response.url, {
-                          shouldDirty: true,
-                          shouldTouch: true,
-                          shouldValidate: true,
-                        });
-
-                        return response.url;
-                      }}
-                    />
-                    <input
-                      type="hidden"
-                      {...register('coverUrl', {
-                        required: 'Informe a imagem da vaga.',
-                      })}
-                    />
-                    {errors.coverUrl && (
-                      <p className="mt-1 text-sm text-red-100">{errors.coverUrl.message}</p>
-                    )}
-                  </div>
-                  <div className="hidden md:block" />
-                </div>
-
-                <div className="grid gap-4 md:grid-cols-2">
-                  <div>
-                    <label className="text-sm text-zinc-300">Título</label>
-                    <input
-                      className={fieldClassName}
-                      {...register('title', {
-                        required: 'Informe o título da vaga.',
-                      })}
-                    />
-                    {errors.title && (
-                      <p className="mt-1 text-sm text-red-100">{errors.title.message}</p>
-                    )}
-                  </div>
-                </div>
-
-                <div className="grid gap-4 md:grid-cols-2">
-                  <div>
-                    <label className="text-sm text-zinc-300">Slug</label>
-                    <div
-                      className={`${disabledFieldClassName} flex min-h-[50px] items-center overflow-hidden break-all ${errors.slug ? 'border-red-500/30 text-red-200' : ''}`}
-                    >
-                      {slugPrefixPart ? (
-                        <>
-                          <span className={errors.slug ? 'text-red-200' : 'text-zinc-300'}>
-                            {slugPrefixPart}
-                          </span>
-                          {slugTitlePart ? (
-                            <span className={errors.slug ? 'text-red-200' : 'text-lime-400'}>
-                              {`-${slugTitlePart}`}
-                            </span>
-                          ) : null}
-                        </>
-                      ) : (
-                        <span className="text-zinc-500">
-                          Slug será gerado ao preencher o título
+                <div>
+                  <label className="text-sm text-zinc-300">Slug</label>
+                  <div
+                    className={`${disabledFieldClassName} flex min-h-[50px] items-center overflow-hidden break-all ${errors.slug ? 'border-red-500/30 text-red-200' : ''}`}
+                  >
+                    {slugPrefixPart ? (
+                      <>
+                        <span className={errors.slug ? 'text-red-200' : 'text-zinc-300'}>
+                          {slugPrefixPart}
                         </span>
-                      )}
-                    </div>
-                    <input
-                      type="hidden"
-                      {...register('slug', {
-                        required: 'Slug não gerado.',
-                      })}
-                    />
-                    {errors.slug && (
-                      <p className="mt-1 text-sm text-red-100">{errors.slug.message}</p>
+                        {slugTitlePart ? (
+                          <span className={errors.slug ? 'text-red-200' : 'text-lime-400'}>
+                            {`-${slugTitlePart}`}
+                          </span>
+                        ) : null}
+                      </>
+                    ) : (
+                      <span className="text-zinc-500">Slug será gerado ao preencher o título</span>
                     )}
                   </div>
+                  <input
+                    type="hidden"
+                    {...register('slug', {
+                      required: 'Slug não gerado.',
+                    })}
+                  />
+                  {errors.slug && (
+                    <p className="mt-1 text-sm text-red-100">{errors.slug.message}</p>
+                  )}
                 </div>
 
-                <div className="grid gap-4 md:grid-cols-2">
-                  <div className="md:col-span-2">
-                    <label className="text-sm text-zinc-300">Descrição</label>
-                    <textarea
-                      rows={5}
-                      className={fieldClassName}
-                      {...register('description', {
-                        required: 'Informe a descrição da vaga.',
-                      })}
-                    />
-                    {errors.description && (
-                      <p className="mt-1 text-sm text-red-100">{errors.description.message}</p>
-                    )}
-                  </div>
+                <div className="md:col-span-2">
+                  <label className="text-sm text-zinc-300">Descrição</label>
+                  <textarea
+                    rows={5}
+                    maxLength={descriptionMaxLength}
+                    className={fieldClassName}
+                    {...register('description', {
+                      required: 'Informe a descrição da vaga.',
+                      maxLength: {
+                        value: descriptionMaxLength,
+                        message: `A descrição deve ter no máximo ${descriptionMaxLength} caracteres.`,
+                      },
+                    })}
+                  />
+                  <p className="mt-2 text-right text-xs text-zinc-500">
+                    {descriptionRemainingCharacters} caracteres restantes
+                  </p>
+                  {errors.description && (
+                    <p className="mt-1 text-sm text-red-100">{errors.description.message}</p>
+                  )}
                 </div>
 
-                <div className="grid gap-4 md:grid-cols-2">
-                  <div>
-                    <input
-                      type="hidden"
-                      {...register('slots', {
-                        required: 'Informe a quantidade de vagas.',
-                        valueAsNumber: true,
-                        min: {
-                          value: 1,
-                          message: 'Informe pelo menos uma vaga.',
-                        },
-                      })}
-                    />
-                    <NumberStepper
-                      label="Quantidade de vagas"
-                      value={slotsValue}
-                      min={1}
-                      onChange={(value) =>
-                        setValue('slots', value, {
-                          shouldDirty: true,
-                          shouldTouch: true,
-                          shouldValidate: true,
-                        })
-                      }
-                      error={errors.slots?.message}
-                    />
-                  </div>
-                  <div className="hidden md:block" />
-                </div>
-
-                <fieldset className="rounded-2xl border border-zinc-800 bg-black/30 p-5">
+                <fieldset className="rounded-2xl border border-zinc-800 bg-black/30 p-5 md:col-span-2">
                   <legend className="px-2 text-sm font-semibold uppercase text-zinc-100">
                     Requisitos
                   </legend>
 
                   <div className="grid gap-4">
-                    <div className="grid gap-4 md:grid-cols-2">
-                      <div>
-                        <label className="text-sm text-zinc-300">Escolaridade</label>
-                        <div className="relative">
-                          <select
-                            className={`${fieldClassName} appearance-none pr-12`}
-                            {...register('educationLevel', {
-                              required: 'Informe a escolaridade.',
-                            })}
-                          >
-                            <option value="">Selecione</option>
-                            {educationLevelOptions.map((option) => (
-                              <option key={option.value} value={option.value}>
-                                {option.label}
-                              </option>
-                            ))}
-                          </select>
-                          <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500">
-                            <ChevronDown className="h-5 w-5" />
-                          </span>
+                    <div className="grid gap-4 xl:grid-cols-2">
+                      <div className="grid gap-4 md:grid-cols-2">
+                        <div>
+                          <label className="text-sm text-zinc-300">Tipo de contrato</label>
+                          <div className="relative">
+                            <select
+                              className={`${fieldClassName} appearance-none pr-12`}
+                              {...register('contractType', {
+                                required: 'Informe o tipo de contrato.',
+                              })}
+                            >
+                              {contractTypeOptions.map((option) => (
+                                <option key={option.value} value={option.value}>
+                                  {option.label}
+                                </option>
+                              ))}
+                            </select>
+                            <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500">
+                              <ChevronDown className="h-5 w-5" />
+                            </span>
+                          </div>
+                          {errors.contractType && (
+                            <p className="mt-1 text-sm text-red-100">
+                              {errors.contractType.message}
+                            </p>
+                          )}
                         </div>
-                        {errors.educationLevel && (
-                          <p className="mt-1 text-sm text-red-100">
-                            {errors.educationLevel.message}
-                          </p>
-                        )}
+
+                        <div>
+                          <input
+                            type="hidden"
+                            {...register('slots', {
+                              required: 'Informe a quantidade de vagas.',
+                              valueAsNumber: true,
+                              min: {
+                                value: 1,
+                                message: 'Informe pelo menos uma vaga.',
+                              },
+                            })}
+                          />
+                          <NumberStepper
+                            label="Quantidade de vagas"
+                            value={slotsValue}
+                            min={1}
+                            onChange={(value) =>
+                              setValue('slots', value, {
+                                shouldDirty: true,
+                                shouldTouch: true,
+                                shouldValidate: true,
+                              })
+                            }
+                            error={errors.slots?.message}
+                          />
+                        </div>
                       </div>
-                      <div className="hidden md:block" />
+
+                      <div className="grid gap-4 md:grid-cols-2">
+                        <div>
+                          <input
+                            type="hidden"
+                            {...register('minExperienceYears', {
+                              required: 'Informe a experiência mínima.',
+                              valueAsNumber: true,
+                              min: {
+                                value: 0,
+                                message: 'Informe um valor válido.',
+                              },
+                            })}
+                          />
+                          <NumberStepper
+                            label="Experiência mínima"
+                            value={minExperienceYearsValue}
+                            min={0}
+                            onChange={(value) =>
+                              setValue('minExperienceYears', value, {
+                                shouldDirty: true,
+                                shouldTouch: true,
+                                shouldValidate: true,
+                              })
+                            }
+                            error={errors.minExperienceYears?.message}
+                          />
+                        </div>
+
+                        <div>
+                          <input
+                            type="hidden"
+                            {...register('maxExperienceYears', {
+                              required: 'Informe a experiência máxima.',
+                              valueAsNumber: true,
+                              min: {
+                                value: 0,
+                                message: 'Informe um valor válido.',
+                              },
+                            })}
+                          />
+                          <NumberStepper
+                            label="Experiência máxima"
+                            value={maxExperienceYearsValue}
+                            min={0}
+                            onChange={(value) =>
+                              setValue('maxExperienceYears', value, {
+                                shouldDirty: true,
+                                shouldTouch: true,
+                                shouldValidate: true,
+                              })
+                            }
+                            error={errors.maxExperienceYears?.message}
+                          />
+                        </div>
+                      </div>
                     </div>
 
-                    <div className="grid gap-4 md:grid-cols-2">
-                      <div>
-                        <input
-                          type="hidden"
-                          {...register('minExperienceYears', {
-                            required: 'Informe a experiência mínima.',
-                            valueAsNumber: true,
-                            min: {
-                              value: 0,
-                              message: 'Informe um valor válido.',
-                            },
-                          })}
-                        />
-                        <NumberStepper
-                          label="Experiência mínima"
-                          value={minExperienceYearsValue}
-                          min={0}
-                          onChange={(value) =>
-                            setValue('minExperienceYears', value, {
-                              shouldDirty: true,
-                              shouldTouch: true,
-                              shouldValidate: true,
-                            })
-                          }
-                          error={errors.minExperienceYears?.message}
-                        />
-                      </div>
+                    <div className="grid gap-4 xl:grid-cols-2">
+                      <div className="grid gap-4 md:grid-cols-2">
+                        <div>
+                          <label className="text-sm text-zinc-300">Escolaridade</label>
+                          <div className="relative">
+                            <select
+                              className={`${fieldClassName} appearance-none pr-12`}
+                              {...register('educationLevel', {
+                                required: 'Informe a escolaridade.',
+                              })}
+                            >
+                              <option value="">Selecione</option>
+                              {educationLevelOptions.map((option) => (
+                                <option key={option.value} value={option.value}>
+                                  {option.label}
+                                </option>
+                              ))}
+                            </select>
+                            <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500">
+                              <ChevronDown className="h-5 w-5" />
+                            </span>
+                          </div>
+                          {errors.educationLevel && (
+                            <p className="mt-1 text-sm text-red-100">
+                              {errors.educationLevel.message}
+                            </p>
+                          )}
+                        </div>
 
-                      <div>
-                        <input
-                          type="hidden"
-                          {...register('maxExperienceYears', {
-                            required: 'Informe a experiência máxima.',
-                            valueAsNumber: true,
-                            min: {
-                              value: 0,
-                              message: 'Informe um valor válido.',
-                            },
-                          })}
-                        />
-                        <NumberStepper
-                          label="Experiência máxima"
-                          value={maxExperienceYearsValue}
-                          min={0}
-                          onChange={(value) =>
-                            setValue('maxExperienceYears', value, {
-                              shouldDirty: true,
-                              shouldTouch: true,
-                              shouldValidate: true,
-                            })
-                          }
-                          error={errors.maxExperienceYears?.message}
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </fieldset>
-
-                <fieldset className="rounded-2xl border border-zinc-800 bg-black/30 p-5">
-                  <legend className="px-2 text-sm font-semibold uppercase text-zinc-100">
-                    Idiomas
-                  </legend>
-
-                  <div className="grid gap-4">
-                    <div className="grid gap-4 md:grid-cols-2">
-                      <div>
-                        <Button
-                          type="button"
-                          variant="profile"
-                          icon={<Plus className="h-4 w-4" />}
-                          onClick={handleOpenLanguageModal}
-                          className="rounded-xl border-zinc-800 bg-black/40 text-zinc-200 hover:bg-white/[0.03]"
-                        >
-                          Adicionar língua
-                        </Button>
-                      </div>
-                      <div className="hidden md:block" />
-                    </div>
-
-                    {languages.length > 0 && (
-                      <div className="grid gap-3">
-                        {languages.map((language, index) => (
-                          <article
-                            key={`${language.name}-${language.level}-${index}`}
-                            className="rounded-2xl border border-zinc-800 bg-zinc-950/80 p-4 backdrop-blur"
+                        <div>
+                          <label className="text-sm text-transparent select-none">Acao</label>
+                          <Button
+                            type="button"
+                            variant="profile"
+                            icon={<Plus className="h-4 w-4" />}
+                            onClick={handleOpenLanguageModal}
+                            className="mt-2 inline-flex h-[50px] items-center rounded-xl bg-gray-100 px-4 py-3 text-black hover:bg-gray-300"
                           >
-                            <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-                              <div>
-                                <p className="text-sm font-semibold text-zinc-100">
-                                  {getLanguageLabel(language.name)}
-                                </p>
-                                <p className="mt-1 text-sm text-zinc-500">
-                                  {getLanguageLevelLabel(language.level)}
-                                </p>
-                              </div>
-
-                              <Button
-                                type="button"
-                                variant="danger"
-                                icon={<Trash2 className="h-4 w-4" />}
-                                onClick={() => handleRemoveLanguage(index)}
-                                className="rounded-xl border-red-500/20 bg-red-500/10 text-red-200 hover:bg-red-500/15"
-                              >
-                                Deletar
-                              </Button>
-                            </div>
-                          </article>
-                        ))}
+                            Adicionar língua
+                          </Button>
+                        </div>
                       </div>
-                    )}
 
-                    {languagesError && <p className="text-sm text-red-100">{languagesError}</p>}
+                      <div className="space-y-4">
+                        <div className="grid gap-3 md:grid-cols-3">
+                          {languageOptions.map((option) => {
+                            const language = getLanguageRequirement(languages, option.value);
+                            const languageIndex = languages.findIndex(
+                              (item) => item.name === option.value,
+                            );
+                            const isActive = Boolean(language);
+
+                            return (
+                              <article
+                                key={option.value}
+                                className={`rounded-2xl border p-4 backdrop-blur transition-all ${
+                                  isActive
+                                    ? 'border-lime-500/20 bg-lime-500/10'
+                                    : 'border-zinc-900 bg-zinc-950/30'
+                                }`}
+                              >
+                                <div className="flex h-full flex-col justify-between gap-4">
+                                  <div>
+                                    <p
+                                      className={`text-sm font-semibold ${
+                                        isActive ? 'text-lime-300' : 'text-zinc-600'
+                                      }`}
+                                    >
+                                      {option.label}
+                                    </p>
+                                    <p
+                                      className={`mt-1 text-sm ${
+                                        isActive ? 'text-lime-200' : 'text-zinc-700'
+                                      }`}
+                                    >
+                                      {language
+                                        ? getLanguageLevelLabel(language.level)
+                                        : 'Não adicionado'}
+                                    </p>
+                                  </div>
+
+                                  {isActive && option.value !== LanguagesEnum.PORTUGUESE ? (
+                                    <Button
+                                      type="button"
+                                      variant="danger"
+                                      icon={<Trash2 className="h-4 w-4" />}
+                                      onClick={() => handleRemoveLanguage(languageIndex)}
+                                      className="rounded-xl border-red-500/20 bg-red-500/10 text-red-200 hover:bg-red-500/15"
+                                    >
+                                      Deletar
+                                    </Button>
+                                  ) : null}
+                                </div>
+                              </article>
+                            );
+                          })}
+                        </div>
+
+                        {languagesError && <p className="text-sm text-red-100">{languagesError}</p>}
+                      </div>
+                    </div>
                   </div>
                 </fieldset>
 
-                <fieldset className="rounded-2xl border border-zinc-800 bg-black/30 p-5">
+                <fieldset className="rounded-2xl border border-zinc-800 bg-black/30 p-5 md:col-span-2">
                   <legend className="px-2 text-sm font-semibold uppercase text-zinc-100">
                     Benefits
                   </legend>
@@ -993,6 +1061,9 @@ export function RecruiterJobForm({ mode, jobId, initialValues }: RecruiterJobFor
                           inputMode="numeric"
                           className={fieldClassName}
                           value={formatCurrencyInput(salaryValue)}
+                          ref={salaryInputRef}
+                          onFocus={moveSalaryCaretToCurrencyEnd}
+                          onClick={moveSalaryCaretToCurrencyEnd}
                           onChange={(event) => {
                             setValue('salary', parseCurrencyInput(event.target.value), {
                               shouldDirty: true,
@@ -1128,7 +1199,7 @@ export function RecruiterJobForm({ mode, jobId, initialValues }: RecruiterJobFor
                       className={`${fieldClassName} appearance-none pr-12`}
                     >
                       <option value="">Selecione</option>
-                      {languageOptions.map((option) => (
+                      {availableLanguageOptions.map((option) => (
                         <option key={option.value} value={option.value}>
                           {option.label}
                         </option>

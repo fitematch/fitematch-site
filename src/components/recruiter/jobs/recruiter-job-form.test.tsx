@@ -2,7 +2,7 @@ import { fireEvent, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { STORAGE_KEYS } from '@/constants/storage-keys';
 import { ProductRoleEnum } from '@/types/entities/user.entity';
-import { CompanyStatusEnum } from '@/types/entities/company.entity';
+import { LanguagesEnum, LanguagesLevelEnum } from '@/types/entities/job.entity';
 import { RecruiterJobForm } from './recruiter-job-form';
 import { renderWithProviders } from '@/tests/utils/render-with-providers';
 import { resetMockDb } from '@/tests/mocks/handlers';
@@ -27,10 +27,6 @@ function setAuthenticatedRecruiter() {
       company: mockDb.company.mine,
     },
   } as never;
-  mockDb.company.mine = {
-    ...mockDb.company.mine!,
-    status: CompanyStatusEnum.ACTIVE,
-  } as never;
 }
 
 function renderJobForm(ui: React.ReactElement) {
@@ -38,7 +34,7 @@ function renderJobForm(ui: React.ReactElement) {
     <>
       {ui}
       <FlashMessageProbe />
-    </>
+    </>,
   );
 }
 
@@ -78,13 +74,13 @@ describe('RecruiterJobForm', () => {
 
     const titleInput = document.querySelector('input[name="title"]') as HTMLInputElement;
     const descriptionInput = document.querySelector(
-      'textarea[name="description"]'
+      'textarea[name="description"]',
     ) as HTMLTextAreaElement;
     const contractSelect = document.querySelector(
-      'select[name="contractType"]'
+      'select[name="contractType"]',
     ) as HTMLSelectElement;
     const educationSelect = document.querySelector(
-      'select[name="educationLevel"]'
+      'select[name="educationLevel"]',
     ) as HTMLSelectElement;
     const salaryInputs = Array.from(document.querySelectorAll('input[type="text"]'));
 
@@ -108,7 +104,7 @@ describe('RecruiterJobForm', () => {
     await user.click(screen.getByRole('button', { name: /Criar/i }));
 
     expect(
-      await screen.findByText('Preencha todos os campos obrigatórios da vaga.')
+      await screen.findByText('Preencha todos os campos obrigatórios da vaga.'),
     ).toBeInTheDocument();
   });
 
@@ -126,10 +122,167 @@ describe('RecruiterJobForm', () => {
     });
 
     expect(mockDb.upload.lastUpload?.endpoint).toBe('/upload/job-cover');
+    expect(mockDb.job.mine[1].requirements?.languages).toEqual([
+      {
+        name: LanguagesEnum.PORTUGUESE,
+        level: LanguagesLevelEnum.NATIVE,
+      },
+      {
+        name: LanguagesEnum.ENGLISH,
+        level: LanguagesLevelEnum.BASIC,
+      },
+    ]);
     expect(
-      await screen.findByText('Vaga criada com sucesso e enviada para aprovação.')
+      await screen.findByText('Vaga criada com sucesso e enviada para aprovação.'),
     ).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Atualizar/i })).toBeInTheDocument();
+  });
+
+  it('mantém português nativo fixo e remove idiomas já adicionados da modal', async () => {
+    const user = userEvent.setup();
+
+    renderJobForm(<RecruiterJobForm mode="create" />);
+
+    await screen.findByRole('button', { name: /Criar/i });
+    expect(screen.getByText('Português')).toBeInTheDocument();
+    expect(screen.getByText('Nativo')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /Deletar/i })).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: /Adicionar língua/i }));
+
+    let modal = await screen.findByRole('heading', { name: 'Adicionar língua' });
+    let scope = within(modal.closest('div[class*="rounded-2xl"]') as HTMLElement);
+    let languageSelect = scope.getAllByRole('combobox')[0] as HTMLSelectElement;
+
+    expect(Array.from(languageSelect.options).map((option) => option.value)).not.toContain(
+      LanguagesEnum.PORTUGUESE,
+    );
+
+    await user.selectOptions(languageSelect, LanguagesEnum.ENGLISH);
+    await user.selectOptions(scope.getAllByRole('combobox')[1], LanguagesLevelEnum.BASIC);
+    await user.click(scope.getByRole('button', { name: /Salvar/i }));
+
+    await user.click(screen.getByRole('button', { name: /Adicionar língua/i }));
+
+    modal = await screen.findByRole('heading', { name: 'Adicionar língua' });
+    scope = within(modal.closest('div[class*="rounded-2xl"]') as HTMLElement);
+    languageSelect = scope.getAllByRole('combobox')[0] as HTMLSelectElement;
+
+    expect(Array.from(languageSelect.options).map((option) => option.value)).not.toContain(
+      LanguagesEnum.ENGLISH,
+    );
+  });
+
+  it('permite publicar quando readMine falha mas a empresa do usuário já está ativa', async () => {
+    mockDb.company.mineStatus = 404;
+    const user = userEvent.setup();
+
+    renderJobForm(<RecruiterJobForm mode="create" />);
+
+    await screen.findByRole('button', { name: /Criar/i });
+    expect(
+      screen.queryByText(/Você precisa cadastrar sua empresa e esperar que ela seja aprovada/i),
+    ).not.toBeInTheDocument();
+
+    await fillCreateForm(user);
+    await user.click(screen.getByRole('button', { name: /Criar/i }));
+
+    await waitFor(() => {
+      expect(mockDb.job.mine).toHaveLength(2);
+    });
+  });
+
+  it('permite publicar quando a empresa existe mas ainda não foi aprovada', async () => {
+    mockDb.company.mine = {
+      ...mockDb.company.mine!,
+      status: undefined,
+      approval: undefined,
+      documents: {
+        ...mockDb.company.mine!.documents,
+        isVerified: false,
+      },
+    } as never;
+    mockDb.auth.meUser = {
+      ...mockDb.auth.meUser!,
+      recruiterProfile: {
+        ...mockDb.auth.meUser!.recruiterProfile,
+        company: {
+          ...mockDb.auth.meUser!.recruiterProfile?.company,
+          status: undefined,
+          approval: undefined,
+          documents: {
+            ...mockDb.auth.meUser!.recruiterProfile?.company?.documents,
+            isVerified: false,
+          },
+        },
+      },
+    } as never;
+    const user = userEvent.setup();
+
+    renderJobForm(<RecruiterJobForm mode="create" />);
+
+    await screen.findByRole('button', { name: /Criar/i });
+    expect(
+      screen.queryByText(/Você precisa cadastrar sua empresa antes de publicar vagas/i),
+    ).not.toBeInTheDocument();
+
+    await fillCreateForm(user);
+    await user.click(screen.getByRole('button', { name: /Criar/i }));
+
+    await waitFor(() => {
+      expect(mockDb.job.mine).toHaveLength(2);
+    });
+  });
+
+  it('permite publicar quando /auth/me não traz companyId mas readMine retorna empresa ativa', async () => {
+    mockDb.auth.meUser = {
+      ...mockDb.auth.meUser!,
+      recruiterProfile: {
+        ...mockDb.auth.meUser!.recruiterProfile,
+        companyId: undefined,
+      },
+    } as never;
+    const user = userEvent.setup();
+
+    renderJobForm(<RecruiterJobForm mode="create" />);
+
+    await screen.findByRole('button', { name: /Criar/i });
+    expect(
+      screen.queryByText(/Você precisa cadastrar sua empresa e esperar que ela seja aprovada/i),
+    ).not.toBeInTheDocument();
+
+    await fillCreateForm(user);
+    await user.click(screen.getByRole('button', { name: /Criar/i }));
+
+    await waitFor(() => {
+      expect(mockDb.job.mine).toHaveLength(2);
+      expect(mockDb.job.mine[1].companyId).toBe('company-1');
+    });
+  });
+
+  it('permite publicar quando a API retorna empresa aprovada sem status explícito', async () => {
+    mockDb.company.mine = {
+      ...mockDb.company.mine!,
+      status: undefined,
+      approval: {
+        approvedAt: '2026-05-14T12:00:00.000Z',
+      },
+    } as never;
+    const user = userEvent.setup();
+
+    renderJobForm(<RecruiterJobForm mode="create" />);
+
+    await screen.findByRole('button', { name: /Criar/i });
+    expect(
+      screen.queryByText(/Você precisa cadastrar sua empresa antes de publicar vagas/i),
+    ).not.toBeInTheDocument();
+
+    await fillCreateForm(user);
+    await user.click(screen.getByRole('button', { name: /Criar/i }));
+
+    await waitFor(() => {
+      expect(mockDb.job.mine).toHaveLength(2);
+    });
   });
 
   it('update job', async () => {
@@ -159,15 +312,13 @@ describe('RecruiterJobForm', () => {
       },
     } as never;
 
-    renderJobForm(
-      <RecruiterJobForm mode="edit" jobId="job-1" initialValues={initialJob} />
-    );
+    renderJobForm(<RecruiterJobForm mode="edit" jobId="job-1" initialValues={initialJob} />);
 
     await waitFor(() => {
       expect(document.querySelector('input[name="title"]')).not.toBeNull();
-      expect(
-        (document.querySelector('input[name="title"]') as HTMLInputElement).value
-      ).toBe('Personal Trainer');
+      expect((document.querySelector('input[name="title"]') as HTMLInputElement).value).toBe(
+        'Personal Trainer',
+      );
     });
 
     const titleInput = document.querySelector('input[name="title"]');

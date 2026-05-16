@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { CompanyService } from '@/services/company/company.service';
 import { PublicCompanyResponse } from '@/services/company/company.types';
+import { getUniqueCompaniesByBrand } from '@/utils/company-brand';
 
 export function usePublicCompanies() {
   const [companies, setCompanies] = useState<PublicCompanyResponse[]>([]);
@@ -15,7 +16,7 @@ export function usePublicCompanies() {
 
       const response = await CompanyService.listPublic();
 
-      setCompanies(response);
+      setCompanies(getUniqueCompaniesByBrand(response));
       setError(null);
     } catch {
       setError('Não foi possível carregar as empresas.');

@@ -1,3 +1,5 @@
+import { CompanyEntity } from './company.entity';
+
 export interface PhoneEntity {
   country?: string;
   number?: string;
@@ -195,9 +197,7 @@ export interface CandidateProfileEntity {
 export interface RecruiterProfileEntity {
   companyId?: string;
   tradeName?: string;
-  company?: {
-    tradeName?: string;
-  };
+  company?: Partial<CompanyEntity>;
   position?: string;
   contacts?: RecruiterContactsEntity;
 }

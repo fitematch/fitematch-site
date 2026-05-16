@@ -464,29 +464,32 @@ export function RecruiterCompanyForm() {
               <input type="hidden" {...register('logoUrl')} />
 
               <div className="grid gap-4 md:grid-cols-2">
-                <div>
-                  <Input
-                    label="CNPJ"
-                    labelClassName={labelClassName}
-                    className={fieldClassName}
-                    placeholder="00.000.000/0000-00"
-                    error={errors.cnpj?.message}
-                    {...cnpjField}
-                    onChange={(event) => {
-                      clearCnpjError();
-                      const formattedValue = formatCnpj(event.target.value);
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div>
+                    <Input
+                      label="CNPJ"
+                      labelClassName={labelClassName}
+                      className={fieldClassName}
+                      placeholder="00.000.000/0000-00"
+                      error={errors.cnpj?.message}
+                      {...cnpjField}
+                      onChange={(event) => {
+                        clearCnpjError();
+                        const formattedValue = formatCnpj(event.target.value);
 
-                      setValue('cnpj', formattedValue, {
-                        shouldDirty: true,
-                        shouldTouch: true,
-                        shouldValidate: true,
-                      });
-                    }}
-                    onBlur={(event) => {
-                      cnpjField.onBlur(event);
-                      void handleCnpjLookup(event.target.value);
-                    }}
-                  />
+                        setValue('cnpj', formattedValue, {
+                          shouldDirty: true,
+                          shouldTouch: true,
+                          shouldValidate: true,
+                        });
+                      }}
+                      onBlur={(event) => {
+                        cnpjField.onBlur(event);
+                        void handleCnpjLookup(event.target.value);
+                      }}
+                    />
+                  </div>
+                  <div className="hidden md:block" />
                 </div>
               </div>
 
@@ -566,6 +569,7 @@ export function RecruiterCompanyForm() {
                     error={errors.phoneNumber?.message}
                   />
                 </div>
+                <div className="hidden md:block" />
               </div>
 
               <div className="grid gap-4 md:grid-cols-2">
@@ -602,29 +606,32 @@ export function RecruiterCompanyForm() {
           >
             <div className="grid gap-4">
               <div className="grid gap-4 md:grid-cols-2">
-                <div>
-                  <Input
-                    label="CEP"
-                    labelClassName={labelClassName}
-                    className={fieldClassName}
-                    placeholder="01310-100"
-                    error={errors.zipCode?.message}
-                    {...zipCodeField}
-                    onChange={(event) => {
-                      clearZipCodeError();
-                      const formattedValue = formatZipCode(event.target.value);
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div>
+                    <Input
+                      label="CEP"
+                      labelClassName={labelClassName}
+                      className={fieldClassName}
+                      placeholder="01310-100"
+                      error={errors.zipCode?.message}
+                      {...zipCodeField}
+                      onChange={(event) => {
+                        clearZipCodeError();
+                        const formattedValue = formatZipCode(event.target.value);
 
-                      setValue('zipCode', formattedValue, {
-                        shouldDirty: true,
-                        shouldTouch: true,
-                        shouldValidate: true,
-                      });
-                    }}
-                    onBlur={(event) => {
-                      zipCodeField.onBlur(event);
-                      void handleZipCodeLookup(event.target.value);
-                    }}
-                  />
+                        setValue('zipCode', formattedValue, {
+                          shouldDirty: true,
+                          shouldTouch: true,
+                          shouldValidate: true,
+                        });
+                      }}
+                      onBlur={(event) => {
+                        zipCodeField.onBlur(event);
+                        void handleZipCodeLookup(event.target.value);
+                      }}
+                    />
+                  </div>
+                  <div className="hidden md:block" />
                 </div>
               </div>
 

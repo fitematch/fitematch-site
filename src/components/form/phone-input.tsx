@@ -30,6 +30,7 @@ export function PhoneInput({
   const { countries, defaultCountry, isLoading } = useCountryDialCodes();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
+  const numberInputRef = useRef<HTMLInputElement | null>(null);
 
   const selectedCountry = useMemo(() => {
     return countries.find((country) => country.dialCode === countryValue) || defaultCountry;
@@ -81,6 +82,20 @@ export function PhoneInput({
     if (event.key === 'Escape') {
       setIsMenuOpen(false);
     }
+  }
+
+  function moveCaretAfterDialCode() {
+    const input = numberInputRef.current;
+
+    if (!input) {
+      return;
+    }
+
+    const caretPosition = selectedCountry.dialCode.length;
+
+    requestAnimationFrame(() => {
+      input.setSelectionRange(caretPosition, caretPosition);
+    });
   }
 
   return (
@@ -156,8 +171,11 @@ export function PhoneInput({
         <div>
           <label className={`mb-1 block text-sm font-medium ${labelClassName}`}>Número</label>
           <input
+            ref={numberInputRef}
             value={formattedPhone}
             onChange={handleNumberChange}
+            onFocus={moveCaretAfterDialCode}
+            onClick={moveCaretAfterDialCode}
             disabled={disabled}
             placeholder={`${selectedCountry.dialCode} ${selectedCountry.mask}`}
             className="h-[50px] w-full rounded-xl border border-zinc-800 bg-zinc-950 px-4 py-3 text-zinc-100 outline-none placeholder:text-zinc-500 disabled:cursor-not-allowed disabled:opacity-60"
